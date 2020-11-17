@@ -78,3 +78,9 @@ class Game:
     def exit_game(self) -> None:
         print('Bye bye')
         self.game_over = True
+
+    def set_scores(self, value):
+        self.scores = value
+
+    def add_scores(self, delta):
+        self.scores += delta
