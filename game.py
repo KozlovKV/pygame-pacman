@@ -1,10 +1,8 @@
 import pygame
 
 from constants import Color
-from scenes import MainScene, MenuScene, FinalScene, PauseScene
-from scenes.highscores import HighScoresScene
-from scenes.overlay import OverlayScene
-from scenes.settings import SettingsScene
+from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
+    FinalScene
 
 
 class Game:
