@@ -3,6 +3,7 @@ import pygame
 from constants import Color
 from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
     FinalScene
+from scenes.testing import TestScene
 
 
 class Game:
@@ -14,7 +15,7 @@ class Game:
     HIGHSCORES_SCENE_INDEX = 2
     MAIN_SCENE_INDEX = 3
     GAMEOVER_SCENE_INDEX = 4
-    current_scene_index = MENU_SCENE_INDEX
+    current_scene_index = 5  # testing hub
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
@@ -22,7 +23,8 @@ class Game:
                        SettingsScene(self),
                        HighScoresScene(self),
                        MainScene(self),
-                       FinalScene(self)]
+                       FinalScene(self),
+                       TestScene(self)]
         self.scores = 0
         self.settings = {
             'ghost_speed': 1,
@@ -67,11 +69,11 @@ class Game:
             pygame.time.wait(Game.TICK)
 
     def set_scene(self, index: int, resume: bool = False) -> None:
-        if not resume:
-            self.scenes[self.current_scene_index].on_deactivate()
+        # if not resume:
+        #     self.scenes[self.current_scene_index].on_deactivate()
         self.current_scene_index = index
-        if not resume:
-            self.scenes[self.current_scene_index].on_activate()
+        # if not resume:
+        #     self.scenes[self.current_scene_index].on_activate()
 
     def exit_game(self) -> None:
         print('Bye bye')
