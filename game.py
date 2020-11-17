@@ -25,6 +25,15 @@ class Game:
                        HighScoresScene(self),
                        MainScene(self),
                        FinalScene(self)]
+        self.scores = 0
+        self.settings = {
+            'ghost_speed': 1,
+            'ghosts_count': 4,
+            'level': 0,
+            'mode': 0,
+            'field_texture': 0,
+            'coop': False
+        }
         self.game_over = False
 
     @staticmethod
