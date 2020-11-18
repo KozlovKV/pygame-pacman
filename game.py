@@ -1,24 +1,39 @@
 import pygame
 
 from constants import Color
-from scenes import MainScene, MenuScene, FinalScene, PauseScene
-from scenes.overlay import OverlayScene
+from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
+    FinalScene
+from scenes.testing import TestScene
 
 
 class Game:
-    SIZE = WIDTH, HEIGHT = 800, 600
+    SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 1000
+    FIELD_SIZE = FIELD_WIDTH, FIELD_HEIGHT = 750, 750
+    TICK = 75
     MENU_SCENE_INDEX = 0
-    MAIN_SCENE_INDEX = 1
-    GAMEOVER_SCENE_INDEX = 2
-    PAUSE_SCENE_INDEX = 3
-    current_scene_index = MENU_SCENE_INDEX
-    USE_FPS_OVERLAY = False
+    SETTINGS_SCENE_INDEX = 1
+    HIGHSCORES_SCENE_INDEX = 2
+    MAIN_SCENE_INDEX = 3
+    GAMEOVER_SCENE_INDEX = 4
+    current_scene_index = 5  # testing hub
 
     def __init__(self) -> None:
-        self.screen = pygame.display.set_mode(self.SIZE, pygame.RESIZABLE)
-        self.scenes = [MenuScene(self), MainScene(self), FinalScene(self), PauseScene(self)]
-        if self.USE_FPS_OVERLAY:
-            self.overlay = OverlayScene(self)
+        self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
+        self.scenes = [MenuScene(self),
+                       SettingsScene(self),
+                       HighScoresScene(self),
+                       MainScene(self),
+                       FinalScene(self),
+                       TestScene(self)]
+        self.scores = 0
+        self.settings = {
+            'ghost_speed': 1,
+            'ghosts_count': 4,
+            'level': 0,
+            'mode': 0,
+            'field_texture': 0,
+            'coop': False
+        }
         self.game_over = False
 
     @staticmethod
@@ -33,37 +48,17 @@ class Game:
         if Game.exit_button_pressed(event) or Game.exit_hotkey_pressed(event):
             self.exit_game()
 
-    def resize_scenes(self) -> None:
-        for scene in self.scenes:
-            scene.on_window_resize()
-        if self.USE_FPS_OVERLAY:
-            self.overlay.on_window_resize()
-
-    def process_resize_event(self, event: pygame.event.Event) -> None:
-        if event.type != pygame.VIDEORESIZE:
-            return
-        self.SIZE = self.WIDTH, self.HEIGHT = event.w, event.h
-        self.screen = pygame.display.set_mode(self.SIZE, pygame.RESIZABLE)
-        self.resize_scenes()
-
     def process_all_events(self) -> None:
         for event in pygame.event.get():
             self.process_exit_events(event)
-            self.process_resize_event(event)
             self.scenes[self.current_scene_index].process_event(event)
-            if self.USE_FPS_OVERLAY:
-                self.overlay.process_event(event)
 
     def process_all_logic(self) -> None:
         self.scenes[self.current_scene_index].process_logic()
-        if self.USE_FPS_OVERLAY:
-            self.overlay.process_logic()
 
     def process_all_draw(self) -> None:
         self.screen.fill(Color.BLACK)
         self.scenes[self.current_scene_index].process_draw()
-        if self.USE_FPS_OVERLAY:
-            self.overlay.process_draw()
         pygame.display.flip()
 
     def main_loop(self) -> None:
@@ -71,15 +66,21 @@ class Game:
             self.process_all_events()
             self.process_all_logic()
             self.process_all_draw()
-            pygame.time.wait(10)
+            pygame.time.wait(Game.TICK)
 
     def set_scene(self, index: int, resume: bool = False) -> None:
-        if not resume:
-            self.scenes[self.current_scene_index].on_deactivate()
+        # if not resume:
+        #     self.scenes[self.current_scene_index].on_deactivate()
         self.current_scene_index = index
-        if not resume:
-            self.scenes[self.current_scene_index].on_activate()
+        # if not resume:
+        #     self.scenes[self.current_scene_index].on_activate()
 
     def exit_game(self) -> None:
         print('Bye bye')
         self.game_over = True
+
+    def set_scores(self, value):
+        self.scores = value
+
+    def add_scores(self, delta):
+        self.scores += delta
