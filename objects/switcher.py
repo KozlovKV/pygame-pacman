@@ -1,0 +1,2 @@
+class ArrowSwitcher:
+    pass
