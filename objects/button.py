@@ -3,21 +3,23 @@ from typing import Callable
 import pygame
 
 from third_party.button import Button
-from constants import Color
+from constants import Color, MAIN_FONT
 from objects.base import DrawableObject
 
 
 class ButtonObject(DrawableObject):
     BUTTON_STYLE = {
-        "hover_color": Color.BLUE,
-        "clicked_color": Color.GREEN,
+        "hover_color": Color.SOFT_BLUE,
+        "clicked_color": Color.SOFT_GREEN,
         "font_color": Color.WHITE,
         "clicked_font_color": Color.BLACK,
-        "hover_font_color": Color.ORANGE,
+        "hover_font_color": Color.SOFT_ORANGE,
+        "font": MAIN_FONT,
     }
 
     def __init__(self, game,
-                 x: int, y: int, width: int, height: int, color: pygame.color.Color = None,
+                 x: int, y: int, width: int, height: int,
+                 color: pygame.color.Color = None,
                  function: Callable[[None], None] = None,
                  text: str = 'Define me!') -> None:
         super().__init__(game)

@@ -5,7 +5,7 @@ from scenes import BaseScene
 
 class MenuScene(BaseScene):
     def create_objects(self) -> None:
-        self.objects.append(ButtonObject(self.game, 10, 600, 200, 40, Color.RED,
+        self.objects.append(ButtonObject(self.game, 10, 600, 200, 40, Color.SOFT_RED,
                                          self.game.exit_game, 'EXIT'))
         # self.button_start = ButtonObject(
         #     self.game,
