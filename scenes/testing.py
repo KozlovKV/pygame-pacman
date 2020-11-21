@@ -1,6 +1,8 @@
 from constants import Color
 from objects import ButtonObject
+from objects.highscore import HighScoresTable
 from scenes import BaseScene
+
 
 
 class TestScene(BaseScene):
@@ -16,6 +18,7 @@ class TestScene(BaseScene):
                          self.main_scene, 'MAIN_SCENE'),
             ButtonObject(self.game, 10, 500, 400, 42, Color.SOFT_RED,
                          self.go_scene, 'GAME_OVER_SCENE'),
+            # HighScoresTable(self.game),
             ButtonObject(self.game, 10, 600, 400, 42, Color.SOFT_RED,
                          self.game.exit_game, 'EXIT')
         ]
