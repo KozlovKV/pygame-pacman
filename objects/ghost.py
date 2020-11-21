@@ -1,5 +1,12 @@
 from objects import ImageObject
 from queue import Queue
+from enum import Enum
+
+
+class Modes(Enum):
+    CHASE = 0
+    SCATTER = 1
+    FRIGHTENED = 2
 
 
 # Преобразовывает игровое поле в граф в формате списка смежности
@@ -45,13 +52,64 @@ def find_path(graph: list, start: int, end: int) -> list:  # Формат гра
 
 
 class Ghost(ImageObject):
-    def __init__(self, game, filename: str, x: int, y: int, field):
+    mode = Modes.CHASE
+
+    def __init__(self, game, filename: str, x: int, y: int, field, pacman):
         super().__init__(game, filename, x, y)
         self.game = game
         self.field = process_field(field)
-
-    def process_draw(self):
-        super().process_draw()
+        self.pacman = pacman
 
     def process_logic(self):
+        pass  # TODO
+
+
+class Blinky(Ghost):
+    """Целевой клеткой всегда является пакман, даже в режиме разбегания.
+    Красного цвета."""
+
+    def __init__(self, game, filename: str, x: int, y: int, field, pacman):
+        super().__init__(game, filename, x, y, field, pacman)
+
+    def process_logic(self):
+        super().process_logic()
+        pass  # TODO
+
+
+class Pinky(Ghost):
+    """Целевой клеткой является позиция на 4 клетки впереди пакмана.
+    Розового цввета."""
+
+    def __init__(self, game, filename: str, x: int, y: int, field, pacman):
+        super().__init__(game, filename, x, y, field, pacman)
+
+    def process_logic(self):
+        super().process_logic()
+        pass  # TODO
+
+
+class Inky(Ghost):
+    """Целевая клетка зависит от положения Блинки и пакмана.
+    Начинает погоню только после того, как пакман съест 30 точек.
+    Синего цвета."""
+
+    def __init__(self, game, filename: str, x: int, y: int, field, pacman, blinky):
+        super().__init__(game, filename, x, y, field, pacman)
+        self.blinky = blinky
+
+    def process_logic(self):
+        super().process_logic()
+        pass  # TODO
+
+
+class Clyde(Ghost):
+    """Целевой клеткой является пакман, когда Клайд на расстоянии не более 8 клеток от него.
+    В остальное время находится в режиме разбегания.
+    Начинает погоню только после того, как пакман съест 1/3 всех точек.
+    Оранжевого цвета."""
+    def __init__(self, game, filename: str, x: int, y: int, field, pacman):
+        super().__init__(game, filename, x, y, field, pacman)
+
+    def process_logic(self):
+        super().process_logic()
         pass  # TODO
