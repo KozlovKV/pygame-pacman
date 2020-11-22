@@ -1,21 +1,29 @@
-from functools import reduce
+import datetime
 
 import pygame
 
-from constants import Color
-from objects import ButtonObject
+from constants import Color, MAIN_FONT
+from objects import ButtonObject, TextObject
 from scenes import BaseScene
 
 
 class MainScene(BaseScene):
+    CELL_SIZE = 30
+
     def __init__(self, game):
         self.level = game.settings['level']
         self.game_mode = game.settings['mode']
         self.coop = game.settings['coop']
+
+        self.begin_time = datetime.datetime.now()
+        self.current_time = datetime.datetime.now()
+
+        self.lives = 3
+
         self.paused = False
-        self.cell_width = 0
-        self.cell_height = 0
-        super().__init__(game)
+
+        self.field_width = 0
+        self.field_height = 0
 
         self.pacmans = []
         self.ghosts = []
@@ -26,20 +34,33 @@ class MainScene(BaseScene):
 
         self.pacmans_count = len(self.pacmans)
         self.seeds_count = len(self.seeds) + len(self.super_seeds)
-        self.ghosts_count = self.game.settings['ghosts_count']
+        self.ghosts_count = game.settings['ghosts_count']
+
+        super().__init__(game)
 
     def create_objects(self) -> None:
+        tmp_x = 20 + MAIN_FONT.size('SCORE: 0000')[0] // 2
+        self.score_bar = TextObject(self.game, text='SCORE: 0', x=tmp_x, y=20)
+        tmp_x = self.game.SCREEN_WIDTH - MAIN_FONT.size('TIME: 0000')[0] // 2 \
+                - 20
+        self.playing_time = TextObject(self.game, text='TIME: 0', x=tmp_x, y=20)
+        tmp_x = self.game.SCREEN_WIDTH // 2
+        self.lives_bar = TextObject(self.game, text=f'LIVES: {self.lives}',
+                                x=tmp_x, y=20)
+
         self.generate_map()
+
         self.objects.append(
             ButtonObject(self.game, 10, 600, 200, 40, Color.SOFT_RED,
                          self.game.exit_game, 'EXIT'))
+        self.objects.append(self.score_bar)
+        self.objects.append(self.playing_time)
+        self.objects.append(self.lives_bar)
 
     def generate_map(self):
         level_strings = []
         with open(f'./resources/levels/level_{self.level}.txt') as fin:
             [level_strings.append(string) for string in fin.readlines()]
-        self.cell_width = self.game.FIELD_WIDTH // int(level_strings[0][3:])
-        self.cell_height = self.game.FIELD_HEIGHT // int(level_strings[1][3:])
         # TODO: Считывание карты
 
     def additional_logic(self) -> None:
@@ -48,10 +69,19 @@ class MainScene(BaseScene):
         self.seeds_count = len(list(filter(lambda x: x.alive,
                                            self.seeds + self.super_seeds)))
 
-        if self.is_win():
-            self.end_game(True)
-        elif self.is_lose():
-            self.end_game(False)
+        self.current_time = datetime.datetime.now()
+        time_delta = self.current_time - self.begin_time
+        seconds_delta = int(time_delta.total_seconds())
+        self.playing_time.update_text(f'TIME: {seconds_delta}')
+
+        self.score_bar.update_text(f'SCORE: {self.game.score}')
+
+        self.lives_bar.update_text(f'LIVES: {self.lives}')
+
+        # if self.is_win():
+        #     self.end_game(True)
+        # elif self.is_lose():
+        #     self.end_game(False)
 
     def is_win(self):
         if self.game_mode == 'score_cup':
