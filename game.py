@@ -19,12 +19,6 @@ class Game:
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
-        self.scenes = [MenuScene(self),
-                       SettingsScene(self),
-                       HighScoresScene(self),
-                       MainScene(self),
-                       FinalScene(self),
-                       TestScene(self)]
         self.scores = 0
         self.settings = {
             'ghost_speed': 1,
@@ -35,6 +29,12 @@ class Game:
             'coop': False
         }
         self.game_over = False
+        self.scenes = [MenuScene(self),
+                       SettingsScene(self),
+                       HighScoresScene(self),
+                       MainScene(self),
+                       FinalScene(self),
+                       TestScene(self)]
 
     @staticmethod
     def exit_button_pressed(event: pygame.event.Event) -> bool:
