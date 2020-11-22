@@ -28,6 +28,7 @@ class Game:
             'field_texture': 0,
             'coop': False
         }
+        self.is_win = False
         self.game_over = False
         self.scenes = [MenuScene(self),
                        SettingsScene(self),
