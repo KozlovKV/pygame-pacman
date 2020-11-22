@@ -24,7 +24,7 @@ class TextObject(DrawableObject):
         x = self.rect.centerx
         y = self.rect.centery
         self.rect = self.surface.get_rect()
-        self.move_center(x, y)
+        self.set_center(x, y)
 
     def process_draw(self) -> None:
         self.game.screen.blit(self.surface, self.rect)

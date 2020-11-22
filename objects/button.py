@@ -35,12 +35,12 @@ class ButtonObject(DrawableObject):
             **self.BUTTON_STYLE
         )
 
-    def move_center(self, x: int, y: int) -> None:
-        super(ButtonObject, self).move_center(x, y)
+    def set_center(self, x: int, y: int) -> None:
+        super(ButtonObject, self).set_center(x, y)
         self.button.rect = self.rect
 
-    def move(self, x: int, y: int) -> None:
-        super().move(x, y)
+    def set_position(self, x: int, y: int) -> None:
+        super().set_position(x, y)
         self.button.rect = self.rect
 
     @staticmethod
