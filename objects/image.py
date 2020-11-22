@@ -4,7 +4,7 @@ from objects.base import DrawableObject
 
 
 class ImageObject(DrawableObject):
-    def __init__(self, game, filename: str = None, x: int = None, y: int = None) -> None:
+    def __init__(self, game, filename: str, x: int = None, y: int = None):
         super().__init__(game)
         if filename:
             self.filename = filename
@@ -13,7 +13,7 @@ class ImageObject(DrawableObject):
         self.rect.x = x if x else 0
         self.rect.y = y if y else 0
 
-    def change_img(self,filename):
+    def change_img(self, filename):
         self.filename = filename
         self.image = pygame.image.load(self.filename)
         a = self.rect.x
@@ -23,5 +23,5 @@ class ImageObject(DrawableObject):
         self.rect.y = b
 
     def process_draw(self) -> None:
-        if self.alive == True:
+        if self.alive:
             self.game.screen.blit(self.image, self.rect)
