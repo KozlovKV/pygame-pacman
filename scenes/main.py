@@ -5,6 +5,7 @@ import pygame
 from constants import Color, MAIN_FONT
 from objects import ButtonObject, TextObject
 from objects.base import DrawableObject
+from objects.seed import Seed
 from scenes import BaseScene
 
 
@@ -14,11 +15,6 @@ class MainScene(BaseScene):
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
 
     def __init__(self, game):
-        self.score_bar = None
-        self.playing_time = None
-        self.lives_bar = None
-        self.pause_bar = None
-        self.pause_button = None
 
         self.level = game.settings['level']
         self.game_mode = game.settings['mode']
@@ -33,20 +29,15 @@ class MainScene(BaseScene):
         self.border_field = None
         self.field = None
 
-        self.pacmans = []
-        self.ghosts = []
-        self.seeds = []
-        self.super_seeds = []
-        self.walls = []
-        self.teleports = []
-
-        self.pacmans_count = len(self.pacmans)
-        self.seeds_count = len(self.seeds) + len(self.super_seeds)
-        self.ghosts_count = game.settings['ghosts_count']
-
         super().__init__(game)
 
     def create_objects(self) -> None:
+        self.score_bar = None
+        self.playing_time = None
+        self.lives_bar = None
+        self.pause_bar = None
+        self.pause_button = None
+
         tmp_x = 20 + MAIN_FONT.size('SCORE: 0000')[0] // 2
         self.score_bar = TextObject(self.game, text='SCORE: 0', x=tmp_x, y=20)
 
@@ -77,6 +68,13 @@ class MainScene(BaseScene):
         self.generate_map()
 
     def generate_map(self):
+        self.pacmans = []
+        self.ghosts = []
+        self.seeds = []
+        self.super_seeds = []
+        self.walls = []
+        self.teleports = []
+
         level_strings = []
         with open(f'./resources/levels/level_{self.level}.txt') as fin:
             [level_strings.append(string) for string in fin.readlines()]
@@ -108,7 +106,79 @@ class MainScene(BaseScene):
 
         level_objects_list = [string.split() for string in
                               level_strings[2:2 + cells_in_col]]
-        # TODO: Обработка списка и преобразование в объекты
+        for y in range(cells_in_col):
+            for x in range(cells_in_row):
+                object_char = level_objects_list[y][x]
+                if object_char == '#':
+                    self.walls.append(
+                        # Добавление стены
+                        # . . .
+                        # Макет стены
+                        DrawableObject(self.game,
+                                       real_field_x + x * MainScene.CELL_SIZE,
+                                       real_field_y + y * MainScene.CELL_SIZE,
+                                       MainScene.CELL_SIZE, MainScene.CELL_SIZE,
+                                       Color.BLUE)
+                    )
+                elif object_char == '_' and not self.game_mode == 'survival':
+                    self.seeds.append(
+                        # Добавление зерна
+                        Seed(self.game,
+                             real_field_x + x * MainScene.CELL_SIZE + 10,
+                             real_field_y + y * MainScene.CELL_SIZE + 10)
+                    )
+                elif object_char == 'S':
+                    self.super_seeds.append(
+                        # Добавление супер-зерна
+                        # . . .
+                        # Макет супер-зерна
+                        DrawableObject(self.game,
+                                       real_field_x + x * MainScene.CELL_SIZE,
+                                       real_field_y + y * MainScene.CELL_SIZE,
+                                       MainScene.CELL_SIZE, MainScene.CELL_SIZE,
+                                       (233, 185, 149))
+                    )
+                elif object_char == 'G':
+                    self.ghosts.append(
+                        # Добавление призраков по кругу
+                        # . . .
+                        # Макет призрака
+                        DrawableObject(self.game,
+                                       real_field_x + x * MainScene.CELL_SIZE,
+                                       real_field_y + y * MainScene.CELL_SIZE,
+                                       MainScene.CELL_SIZE, MainScene.CELL_SIZE,
+                                       Color.SOFT_BLUE)
+                    )
+                elif object_char == 'P':
+                    self.pacmans.append(
+                        # Добавление Пакмана
+                        # . . .
+                        # Макет пакмана
+                        DrawableObject(self.game,
+                                       real_field_x + x * MainScene.CELL_SIZE,
+                                       real_field_y + y * MainScene.CELL_SIZE,
+                                       MainScene.CELL_SIZE, MainScene.CELL_SIZE,
+                                       Color.YELLOW)
+                    )
+                elif object_char == 'p' and self.coop:
+                    self.pacmans.append(
+                        # Добавление Пакмана
+                        # . . .
+                        # Макет пакмана
+                        DrawableObject(self.game,
+                                       real_field_x + x * MainScene.CELL_SIZE,
+                                       real_field_y + y * MainScene.CELL_SIZE,
+                                       MainScene.CELL_SIZE, MainScene.CELL_SIZE,
+                                       Color.SOFT_YELLOW)
+                    )
+                # TODO: Прописать алгоритм телепортов
+                # TODO: оптимизировать процесс
+                self.objects += (self.pacmans + self.ghosts + self.seeds +
+                                 self.super_seeds + self.walls)
+
+                self.pacmans_count = len(self.pacmans)
+                self.seeds_count = len(self.seeds) + len(self.super_seeds)
+                self.ghosts_count = self.game.settings['ghosts_count']
 
     def additional_logic(self) -> None:
         self.pacmans_count = len(list(filter(lambda x: x.alive, self.pacmans)))
