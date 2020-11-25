@@ -17,6 +17,7 @@ class Game:
     current_scene_index = 5  # testing hub
 
     def __init__(self) -> None:
+        self.first = True  # TODO: потом удалить
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
         self.score = 0
         self.settings = {
@@ -57,7 +58,11 @@ class Game:
         self.scenes[self.current_scene_index].process_logic()
 
     def process_all_draw(self) -> None:
-        self.screen.fill(Color.BLACK)
+        if not self.current_scene_index == self.MAIN_SCENE_INDEX:
+            self.screen.fill(Color.BLACK)
+        elif self.first:
+            self.first = False
+            self.screen.fill(Color.BLACK)
         self.scenes[self.current_scene_index].process_draw()
         pygame.display.flip()
 

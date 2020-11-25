@@ -15,6 +15,7 @@ class MainScene(BaseScene):
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
 
     def __init__(self, game):
+        self.first = True  # TODO: Убрать потом
 
         self.level = game.settings['level']
         self.game_mode = game.settings['mode']
@@ -101,8 +102,6 @@ class MainScene(BaseScene):
                                            Color.SOFT_BLUE)
         self.field = DrawableObject(self.game, real_field_x, real_field_y,
                                     field_width, field_height, Color.BLACK)
-        self.objects.append(self.border_field)
-        self.objects.append(self.field)
 
         level_objects_list = [string.split() for string in
                               level_strings[2:2 + cells_in_col]]
@@ -173,8 +172,7 @@ class MainScene(BaseScene):
                     )
                 # TODO: Прописать алгоритм телепортов
                 # TODO: оптимизировать процесс
-                self.objects += (self.pacmans + self.ghosts + self.seeds +
-                                 self.super_seeds + self.walls)
+                self.objects += (self.pacmans + self.ghosts)
 
                 self.pacmans_count = len(self.pacmans)
                 self.seeds_count = len(self.seeds) + len(self.super_seeds)
@@ -221,3 +219,15 @@ class MainScene(BaseScene):
     def switch_pause(self):
         self.pause_bar.rect.y *= -1
         self.paused = not self.paused
+        
+    def process_draw(self) -> None:
+        if self.first:
+            self.border_field.process_draw()
+            self.field.process_draw()
+            [wall.process_draw() for wall in self.walls]
+            [seed.process_draw() for seed in self.seeds]
+            [super_seed.process_draw() for super_seed in self.super_seeds]
+            self.first = False
+        pygame.draw.rect(self.game.screen, Color.BLACK,
+                         (0, 0, self.game.SCREEN_WIDTH, MainScene.FIELD_Y))
+        super(MainScene, self).process_draw()
