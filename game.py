@@ -63,7 +63,6 @@ class Game:
 
     def main_loop(self) -> None:
         while not self.game_over:
-            print('CYCLED')
             self.process_all_events()
             self.process_all_logic()
             self.process_all_draw()
