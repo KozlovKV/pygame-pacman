@@ -121,6 +121,14 @@ class MatrixPoint:
         self.obj.process_draw()
 
 
+def wall_collision_check(pacman: MatrixPoint, wall: MatrixPoint):
+    vec_x = wall.x - pacman.x
+    vec_y = wall.y - pacman.y
+    if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
+        pacman.obj.vec_x = 0
+        pacman.obj.vec_y = 0
+
+
 class MatrixMap(BaseScene):
     CELL_SIZE = 30
     BORDER_SIZE = 5
@@ -258,11 +266,14 @@ class MatrixMap(BaseScene):
         if not y == self.matrix_height-1:
             m_points.append(self.matrix[y+1][x])
         for m_point in m_points:
-            if pacman.obj.collision(m_point.obj):
-                if m_point.type == 'wall':
-                    pacman.wall_collision_reaction()
+            if m_point.type == 'wall':
+                wall_collision_check(pacman, m_point)
+            elif pacman.obj.collision(m_point.obj):
+                if m_point.type == 'ghost' or m_point.type == 'teleport':
+                    m_point.obj.collision_reaction(pacman.obj)
                 else:
                     m_point.obj.collision_reaction()
+                    self.remove_object_from_matrix(m_point)
 
     def check_matrix_positions(self, objects):
         for obj in objects:
@@ -272,14 +283,16 @@ class MatrixMap(BaseScene):
                                           obj.obj.rect.x // MatrixMap.CELL_SIZE,
                                           obj.obj.rect.x // MatrixMap.CELL_SIZE)
 
-    def change_pos_in_matrix(self, obj: MatrixPoint, new_x, new_y):
-        self.matrix[obj.y][obj.x] = 0
-        self.matrix[new_y][new_x] = obj
-        obj.x = new_x
-        obj.y = new_y
+    def change_pos_in_matrix(self, m_point: MatrixPoint, new_x, new_y):
+        self.matrix[m_point.y][m_point.x] = 0
+        self.matrix[new_y][new_x] = m_point
+        m_point.x = new_x
+        m_point.y = new_y
 
-    def remove_object_from_matrix(self, x, y):
-        pass
+    def remove_object_from_matrix(self, m_point: MatrixPoint):
+        self.matrix[m_point.y][m_point.x] = 0
+        m_point.x = -1
+        m_point.y = -1
 
     def process_draw(self) -> None:
         if self.first:
