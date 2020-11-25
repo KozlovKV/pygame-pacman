@@ -1,71 +1,80 @@
 import pygame
 
-from constants import Color, MAIN_FONT
-from objects import ButtonObject
-from third_party.button import Button
+from objects import ButtonObject, TextObject
+from objects.base import DrawableObject
 
 
-class ArrowSwitcher(ButtonObject):
+class ArrowSwitcher(DrawableObject):
     def __init__(self, game,
                  x: int, y: int, width: int, height: int,
+                 text_color: pygame.color.Color = (255, 255, 255),
                  color: pygame.color.Color = None,
                  start_index: int = 0, *args) -> None:
-        self.arguments = args
-        self.args_index = start_index
-        self.all_rect = pygame.rect.Rect(x, y, width, height)
-        self.mid_rect = pygame.rect.Rect(x + width // 4, y, width // 2, height)
-        self.left_rect = pygame.rect.Rect(x, y, width // 4, height)
-        self.right_rect = pygame.rect.Rect(x + (width // 4 * 3), y, width // 4, height)
-        super().__init__(game, x + width // 4, y, width // 2, height, color, None, args[start_index])
-        self.left_button = Button(
-            rect=self.left_rect,
-            color=self.color,
-            function=self.dec_arg,
-            text="<",
-            **self.BUTTON_STYLE
+        super().__init__(game)
+        self.values = args
+        self.current_index = start_index
+        self.color = color
+        self.rect = pygame.rect.Rect(x, y, width, height)
+        self.text_area = TextObject(
+            game,
+            'Consolas', 32, True, False,
+            self.values[self.current_index],
+            text_color,
+            x + width // 2, y + height // 2
         )
-        self.right_button = Button(
-            rect=self.right_rect,
+        self.button_back = ButtonObject(
+            self.game,
+            x, y, 50, height,
             color=self.color,
-            function=self.inc_arg,
-            text=">",
-            **self.BUTTON_STYLE
+            function=self.switch_back,
+            text="<"
+        )
+        self.button_next = ButtonObject(
+            self.game,
+            x + width - 50, y, 50, height,
+            color=self.color,
+            function=self.switch_next,
+            text=">"
         )
 
-    def dec_arg(self) -> None:
-        self.args_index -= 1
-        if self.args_index < 0:
-            self.args_index = len(self.arguments)-1
-        self.set_text(self.arguments[self.args_index])
+    def switch_back(self) -> None:
+        self.current_index -= 1
+        if self.current_index < 0:
+            self.current_index = len(self.values) - 1
+        self.set_text(self.values[self.current_index])
 
-    def inc_arg(self) -> None:
-        self.args_index += 1
-        if self.args_index > len(self.arguments)-1:
-            self.args_index = 0
-        self.set_text(self.arguments[self.args_index])
+    def switch_next(self) -> None:
+        self.current_index += 1
+        if self.current_index > len(self.values)-1:
+            self.current_index = 0
+        self.set_text(self.values[self.current_index])
 
     def set_center(self, x: int, y: int) -> None:
-        super(ButtonObject, self).set_center(x, y)
-        self.button.rect = self.rect
-        self.left_button.rect = self.rect
-        self.right_button.rect = self.rect
+        super(self).set_center(x, y)
+        self.text_area.rect = self.rect
+        self.button_back.rect = self.rect
+        self.button_next.rect = self.rect
 
     def set_position(self, x: int, y: int) -> None:
         super().set_position(x, y)
-        self.button.rect = self.rect
-        self.left_button.rect = self.rect
-        self.right_button.rect = self.rect
+        self.text_area.rect = self.rect
+        self.button_back.rect = self.rect
+        self.button_next.rect = self.rect
 
     def set_text(self, text) -> None:
         self.text = text
-        self.button.text = text
-        self.button.render_text()
+        self.text_area.text = text
+        self.text_area.update_text(text)
 
     def process_event(self, event) -> None:
-        self.left_button.check_event(event)
-        self.right_button.check_event(event)
+        self.button_back.process_event(event)
+        self.button_next.process_event(event)
 
     def process_draw(self) -> None:
-        self.button.update(self.game.screen)
-        self.left_button.update(self.game.screen)
-        self.right_button.update(self.game.screen)
+        self.text_area.process_draw()
+        self.button_back.process_draw()
+        self.button_next.process_draw()
+
+    def get_current_value(self) -> str:
+        return self.values[self.current_index]
+

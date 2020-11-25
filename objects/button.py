@@ -44,7 +44,7 @@ class ButtonObject(DrawableObject):
         self.button.rect = self.rect
 
     @staticmethod
-    def no_action(self) -> None:
+    def no_action() -> None:
         pass
 
     def set_text(self, text) -> None:
