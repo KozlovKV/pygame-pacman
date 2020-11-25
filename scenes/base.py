@@ -42,12 +42,12 @@ class BaseScene:
         pass
 
     def process_draw(self) -> None:
-        # timer = datetime.datetime.now()
+        timer = datetime.datetime.now()
         for item in self.objects:
             item.process_draw()
         self.additional_draw()
-        # delta = datetime.datetime.now() - timer
-        # print(f'DRAWING: {delta.total_seconds()}')
+        delta = datetime.datetime.now() - timer
+        print(f'DRAWING: {delta.total_seconds()}')
 
     def additional_draw(self) -> None:
         pass
