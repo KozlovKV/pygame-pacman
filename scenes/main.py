@@ -68,10 +68,10 @@ class MainScene(BaseScene):
 
         self.lives_bar.update_text(f'LIVES: {self.lives}')
 
-        # if self.is_win():
-        #     self.end_game(True)
-        # elif self.is_lose():
-        #     self.end_game(False)
+        if self.is_win():
+            self.end_game(True)
+        elif self.is_lose():
+            self.end_game(False)
 
     def is_win(self):
         if self.game_mode == 'score_cup':
@@ -124,9 +124,10 @@ class MatrixPoint:
 def wall_collision_check(pacman: MatrixPoint, wall: MatrixPoint):
     vec_x = wall.x - pacman.x
     vec_y = wall.y - pacman.y
-    if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
-        pacman.obj.vec_x = 0
-        pacman.obj.vec_y = 0
+    # TODO: Раскоментировать, когда будет готов пакман
+    # if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
+    #     pacman.obj.vec_x = 0
+    #     pacman.obj.vec_y = 0
 
 
 class MatrixMap(BaseScene):
@@ -241,7 +242,6 @@ class MatrixMap(BaseScene):
                 self.objects += (self.pacmans + self.ghosts)
 
     def additional_logic(self) -> None:
-        # TODO: Работает, но лучше переделать
         self.pacmans_count = len(list(filter(lambda x: x.obj.alive, self.pacmans)))
         self.ghosts_count = len(list(filter(lambda x: x.obj.alive, self.ghosts)))
         self.seeds_count = len(list(filter(lambda x: x.obj.alive,
