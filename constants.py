@@ -18,6 +18,7 @@ class Color:
     SOFT_GREEN = pygame.color.Color(32, 232, 14)
     SOFT_ORANGE = pygame.color.Color(255, 180, 51)
     SOFT_YELLOW = pygame.color.Color(255, 255, 82)
+    PURPLE = pygame.color.Color(255, 0, 255)
 
 
 pygame.font.init()
