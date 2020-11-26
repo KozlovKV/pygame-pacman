@@ -7,8 +7,7 @@ from scenes.testing import TestScene
 
 
 class Game:
-    SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 1000
-    FIELD_SIZE = FIELD_WIDTH, FIELD_HEIGHT = 750, 750
+    SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 900
     TICK = 75
     MENU_SCENE_INDEX = 0
     SETTINGS_SCENE_INDEX = 1
@@ -19,22 +18,23 @@ class Game:
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
+        self.score = 0
+        self.settings = {
+            'ghost_speed': 1,
+            'ghosts_count': 4,
+            'level': 0,
+            'mode': 'score_cup',
+            'field_texture': 0,
+            'coop': False
+        }
+        self.is_win = False
+        self.game_over = False
         self.scenes = [MenuScene(self),
                        SettingsScene(self),
                        HighScoresScene(self),
                        MainScene(self),
                        FinalScene(self),
                        TestScene(self)]
-        self.scores = 0
-        self.settings = {
-            'ghost_speed': 1,
-            'ghosts_count': 4,
-            'level': 0,
-            'mode': 0,
-            'field_texture': 0,
-            'coop': False
-        }
-        self.game_over = False
 
     @staticmethod
     def exit_button_pressed(event: pygame.event.Event) -> bool:
@@ -80,7 +80,7 @@ class Game:
         self.game_over = True
 
     def set_scores(self, value):
-        self.scores = value
+        self.score = value
 
     def add_scores(self, delta):
-        self.scores += delta
+        self.score += delta

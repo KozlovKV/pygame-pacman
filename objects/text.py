@@ -5,8 +5,8 @@ from objects.base import DrawableObject
 
 class TextObject(DrawableObject):
     def __init__(self, game,
-                 font_name: str = 'Comic Sans',
-                 font_size: int = 35, is_bold: bool = True, is_italic: bool = False, text: str = 'Define me!',
+                 font_name: str = 'Consolas',
+                 font_size: int = 32, is_bold: bool = True, is_italic: bool = False, text: str = 'Define me!',
                  color: pygame.color.Color = (255, 255, 255), x: int = 100, y: int = 100) -> None:
         super().__init__(game)
         self.font_name = font_name
@@ -24,7 +24,7 @@ class TextObject(DrawableObject):
         x = self.rect.centerx
         y = self.rect.centery
         self.rect = self.surface.get_rect()
-        self.move_center(x, y)
+        self.set_center(x, y)
 
     def process_draw(self) -> None:
         self.game.screen.blit(self.surface, self.rect)
