@@ -54,7 +54,7 @@ class MainScene(BaseScene):
         self.objects.append(self.pause_button)
         self.objects.append(
             ButtonObject(self.game, 10, 60, 200, 40, Color.SOFT_RED,
-                         self.game.set_test_scene(), 'TO TEST'))
+                         self.game.set_test_scene, 'TO TEST'))
 
         self.matrix = MatrixMap(self.game)
         self.objects.append(self.matrix)
@@ -96,6 +96,10 @@ class MainScene(BaseScene):
     def end_game(self, win=False):
         self.game.is_win = win
         self.game.set_scene(self.game.GAMEOVER_SCENE_INDEX)
+
+    def on_activate(self) -> None:
+        self.__init__(self.game)
+        self.game.screen.fill(Color.BLACK)
 
     def process_event(self, event: pygame.event.Event) -> None:
         if self.paused:
