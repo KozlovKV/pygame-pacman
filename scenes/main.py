@@ -54,7 +54,7 @@ class MainScene(BaseScene):
         self.objects.append(self.pause_button)
         self.objects.append(
             ButtonObject(self.game, 10, 60, 200, 40, Color.SOFT_RED,
-                         self.game.exit_game, 'EXIT'))
+                         self.game.set_test_scene(), 'TO TEST'))
 
         self.matrix = MatrixMap(self.game)
         self.objects.append(self.matrix)
