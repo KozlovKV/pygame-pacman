@@ -49,7 +49,7 @@ class SettingsScene(BaseScene):
                                           Color.WHITE, Color.PURPLE,
                                           0, *settings_7))
         self.objects.append(ButtonObject(self.game, 10, 550, 230, 40, Color.SOFT_RED,
-                                         self.testing_scene, 'TO MAIN MENU'))
+                                         self.game.set_test_scene, 'TO TEST MENU'))
 
     def process_logic(self) -> None:
         self.game.settings['level'] = int(self.objects[1].get_current_value().split(': ')[1])
@@ -59,7 +59,3 @@ class SettingsScene(BaseScene):
         self.game.settings['ghosts_speed'] = int(self.objects[5].get_current_value().split(': ')[1])
         self.game.settings['packman_texture'] = int(self.objects[6].get_current_value().split(': ')[1])
         self.game.settings['lvl_texture'] = int(self.objects[7].get_current_value().split(': ')[1])
-
-    def testing_scene(self):
-        print('MENU_TEMPLATE_LAUNCHED')
-        self.game.set_scene(5)

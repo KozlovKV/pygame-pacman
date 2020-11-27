@@ -12,9 +12,10 @@ class DrawableObject:
         return self.rect.colliderect(other.rect)
 
     def die(self):
-        self.alive = False
         self.rect.x = -1000
         self.rect.y = -1000
+        self.process_draw()
+        self.alive = False
 
     def move(self, x, y):
         self.rect.x += x
