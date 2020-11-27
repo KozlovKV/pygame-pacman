@@ -183,7 +183,6 @@ class MatrixMap(BaseScene):
         for pacman in self.pacmans:
             self.check_collisions_with_pacman(pacman)
 
-    # TODO: Переработать в соответствии с MatrixMultiPoint
     def check_collisions_with_pacman(self, pacman: SimpleMatrixPoint):
         m_points = []
         x = pacman.x
@@ -203,7 +202,7 @@ class MatrixMap(BaseScene):
                                               m_points):
         for m_point in m_points:
             m_obj = m_point.moving_obj
-            if m_obj.type == 'ghost':
+            if m_obj.type == 'ghost' and pacman.obj.collision(m_obj.obj):
                 m_obj.obj.collision_reaction(pacman.obj)
 
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
