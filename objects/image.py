@@ -22,6 +22,9 @@ class ImageObject(DrawableObject):
         self.rect.x = a
         self.rect.y = b
 
+    def rotate_img(self, deg):
+        self.image = pygame.transform.rotate(self.image, deg)
+
     def process_draw(self) -> None:
         if self.alive:
             self.game.screen.blit(self.image, self.rect)
