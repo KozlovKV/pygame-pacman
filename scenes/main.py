@@ -4,9 +4,7 @@ import pygame
 
 from constants import Color, MAIN_FONT
 from objects import ButtonObject, TextObject
-from objects.base import DrawableObject
 from objects.matrix_map import MatrixMap
-from objects.seed import Seed
 from scenes import BaseScene
 
 
@@ -15,7 +13,8 @@ class MainScene(BaseScene):
 
         self.game_mode = game.settings['mode']
 
-        self.milliseconds = 0
+        self.last_timer = datetime.datetime.now()
+        self.played_seconds = 0
 
         self.lives = 3
 
@@ -25,7 +24,7 @@ class MainScene(BaseScene):
 
     def create_objects(self) -> None:
         self.score_bar = None
-        self.playing_time = None
+        self.time_bar = None
         self.lives_bar = None
         self.pause_bar = None
         self.pause_button = None
@@ -35,7 +34,7 @@ class MainScene(BaseScene):
 
         tmp_x = self.game.SCREEN_WIDTH - MAIN_FONT.size('TIME: 0000')[
             0] // 2 - 20
-        self.playing_time = TextObject(self.game, text='TIME: 0', x=tmp_x, y=20)
+        self.time_bar = TextObject(self.game, text='TIME: 0', x=tmp_x, y=20)
 
         tmp_x = self.game.SCREEN_WIDTH // 2
         self.lives_bar = TextObject(self.game, text=f'LIVES: {self.lives}',
@@ -49,7 +48,7 @@ class MainScene(BaseScene):
                                          self.switch_pause, 'PAUSE')
 
         self.objects.append(self.score_bar)
-        self.objects.append(self.playing_time)
+        self.objects.append(self.time_bar)
         self.objects.append(self.lives_bar)
         self.objects.append(self.pause_bar)
         self.objects.append(self.pause_button)
@@ -60,10 +59,18 @@ class MainScene(BaseScene):
         self.matrix = MatrixMap(self.game)
         self.objects.append(self.matrix)
 
-    def additional_logic(self) -> None:
+    def process_logic(self) -> None:
+        if self.paused:
+            self.last_timer = datetime.datetime.now()
+        else:
+            super(MainScene, self).process_logic()
 
-        self.milliseconds += self.game.TICK
-        self.playing_time.update_text(f'TIME: {self.milliseconds // 1000}')
+    def additional_logic(self) -> None:
+        now = datetime.datetime.now()
+        delta = now - self.last_timer
+        self.last_timer = now
+        self.played_seconds += delta.total_seconds()
+        self.time_bar.update_text(f'TIME: {int(self.played_seconds)}')
 
         self.score_bar.update_text(f'SCORE: {self.game.score}')
 
@@ -90,11 +97,17 @@ class MainScene(BaseScene):
         self.game.is_win = win
         self.game.set_scene(self.game.GAMEOVER_SCENE_INDEX)
 
+    def process_event(self, event: pygame.event.Event) -> None:
+        if self.paused:
+            self.pause_button.process_event(event)
+            self.additional_event_check(event)
+        else:
+            super(MainScene, self).process_event(event)
+
     def additional_event_check(self, event: pygame.event.Event) -> None:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
             self.switch_pause()
 
-    # TODO: реализовать логику остановки
     def switch_pause(self):
         self.pause_bar.rect.y *= -1
         self.paused = not self.paused
