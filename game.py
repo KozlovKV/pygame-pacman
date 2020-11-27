@@ -17,7 +17,6 @@ class Game:
     current_scene_index = 5  # testing hub
 
     def __init__(self) -> None:
-        self.first = True  # TODO: потом удалить
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
         self.score = 0
         self.settings = {
@@ -80,9 +79,6 @@ class Game:
     def process_all_draw(self) -> None:
         if not self.current_scene_index == self.MAIN_SCENE_INDEX:
             self.screen.fill(Color.BLACK)
-        elif self.first:
-            self.first = False
-            self.screen.fill(Color.BLACK)
         self.scenes[self.current_scene_index].process_draw()
         pygame.display.flip()
 
@@ -94,11 +90,11 @@ class Game:
             pygame.time.wait(Game.TICK)
 
     def set_scene(self, index: int, resume: bool = False) -> None:
-        # if not resume:
-        #     self.scenes[self.current_scene_index].on_deactivate()
+        if not resume:
+            self.scenes[self.current_scene_index].on_deactivate()
         self.current_scene_index = index
-        # if not resume:
-        #     self.scenes[self.current_scene_index].on_activate()
+        if not resume:
+            self.scenes[self.current_scene_index].on_activate()
 
     def exit_game(self) -> None:
         print('Bye bye')
