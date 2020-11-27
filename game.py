@@ -37,13 +37,33 @@ class Game:
                        FinalScene(self),
                        TestScene(self)]
 
+    def set_menu_scene(self):
+        self.set_scene(Game.MENU_SCENE_INDEX)
+
+    def set_settings_scene(self):
+        self.set_scene(Game.SETTINGS_SCENE_INDEX)
+
+    def set_highscores_scene(self):
+        self.set_scene(Game.HIGHSCORES_SCENE_INDEX)
+
+    def set_main_scene(self):
+        self.set_scene(Game.MAIN_SCENE_INDEX)
+
+    def set_game_over_scene(self):
+        self.set_scene(Game.GAMEOVER_SCENE_INDEX)
+
+    def set_test_scene(self):
+        self.set_scene(5)
+
     @staticmethod
     def exit_button_pressed(event: pygame.event.Event) -> bool:
         return event.type == pygame.QUIT
 
     @staticmethod
     def exit_hotkey_pressed(event: pygame.event.Event) -> bool:
-        return event.type == pygame.KEYDOWN and event.mod & pygame.KMOD_CTRL and event.key == pygame.K_q
+        return event.type == pygame.KEYDOWN and \
+               ((event.mod & pygame.KMOD_CTRL and event.key == pygame.K_q) or
+                event.key == pygame.K_ESCAPE)
 
     def process_exit_events(self, event: pygame.event.Event) -> None:
         if Game.exit_button_pressed(event) or Game.exit_hotkey_pressed(event):
