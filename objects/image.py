@@ -41,8 +41,6 @@ class ImageObject(DrawableObject):
         self.current_frame = (self.current_frame + 1) % self.frames_count
         current_frame_name = self.frame_name.replace('[F]',
                                                      str(self.current_frame))
-        print(current_frame_name)
-        print(self.frame_name)
         self.change_img(current_frame_name)
 
     def change_img(self, filename):
