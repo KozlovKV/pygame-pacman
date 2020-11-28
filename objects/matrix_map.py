@@ -1,7 +1,9 @@
 import constants
 from constants import *
+from objects import ImageObject
 from objects.base import DrawableObject
 from objects.seed import Seed
+from objects.teleport import TeleportObject
 from scenes import BaseScene
 
 
@@ -109,6 +111,7 @@ class MatrixMap(BaseScene):
         level_objects_list = [string.split() for string in
                               level_strings[2:2 + self.matrix_height]]
         self.matrix = list()
+        teleports_pairs = [list() for _ in range(10)]
         for y in range(self.matrix_height):
             self.matrix.append(list())
             for x in range(self.matrix_width):
@@ -164,10 +167,28 @@ class MatrixMap(BaseScene):
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
                     self.pacmans.append(pacman)
                     self.matrix[y][x].update_moving_object(pacman)
-                # TODO: Прописать алгоритм телепортов
-                self.objects += (self.pacmans + self.ghosts)
+                elif '0' <= object_char <= '9':
+                    i = int(object_char)
+                    teleports_pairs[i].append((x, y))
+                    if len(teleports_pairs[i]) == 2:
+                        pair = teleports_pairs[i]
+                        x1, y1 = pair[0][0], pair[0][1]
+                        x2, y2 = pair[1][0], pair[1][1]
+                        teleport = TeleportObject(self.game,
+                                                  real_field_x + x1 * CELL_SIZE,
+                                                  real_field_y + y1 * CELL_SIZE,
+                                                  real_field_x + x2 * CELL_SIZE,
+                                                  real_field_y + y2 * CELL_SIZE)
+                        teleport1 = SimpleMatrixPoint(x1, y1, 'teleport', teleport)
+                        self.matrix[y1][x1].update_static_object(teleport1)
+                        teleport2 = SimpleMatrixPoint(x2, y2, 'teleport', teleport)
+                        self.matrix[y2][x2].update_static_object(teleport2)
+                        self.teleports.append(teleport)
+                        teleports_pairs[i] = list()
+        self.objects += (self.pacmans + self.ghosts + self.teleports)
 
     def additional_logic(self) -> None:
+
         self.pacmans_count = len(
             list(filter(lambda x: x.obj.alive, self.pacmans)))
         self.ghosts_count = len(
