@@ -125,9 +125,9 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_static_object(wall)
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
+                                './resources/images/Seed/Seed.png',
                                 real_field_x + x * MatrixMap.CELL_SIZE,
-                                real_field_y + y * MatrixMap.CELL_SIZE,
-                                "'./resources/images/Seed.png'")
+                                real_field_y + y * MatrixMap.CELL_SIZE)
                     # Добавление матричной точки зерна
                     seed = SimpleMatrixPoint(x, y, 'seed', seed)
                     self.seeds.append(seed)
