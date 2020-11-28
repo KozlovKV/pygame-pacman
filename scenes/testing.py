@@ -26,16 +26,16 @@ class TestScene(BaseScene):
             ButtonObject(self.game, 10, 700, 400, 42, Color.SOFT_RED,
                          self.move_rect, 'BTN'),
             ButtonObject(self.game, 10, 800, 400, 42, Color.SOFT_RED,
-                         self.rotate_img, 'ROT'),
+                         self.next_img, 'NEXT'),
         ]
         self.objects += self.scene_buttons
         self.draw_obj = DrawableObject(self.game, 500, 500, 50, 50)
         self.objects.append(self.draw_obj)
-        self.img_obj = ImageObject(self.game, './resources/images/test.jpg', 600, 500)
+        self.img_obj = ImageObject(self.game, './resources/images/test_0.png', 600, 500, 2, './resources/images/test_[F].png')
         self.objects.append(self.img_obj)
 
     def move_rect(self):
         self.draw_obj.move(0, -10)
 
-    def rotate_img(self):
-        self.img_obj.image = pygame.transform.rotate(self.img_obj.image, 90)
+    def next_img(self):
+        self.img_obj.next_frame()
