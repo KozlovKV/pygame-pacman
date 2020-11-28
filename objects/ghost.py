@@ -58,7 +58,7 @@ def process_level(level_file_name) -> tuple:
     return matrix, graph
 
 
-def bfs(graph: list, start: tuple, end: tuple, width: int, height: int) -> dict:  # Граф - список смежности
+def bfs(graph: list, start: tuple, end: tuple, width: int, height: int) -> tuple:  # Граф - список смежности
     queue = Queue()
     queue.put(start)
     used = {(x, y): False for x in range(height) for y in range(width)}
@@ -80,18 +80,20 @@ def bfs(graph: list, start: tuple, end: tuple, width: int, height: int) -> dict:
                 parents[neighbour] = vertex
             if neighbour == end:
                 found = True
-    return parents
+    return parents, found
 
 
 def find_path(graph: list, start: tuple, end: tuple, width: int, height: int) -> list:  # Граф - список смежности
-    parents = bfs(graph, start, end, width, height)
+    parents, found = bfs(graph, start, end, width, height)
+    if not found or start == end:
+        return [start]
     path = [end]
     parent = parents[end]
     while parent != -1:
         path.append(parent)
         parent = parents[parent]
     path.reverse()
-    return path
+    return path[1:]
 
 
 class Ghost(ImageObject):
@@ -115,6 +117,7 @@ class Ghost(ImageObject):
         self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
         self.is_teleporting = False  # телепортируется ли сейчас призрак, нужно для обработки движения
         self.teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
+        print("OoOoOoooooo")
 
     def get_real_position(self, cell):
         x = self.FIELD_POINT[0] + cell[0] * self.CELL_SIZE
@@ -138,7 +141,7 @@ class Ghost(ImageObject):
 
     # Функция должна быть определена в потомках
     def get_target(self):
-        return 0, 0
+        return 1, 1
 
     def get_next_cell(self):
         height = len(self.level)
