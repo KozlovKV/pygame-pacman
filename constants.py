@@ -23,3 +23,9 @@ class Color:
 
 pygame.font.init()
 MAIN_FONT = pygame.font.SysFont('Consolas', 32, True)
+
+CELL_SIZE = 30
+REAL_FIELD_X = 0
+REAL_FIELD_Y = 0
+PACMAN_SPEED = 1
+GHOST_SPEED = 2
