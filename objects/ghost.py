@@ -98,9 +98,11 @@ def find_path(graph: list, start: tuple, end: tuple, width: int, height: int) ->
 
 class Ghost(ImageObject):
     status = Status.CHASE
+    score_for_kill = 10
 
     def __init__(self, game, filename: str, x: int, y: int,  # x и y - номера строки и столбца клетки спавна
-                 level: str, speed: int = 1):  # level - имя файла с уровнем
+                 level: str, speed: int = 1, respawn: bool = True,  # level - имя файла с уровнем
+                 chase_time: int = 30, scatter_time: int = 5):
         super().__init__(game, filename)
         self.level, self.graph = process_level(level)
         self.pacmans = game.scenes[MAIN_SCENE].pacmans
@@ -109,6 +111,9 @@ class Ghost(ImageObject):
         self.CELL_SIZE = game.scenes[MAIN_SCENE].CELL_SIZE
         self.FIELD_POINT = game.scenes[MAIN_SCENE].FIELD_POINT
         self.speed = speed  # расстояние, которое проходит призрак за 1 тик
+        self.respawn = respawn
+        self.chase_time = chase_time,
+        self.scatter_time = scatter_time
         self.ticks_per_cell = self.CELL_SIZE // speed  # количество тиков на прохождение клетки
         self.current_ticks = 0  # количество тиков, прошедших с начала движения из предыдущей клетки
         self.next_cell = (x, y)
@@ -135,11 +140,13 @@ class Ghost(ImageObject):
             pacman.die()
 
     def die(self):
+        self.game.add_scores(self.score_for_kill)
+        if self.game.
         self.set_position(*self.get_real_position(self.spawn))
         self.alive = False
 
     # Функция должна быть определена в потомках
-    def get_target(self):
+    def get_chase_target(self):
         return 0, 0
 
     def get_next_cell(self):
@@ -152,7 +159,7 @@ class Ghost(ImageObject):
         elif self.status != Status.CHASE:
             self.target = choose_random(corners)
         else:
-            self.target = self.get_target()
+            self.target = self.get_chase_target()
         self.path = find_path(self.graph, self.cell, self.target, width, height)
         return self.path[0]
 
@@ -201,6 +208,7 @@ class Ghost(ImageObject):
         if not self.alive:
             # TODO что-то делать с таймером
             return
+        self.check_collision()
         self.process_movement()
 
 
