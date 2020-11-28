@@ -8,6 +8,8 @@ from scenes.testing import TestScene
 
 class Game:
     SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 900
+    REAL_FIELD_X = 0
+    REAL_FIELD_Y = 0
     TICK = 75
     MENU_SCENE_INDEX = 0
     SETTINGS_SCENE_INDEX = 1
