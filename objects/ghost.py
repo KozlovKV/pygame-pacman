@@ -117,11 +117,10 @@ class Ghost(ImageObject):
         self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
         self.is_teleporting = False  # телепортируется ли сейчас призрак, нужно для обработки движения
         self.teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
-        print("OoOoOoooooo")
 
     def get_real_position(self, cell):
-        x = self.FIELD_POINT[0] + cell[0] * self.CELL_SIZE
-        y = self.FIELD_POINT[1] + cell[1] * self.CELL_SIZE
+        x = self.FIELD_POINT[0] + cell[1] * self.CELL_SIZE
+        y = self.FIELD_POINT[1] + cell[0] * self.CELL_SIZE
         return x, y
 
     def check_collision(self):
@@ -141,7 +140,7 @@ class Ghost(ImageObject):
 
     # Функция должна быть определена в потомках
     def get_target(self):
-        return 1, 1
+        return 0, 0
 
     def get_next_cell(self):
         height = len(self.level)
@@ -160,6 +159,7 @@ class Ghost(ImageObject):
     # Проверяет, соединены ли текущая и следующая клетки телепортом и если да, то находит каким
     def check_teleport(self):
         if abs(self.cell[0] - self.next_cell[0]) + abs(self.cell[1] - self.next_cell[1]) <= 1:
+            self.is_teleporting = False
             return
         self.is_teleporting = True
         into_teleports = find_neighbours(self.level, self.cell[0], self.cell[1], str.isnumeric)
@@ -174,14 +174,14 @@ class Ghost(ImageObject):
         if self.current_ticks == self.ticks_per_cell // 2:
             out = self.teleport_cells[1]
             out_position = self.get_real_position(out)
-            self.set_position(out_position[0] + (self.next_cell[0] - out[0]) * self.current_ticks,
-                              out_position[1] + (self.next_cell[1] - out[1]) * self.current_ticks)
+            self.set_position(out_position[0] + (self.next_cell[1] - out[1]) * self.current_ticks,
+                              out_position[1] + (self.next_cell[0] - out[0]) * self.current_ticks)
         elif self.current_ticks < self.ticks_per_cell // 2:
-            self.move((self.teleport_cells[0][0] - self.cell[0]) * self.speed,
-                      (self.teleport_cells[0][1] - self.cell[1]) * self.speed)
+            self.move((self.teleport_cells[0][1] - self.cell[1]) * self.speed,
+                      (self.teleport_cells[0][0] - self.cell[0]) * self.speed)
         else:
-            self.move((self.teleport_cells[1][0] - self.next_cell[0]) * self.speed,
-                      (self.teleport_cells[1][1] - self.next_cell[1]) * self.speed)
+            self.move((self.next_cell[1] - self.teleport_cells[1][1]) * self.speed,
+                      (self.next_cell[0] - self.teleport_cells[1][0]) * self.speed)
 
     def process_movement(self):
         if self.current_ticks == self.ticks_per_cell:
@@ -193,8 +193,8 @@ class Ghost(ImageObject):
         if self.is_teleporting:
             self.process_teleport()
         else:
-            self.move((self.next_cell[0] - self.cell[0]) * self.speed,
-                      (self.next_cell[1] - self.cell[1]) * self.speed)
+            self.move((self.next_cell[1] - self.cell[1]) * self.speed,
+                      (self.next_cell[0] - self.cell[0]) * self.speed)
         self.current_ticks += 1
 
     def process_logic(self):
