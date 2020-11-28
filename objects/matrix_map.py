@@ -1,4 +1,5 @@
-from constants import Color
+import constants
+from constants import *
 from objects.base import DrawableObject
 from objects.seed import Seed
 from scenes import BaseScene
@@ -58,7 +59,6 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
 
 
 class MatrixMap(BaseScene):
-    CELL_SIZE = 30
     BORDER_SIZE = 5
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
 
@@ -84,16 +84,18 @@ class MatrixMap(BaseScene):
         self.matrix_width = int(level_strings[0][3:])
         self.matrix_height = int(level_strings[1][3:])
 
-        field_width = self.matrix_width * MatrixMap.CELL_SIZE
+        field_width = self.matrix_width * CELL_SIZE
         width_padding = (self.game.SCREEN_WIDTH - MatrixMap.FIELD_X -
                          field_width) // 2
-        field_height = self.matrix_height * MatrixMap.CELL_SIZE
+        field_height = self.matrix_height * CELL_SIZE
         height_padding = (self.game.SCREEN_HEIGHT - MatrixMap.FIELD_Y -
                           field_height) // 2
 
         # Переменные для рассчёта расположения объектов на игровом поле
         real_field_x = MatrixMap.FIELD_X + width_padding
         real_field_y = MatrixMap.FIELD_Y + height_padding
+        self.game.REAL_FIELD_X = real_field_x
+        self.game.REAL_FIELD_Y = real_field_y
 
         self.border_field = DrawableObject(self.game,
                                            real_field_x - MatrixMap.BORDER_SIZE,
@@ -114,10 +116,9 @@ class MatrixMap(BaseScene):
                 object_char = level_objects_list[y][x]
                 if object_char == '#':
                     wall = DrawableObject(self.game,
-                                          real_field_x + x * MatrixMap.CELL_SIZE,
-                                          real_field_y + y * MatrixMap.CELL_SIZE,
-                                          MatrixMap.CELL_SIZE,
-                                          MatrixMap.CELL_SIZE,
+                                          real_field_x + x * CELL_SIZE,
+                                          real_field_y + y * CELL_SIZE,
+                                          CELL_SIZE, CELL_SIZE,
                                           Color.BLUE)
                     # Добавление матричной точки стены
                     wall = SimpleMatrixPoint(x, y, 'wall', wall)
@@ -125,18 +126,17 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_static_object(wall)
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
-                                real_field_x + x * MatrixMap.CELL_SIZE + 10,
-                                real_field_y + y * MatrixMap.CELL_SIZE + 10)
+                                real_field_x + x * CELL_SIZE + 10,
+                                real_field_y + y * CELL_SIZE + 10)
                     # Добавление матричной точки зерна
                     seed = SimpleMatrixPoint(x, y, 'seed', seed)
                     self.seeds.append(seed)
                     self.matrix[y][x].update_static_object(seed)
                 elif object_char == 'S':
                     super_seed = DrawableObject(self.game,
-                                                real_field_x + x * MatrixMap.CELL_SIZE,
-                                                real_field_y + y * MatrixMap.CELL_SIZE,
-                                                MatrixMap.CELL_SIZE,
-                                                MatrixMap.CELL_SIZE,
+                                                real_field_x + x * CELL_SIZE,
+                                                real_field_y + y * CELL_SIZE,
+                                                CELL_SIZE, CELL_SIZE,
                                                 (233, 185, 149))
                     # Добавление матричной точки супер-зерна
                     super_seed = SimpleMatrixPoint(x, y, 'super_seed',
@@ -146,10 +146,9 @@ class MatrixMap(BaseScene):
 
                 elif object_char == 'G':
                     ghost = DrawableObject(self.game,
-                                           real_field_x + x * MatrixMap.CELL_SIZE,
-                                           real_field_y + y * MatrixMap.CELL_SIZE,
-                                           MatrixMap.CELL_SIZE,
-                                           MatrixMap.CELL_SIZE,
+                                           real_field_x + x * CELL_SIZE,
+                                           real_field_y + y * CELL_SIZE,
+                                           CELL_SIZE, CELL_SIZE,
                                            Color.SOFT_BLUE)
                     # Добавление матричной точки призрака
                     ghost = SimpleMatrixPoint(x, y, 'ghost', ghost)
@@ -157,10 +156,9 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_moving_object(ghost)
                 elif object_char == 'P' or (object_char == 'p' and self.coop):
                     pacman = DrawableObject(self.game,
-                                            real_field_x + x * MatrixMap.CELL_SIZE,
-                                            real_field_y + y * MatrixMap.CELL_SIZE,
-                                            MatrixMap.CELL_SIZE,
-                                            MatrixMap.CELL_SIZE,
+                                            real_field_x + x * CELL_SIZE,
+                                            real_field_y + y * CELL_SIZE,
+                                            CELL_SIZE, CELL_SIZE,
                                             Color.YELLOW)
                     # Добавление матричной точки пакмана
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
@@ -213,24 +211,24 @@ class MatrixMap(BaseScene):
                 wall_collision_check(pacman, s_obj)
             elif s_obj.type == 'teleport':
                 s_obj.check_collisions_with_entries(pacman.obj)
-            elif not s_obj.type == '':
+            elif not s_obj.type == '' and pacman.obj.collision(s_obj.obj):
                 s_obj.obj.collision_reaction()
                 self.remove_static_object_from_matrix(m_point)
 
     def check_matrix_positions(self, objects):
         for m_obj in objects:
-            if (m_obj.obj.rect.x // MatrixMap.CELL_SIZE != m_obj.x or
-                m_obj.obj.rect.y // MatrixMap.CELL_SIZE != m_obj.y) and \
-                    m_obj.obj.rect.x > 0 and m_obj.obj.rect.y > 0:
+            if m_obj.obj.rect.x // CELL_SIZE != m_obj.x or \
+               m_obj.obj.rect.y // CELL_SIZE != m_obj.y:
                 self.change_pos_in_matrix(m_obj,
-                                          m_obj.obj.rect.x // MatrixMap.CELL_SIZE,
-                                          m_obj.obj.rect.x // MatrixMap.CELL_SIZE)
+                                          m_obj.obj.rect.x // CELL_SIZE,
+                                          m_obj.obj.rect.x // CELL_SIZE)
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):
         self.remove_moving_object_from_matrix(m_point)
-        self.matrix[new_y][new_x].update_moving_object(m_point)
-        m_point.x = new_x
-        m_point.y = new_y
+        if new_y > 0 and new_y > 0:
+            self.matrix[new_y][new_x].update_moving_object(m_point)
+            m_point.x = new_x
+            m_point.y = new_y
 
     def remove_static_object_from_matrix(self, m_point: SimpleMatrixPoint):
         self.matrix[m_point.y][m_point.x].update_static_object(
