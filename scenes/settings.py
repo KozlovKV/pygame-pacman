@@ -5,6 +5,14 @@ from scenes import BaseScene
 
 
 class SettingsScene(BaseScene):
+    def __int__(self,  game):
+        super().__init__(game)
+        self.lvl_config = None
+        self.mode_config = None
+        self.coop_config = None
+        self.pacman_config = None
+        self.background_config = None
+
     def create_objects(self) -> None:
         lvl_count = 10
         lvl_skin = 34
@@ -19,23 +27,23 @@ class SettingsScene(BaseScene):
         settings_7 = ('LvL texture: '+str(i) for i in range(lvl_skin+1))
         self.objects.append(ButtonObject(self.game, 10, 600, 230, 40, Color.SOFT_RED,
                                          self.game.exit_game, 'EXIT'))
-        self.objects.append(ArrowSwitcher(self.game,
+        self.lvl_config.append(ArrowSwitcher(self.game,
                                           100, 10, 600, 50,
                                           Color.WHITE, Color.SOFT_RED,
                                           0, *settings_1))
-        self.objects.append(ArrowSwitcher(self.game,
+        self.mode_config.append(ArrowSwitcher(self.game,
                                           100, 70, 600, 50,
                                           Color.WHITE, Color.ORANGE,
                                           0, *settings_2))
-        self.objects.append(ArrowSwitcher(self.game,
+        self.coop_config.append(ArrowSwitcher(self.game,
                                           100, 130, 600, 50,
                                           Color.WHITE, Color.YELLOW,
                                           0, *settings_3))
-        self.objects.append(ArrowSwitcher(self.game,
-                                          100, 190, 600, 50,
-                                          Color.WHITE, Color.BLUE,
-                                          0, *settings_6))
-        self.objects.append(ArrowSwitcher(self.game,
+        self.pacman_config.append(ArrowSwitcher(self.game,
+                                                100, 190, 600, 50,
+                                                Color.WHITE, Color.BLUE,
+                                                0, *settings_6))
+        self.background_config.append(ArrowSwitcher(self.game,
                                           100, 250, 600, 50,
                                           Color.WHITE, Color.PURPLE,
                                           0, *settings_7))
@@ -43,8 +51,8 @@ class SettingsScene(BaseScene):
                                          self.game.set_test_scene, 'TO TEST MENU'))
 
     def process_logic(self) -> None:
-        self.game.settings['level'] = int(self.objects[1].get_current_value().split(': ')[1])
-        self.game.settings['mode'] = self.objects[2].get_current_value().split(': ')[1]
-        self.game.settings['coop'] = self.objects[3].get_current_value().split(': ')[1] == 'True'
-        self.game.settings['pacman_texture'] = self.objects[4].get_current_value().split(': ')[1]
-        self.game.settings['lvl_texture'] = int(self.objects[5].get_current_value().split(': ')[1])
+        self.game.settings['level'] = int(self.lvl_config.get_current_value().split(': ')[1])
+        self.game.settings['mode'] = self.mode_config.get_current_value().split(': ')[1]
+        self.game.settings['coop'] = self.coop_config.get_current_value().split(': ')[1] == 'True'
+        self.game.settings['pacman_texture'] = self.pacman_config.get_current_value().split(': ')[1]
+        self.game.settings['lvl_texture'] = int(self.background_config.get_current_value().split(': ')[1])
