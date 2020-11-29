@@ -244,7 +244,7 @@ class Ghost(ImageObject):
     def process_logic(self) -> None:
         if not self.alive and self.cell == self.spawn:
             self.alive = True
-        self.process_statuses()
+        Ghost.process_statuses()
         self.pacman_choice_timer += 1
         if self.pacman_choice_timer >= self.PACMAN_CHOICE_TIME:
             self.current_pacman = choose_random(self.pacmans)
