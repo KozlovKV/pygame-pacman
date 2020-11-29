@@ -1,5 +1,5 @@
 from constants import Color
-from objects import ButtonObject
+from objects.button import ButtonObject
 from objects.switcher import ArrowSwitcher
 from scenes import BaseScene
 
@@ -9,14 +9,14 @@ class SettingsScene(BaseScene):
         lvl_count = 10
         enemy_count = 10
         enemy_speed = 10
-        packman_skin = 5
+        pacman_skin = 5
         lvl_skin = 34
         settings_1 = ("lvl: "+str(i) for i in range(lvl_count+1))
         settings_2 = ('Mode: score_cup', 'Mode: survival', 'Mode: hunt')
         settings_3 = ('Coop: False', 'Coop: True')
         settings_4 = ('Ghosts count: '+str(i) for i in range(1, enemy_count+1))
         settings_5 = ('Ghosts speed: '+str(i) for i in range(1, enemy_speed+1))
-        settings_6 = ('Packman skin: '+str(i) for i in range(packman_skin+1))
+        settings_6 = ('Pacman skin: ' + str(i) for i in range(pacman_skin + 1))
         settings_7 = ('LvL texture: '+str(i) for i in range(lvl_skin+1))
         self.objects.append(ButtonObject(self.game, 10, 600, 230, 40, Color.SOFT_RED,
                                          self.game.exit_game, 'EXIT'))
@@ -57,5 +57,5 @@ class SettingsScene(BaseScene):
         self.game.settings['coop'] = self.objects[3].get_current_value().split(': ')[1] == 'True'
         self.game.settings['ghosts_count'] = int(self.objects[4].get_current_value().split(': ')[1])
         self.game.settings['ghosts_speed'] = int(self.objects[5].get_current_value().split(': ')[1])
-        self.game.settings['packman_texture'] = int(self.objects[6].get_current_value().split(': ')[1])
+        self.game.settings['pacman_texture'] = int(self.objects[6].get_current_value().split(': ')[1])
         self.game.settings['lvl_texture'] = int(self.objects[7].get_current_value().split(': ')[1])

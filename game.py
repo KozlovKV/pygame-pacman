@@ -2,18 +2,21 @@ import pygame
 
 from constants import Color
 from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
-    FinalScene
+    FinalSceneName, FinalSceneScores
 from scenes.testing import TestScene
 
 
 class Game:
     SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 900
+    REAL_FIELD_X = 0
+    REAL_FIELD_Y = 0
     TICK = 75
     MENU_SCENE_INDEX = 0
     SETTINGS_SCENE_INDEX = 1
     HIGHSCORES_SCENE_INDEX = 2
     MAIN_SCENE_INDEX = 3
     GAMEOVER_SCENE_INDEX = 4
+    GAMEOVER_SCENE_INDEX_2 = 6
     current_scene_index = 5  # testing hub
 
     def __init__(self) -> None:
@@ -33,8 +36,9 @@ class Game:
                        SettingsScene(self),
                        HighScoresScene(self),
                        MainScene(self),
-                       FinalScene(self),
-                       TestScene(self)]
+                       FinalSceneName(self),
+                       TestScene(self),
+                       FinalSceneScores(self), ]
 
     def set_menu_scene(self):
         self.set_scene(Game.MENU_SCENE_INDEX)
@@ -50,6 +54,9 @@ class Game:
 
     def set_game_over_scene(self):
         self.set_scene(Game.GAMEOVER_SCENE_INDEX)
+
+    def set_game_over_scene_2(self):
+        self.set_scene(Game.GAMEOVER_SCENE_INDEX_2)
 
     def set_test_scene(self):
         self.set_scene(5)

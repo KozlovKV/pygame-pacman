@@ -2,8 +2,8 @@ from typing import Callable
 
 import pygame
 
-from third_party.button import Button
 from constants import Color, MAIN_FONT
+from third_party.button import Button
 from objects.base import DrawableObject
 
 

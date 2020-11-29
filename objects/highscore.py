@@ -1,5 +1,4 @@
-from constants import MAIN_FONT
-from objects import TextObject
+from objects.text import TextObject
 
 
 class HighScoresTable:
@@ -14,6 +13,7 @@ class HighScoresTable:
         self.count_new_scores = 0
 
     def read_scores(self):
+        self.score_strings = list()
         with open('./data/highscores.txt', 'a') as ftest:
             pass
         with open('./data/highscores.txt', 'r') as fin:

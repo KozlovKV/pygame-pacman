@@ -3,13 +3,16 @@ import datetime
 import pygame
 
 from constants import Color, MAIN_FONT
-from objects import ButtonObject, TextObject
+from objects.button import ButtonObject
+from objects.text import TextObject
 from objects.matrix_map import MatrixMap
 from scenes import BaseScene
 
 
 class MainScene(BaseScene):
     def __init__(self, game):
+
+        game.score = 0
 
         self.game_mode = game.settings['mode']
 

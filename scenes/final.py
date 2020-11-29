@@ -1,16 +1,60 @@
-# from datetime import datetime
-#
-# from constants import Color
-# from objects import TextObject
 from constants import Color
-from objects import ButtonObject
+from objects.button import ButtonObject
+from objects.text import TextObject
+from objects.highscore import HighScoresTable
+from objects.switcher import ArrowSwitcher
 from scenes import BaseScene
 
 
-class FinalScene(BaseScene):
+class FinalSceneName(BaseScene):
     def create_objects(self) -> None:
-        self.objects.append(ButtonObject(self.game, 10, 600, 200, 40, Color.SOFT_RED,
+        alphabet0 = (chr(i) for i in range(65, 91))
+        alphabet1 = (chr(i) for i in range(65, 91))
+        alphabet2 = (chr(i) for i in range(65, 91))
+        self.objects.append(ButtonObject(self.game, 60, 300, 200, 40, Color.GREEN,
+                                         self.go_to_game_over_scene_2, 'ENTER'))
+        self.objects.append(ArrowSwitcher(self.game,
+                                          80, 100, 150, 40,
+                                          Color.WHITE, Color.SOFT_RED,
+                                          0, *alphabet0))
+        self.objects.append(ArrowSwitcher(self.game,
+                                          80, 150, 150, 40,
+                                          Color.WHITE, Color.SOFT_RED,
+                                          0, *alphabet1))
+        self.objects.append(ArrowSwitcher(self.game,
+                                          80, 200, 150, 40,
+                                          Color.WHITE, Color.SOFT_RED,
+                                          0, *alphabet2))
+        self.objects.append(TextObject(self.game, text='AAA', x=310, y=50))
+        self.objects.append(TextObject(self.game, text='ENTER NICKNAME: ', x=150, y=50))
+
+    def process_logic(self) -> None:
+        self.name = ''
+        self.name += self.objects[1].get_current_value()
+        self.name += self.objects[2].get_current_value()
+        self.name += self.objects[3].get_current_value()
+        self.objects[4].update_text(self.name)
+
+    def go_to_game_over_scene_2(self):
+        HighScoresTable(self.game).add_new_score(self.name + ' ' + str(self.game.score))
+        self.game.set_scene(6)
+
+
+class FinalSceneScores(BaseScene):
+    def create_objects(self) -> None:
+        self.objects.append(TextObject(self.game,
+                                       text=('WIN' if self.game.is_win else 'LOSE'),
+                                       color=(Color.GREEN if self.game.is_win else Color.SOFT_RED),
+                                       x=400, y=50))
+        self.objects.append(ButtonObject(self.game, 10, 600, 220, 40, Color.SOFT_RED,
                                          self.game.exit_game, 'EXIT'))
+        self.objects.append(ButtonObject(self.game, 10, 550, 220, 40, Color.BLUE,
+                                         self.game.set_test_scene, 'TO MAIN MENU'))
+        self.objects.append(HighScoresTable(self.game))
+
+    def on_activate(self) -> None:
+        self.objects[3].read_scores()
+
     # TEXT_FMT = 'Game over ({})'
     # seconds_to_end = 3
     #
