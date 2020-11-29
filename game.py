@@ -23,12 +23,11 @@ class Game:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
         self.score = 0
         self.settings = {
-            'ghost_speed': 1,
-            'ghosts_count': 4,
             'level': 0,
             'mode': 'score_cup',
             'field_texture': 0,
-            'coop': False
+            'coop': False,
+            'pacman_texture': 'classic',
         }
         self.is_win = False
         self.game_over = False

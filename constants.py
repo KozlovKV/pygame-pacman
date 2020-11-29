@@ -27,7 +27,7 @@ pygame.font.init()
 MAIN_FONT = pygame.font.SysFont('Consolas', 32, True)
 
 CELL_SIZE = 30
-PACMAN_SPEED = 1
+PACMAN_SPEED = 3
 GHOST_SPEED = 2
 
 
@@ -36,3 +36,9 @@ class Textures:
     WALL = MAIN_FOLDER + 'wall/default/0.png'
     SEED = MAIN_FOLDER + 'seed/0.png'
     TELEPORT = AnimationPreset(2, MAIN_FOLDER + 'teleport/[F].png')
+    PACMAN = {
+        'classic': (AnimationPreset(6, MAIN_FOLDER + 'pacman/classic/[F].png'), True),
+        'bordered': (AnimationPreset(6, MAIN_FOLDER + 'pacman/bordered/[F].png'), True),
+        'inverted': (AnimationPreset(6, MAIN_FOLDER + 'pacman/inverted/[F].png'), True),
+        'ghost': (AnimationPreset(6, MAIN_FOLDER + 'pacman/ghost_like/[F].png'), False),
+    }

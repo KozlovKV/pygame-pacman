@@ -4,6 +4,7 @@ import pygame
 
 from constants import Color, MAIN_FONT
 from objects.button import ButtonObject
+from objects.ghost import Ghost
 from objects.text import TextObject
 from objects.matrix_map import MatrixMap
 from scenes import BaseScene
@@ -75,6 +76,9 @@ class MainScene(BaseScene):
         self.played_seconds += delta.total_seconds()
         self.time_bar.update_text(f'TIME: {int(self.played_seconds)}')
 
+        if self.game_mode == 'survival':
+            self.game.set_scores(int(self.played_seconds)*10)
+
         self.score_bar.update_text(f'SCORE: {self.game.score}')
 
         self.lives_bar.update_text(f'LIVES: {self.lives}')
@@ -83,6 +87,9 @@ class MainScene(BaseScene):
             self.end_game(True)
         elif self.is_lose():
             self.end_game(False)
+
+    def scary_mod_on(self):
+        Ghost.scary_mode_on()
 
     def is_win(self):
         if self.game_mode == 'score_cup':

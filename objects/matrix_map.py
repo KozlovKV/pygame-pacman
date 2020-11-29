@@ -1,6 +1,7 @@
 from constants import *
 from objects.base import DrawableObject
 from objects.image import ImageObject
+from objects.pacman import Pacman
 from objects.seed import Seed
 from objects.teleport import TeleportObject
 from scenes import BaseScene
@@ -53,10 +54,9 @@ class MatrixMultiPoint:
 def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     vec_x = wall.x - pacman.x
     vec_y = wall.y - pacman.y
-    # TODO: Раскоментировать, когда будет готов пакман
-    # if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
-    #     pacman.obj.vec_x = 0
-    #     pacman.obj.vec_y = 0
+    if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
+        pacman.obj.vec_x = 0
+        pacman.obj.vec_y = 0
 
 
 class MatrixMap(BaseScene):
@@ -157,11 +157,10 @@ class MatrixMap(BaseScene):
                     self.ghosts.append(ghost)
                     self.matrix[y][x].update_moving_object(ghost)
                 elif object_char == 'P' or (object_char == 'p' and self.coop):
-                    pacman = DrawableObject(self.game,
-                                            real_field_x + x * CELL_SIZE,
-                                            real_field_y + y * CELL_SIZE,
-                                            CELL_SIZE, CELL_SIZE,
-                                            Color.YELLOW)
+                    pacman = Pacman(self.game,
+                                    real_field_x + x * CELL_SIZE,
+                                    real_field_y + y * CELL_SIZE,
+                                    1 if object_char == 'P' else 2)
                     # Добавление матричной точки пакмана
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
                     self.pacmans.append(pacman)
@@ -222,8 +221,9 @@ class MatrixMap(BaseScene):
                                               m_points):
         for m_point in m_points:
             m_obj = m_point.moving_obj
-            if m_obj.type == 'ghost' and pacman.obj.collision(m_obj.obj):
-                m_obj.obj.collision_reaction(pacman.obj)
+            if m_obj.type == 'ghost':
+                if pacman.obj.collision(m_obj.obj):
+                    m_obj.obj.collision_reaction(pacman.obj)
 
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
@@ -232,22 +232,23 @@ class MatrixMap(BaseScene):
             if s_obj.type == 'wall':
                 wall_collision_check(pacman, s_obj)
             elif s_obj.type == 'teleport':
-                s_obj.check_collisions_with_entries(pacman.obj)
-            elif not s_obj.type == '' and pacman.obj.collision(s_obj.obj):
-                s_obj.obj.collision_reaction()
-                self.remove_static_object_from_matrix(m_point)
+                s_obj.obj.check_collisions_with_entries(pacman.obj)
+            elif not s_obj.type == '':
+                if pacman.obj.collision(s_obj.obj):
+                    s_obj.obj.collision_reaction()
+                    self.remove_static_object_from_matrix(m_point)
 
     def check_matrix_positions(self, objects):
         for m_obj in objects:
-            if m_obj.obj.rect.x // CELL_SIZE != m_obj.x or \
-                m_obj.obj.rect.y // CELL_SIZE != m_obj.y:
-                self.change_pos_in_matrix(m_obj,
-                                          m_obj.obj.rect.x // CELL_SIZE,
-                                          m_obj.obj.rect.x // CELL_SIZE)
+            x = m_obj.obj.rect.x - self.game.REAL_FIELD_X
+            y = m_obj.obj.rect.y - self.game.REAL_FIELD_Y
+            if x // CELL_SIZE != m_obj.x or y // CELL_SIZE != m_obj.y:
+                self.change_pos_in_matrix(m_obj, x // CELL_SIZE,
+                                          y // CELL_SIZE)
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):
         self.remove_moving_object_from_matrix(m_point)
-        if new_y > 0 and new_y > 0:
+        if new_x > 0 and new_y > 0:
             self.matrix[new_y][new_x].update_moving_object(m_point)
             m_point.x = new_x
             m_point.y = new_y
