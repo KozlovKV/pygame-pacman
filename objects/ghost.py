@@ -1,4 +1,4 @@
-from objects import ImageObject
+from objects.image import ImageObject
 
 
 class Ghost(ImageObject):

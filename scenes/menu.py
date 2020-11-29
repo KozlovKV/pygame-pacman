@@ -1,5 +1,5 @@
 from constants import Color
-from objects import ButtonObject
+from objects.button import ButtonObject
 from scenes import BaseScene
 
 

@@ -1,14 +1,13 @@
-from objects import ImageObject
+from constants import Textures
+from objects.image import ImageObject
 
 
 class TeleportObject:
     def __init__(self, game, x1, y1, x2, y2):
         self.game = game
         self.points = [
-            ImageObject(self.game, './resources/images/teleport/teleport_0.png',
-                        x1, y1, 2, './resources/images/teleport/teleport_[F].png'),
-            ImageObject(self.game, './resources/images/teleport/teleport_0.png',
-                        x2, y2, 2, './resources/images/teleport/teleport_[F].png'),
+            ImageObject(self.game, x=x1, y=y1, animation=Textures.TELEPORT),
+            ImageObject(self.game, x=x2, y=y2, animation=Textures.TELEPORT),
         ]
 
         self.time_from_teleported = 0
@@ -21,7 +20,7 @@ class TeleportObject:
         [p.next_frame() for p in self.points]
         if self.last_teleported_object is not None:
             self.time_from_teleported += self.game.TICK
-        if self.time_from_teleported >= self.game.TICK*30:
+        if self.time_from_teleported >= self.game.TICK * 30:
             self.last_teleported_object = None
 
     def check_collisions_with_entries(self, obj: ImageObject):

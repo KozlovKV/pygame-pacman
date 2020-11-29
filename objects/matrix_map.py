@@ -1,7 +1,7 @@
-import constants
 from constants import *
-from objects import ImageObject
 from objects.base import DrawableObject
+from objects.image import ImageObject
+from objects.pacman import Pacman
 from objects.seed import Seed
 from objects.teleport import TeleportObject
 from scenes import BaseScene
@@ -54,13 +54,13 @@ class MatrixMultiPoint:
 def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     vec_x = wall.x - pacman.x
     vec_y = wall.y - pacman.y
-    # TODO: Раскоментировать, когда будет готов пакман
-    # if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
-    #     pacman.obj.vec_x = 0
-    #     pacman.obj.vec_y = 0
+    if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
+        pacman.obj.vec_x = 0
+        pacman.obj.vec_y = 0
 
 
 class MatrixMap(BaseScene):
+    CELL_SIZE = 30
     BORDER_SIZE = 5
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
 
@@ -118,19 +118,18 @@ class MatrixMap(BaseScene):
                 self.matrix[y].append(MatrixMultiPoint(x, y))
                 object_char = level_objects_list[y][x]
                 if object_char == '#':
-                    wall = DrawableObject(self.game,
-                                          real_field_x + x * CELL_SIZE,
-                                          real_field_y + y * CELL_SIZE,
-                                          CELL_SIZE, CELL_SIZE,
-                                          Color.BLUE)
+                    wall = ImageObject(self.game,
+                                       x=real_field_x + x * CELL_SIZE,
+                                       y=real_field_y + y * CELL_SIZE,
+                                       filename=Textures.WALL)
                     # Добавление матричной точки стены
                     wall = SimpleMatrixPoint(x, y, 'wall', wall)
                     self.walls.append(wall)
                     self.matrix[y][x].update_static_object(wall)
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
-                                real_field_x + x * CELL_SIZE + 10,
-                                real_field_y + y * CELL_SIZE + 10)
+                                real_field_x + x * CELL_SIZE,
+                                real_field_y + y * CELL_SIZE)
                     # Добавление матричной точки зерна
                     seed = SimpleMatrixPoint(x, y, 'seed', seed)
                     self.seeds.append(seed)
@@ -158,11 +157,10 @@ class MatrixMap(BaseScene):
                     self.ghosts.append(ghost)
                     self.matrix[y][x].update_moving_object(ghost)
                 elif object_char == 'P' or (object_char == 'p' and self.coop):
-                    pacman = DrawableObject(self.game,
-                                            real_field_x + x * CELL_SIZE,
-                                            real_field_y + y * CELL_SIZE,
-                                            CELL_SIZE, CELL_SIZE,
-                                            Color.YELLOW)
+                    pacman = Pacman(self.game,
+                                    real_field_x + x * CELL_SIZE,
+                                    real_field_y + y * CELL_SIZE,
+                                    1 if object_char == 'P' else 2)
                     # Добавление матричной точки пакмана
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
                     self.pacmans.append(pacman)
@@ -179,9 +177,11 @@ class MatrixMap(BaseScene):
                                                   real_field_y + y1 * CELL_SIZE,
                                                   real_field_x + x2 * CELL_SIZE,
                                                   real_field_y + y2 * CELL_SIZE)
-                        teleport1 = SimpleMatrixPoint(x1, y1, 'teleport', teleport)
+                        teleport1 = SimpleMatrixPoint(x1, y1, 'teleport',
+                                                      teleport)
                         self.matrix[y1][x1].update_static_object(teleport1)
-                        teleport2 = SimpleMatrixPoint(x2, y2, 'teleport', teleport)
+                        teleport2 = SimpleMatrixPoint(x2, y2, 'teleport',
+                                                      teleport)
                         self.matrix[y2][x2].update_static_object(teleport2)
                         self.teleports.append(teleport)
                         teleports_pairs[i] = list()
@@ -221,8 +221,9 @@ class MatrixMap(BaseScene):
                                               m_points):
         for m_point in m_points:
             m_obj = m_point.moving_obj
-            if m_obj.type == 'ghost' and pacman.obj.collision(m_obj.obj):
-                m_obj.obj.collision_reaction(pacman.obj)
+            if m_obj.type == 'ghost':
+                if pacman.obj.collision(m_obj.obj):
+                    m_obj.obj.collision_reaction(pacman.obj)
 
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
@@ -231,22 +232,23 @@ class MatrixMap(BaseScene):
             if s_obj.type == 'wall':
                 wall_collision_check(pacman, s_obj)
             elif s_obj.type == 'teleport':
-                s_obj.check_collisions_with_entries(pacman.obj)
-            elif not s_obj.type == '' and pacman.obj.collision(s_obj.obj):
-                s_obj.obj.collision_reaction()
-                self.remove_static_object_from_matrix(m_point)
+                s_obj.obj.check_collisions_with_entries(pacman.obj)
+            elif not s_obj.type == '':
+                if pacman.obj.collision(s_obj.obj):
+                    s_obj.obj.collision_reaction()
+                    self.remove_static_object_from_matrix(m_point)
 
     def check_matrix_positions(self, objects):
         for m_obj in objects:
-            if m_obj.obj.rect.x // CELL_SIZE != m_obj.x or \
-               m_obj.obj.rect.y // CELL_SIZE != m_obj.y:
-                self.change_pos_in_matrix(m_obj,
-                                          m_obj.obj.rect.x // CELL_SIZE,
-                                          m_obj.obj.rect.x // CELL_SIZE)
+            x = m_obj.obj.rect.x - self.game.REAL_FIELD_X
+            y = m_obj.obj.rect.y - self.game.REAL_FIELD_Y
+            if x // CELL_SIZE != m_obj.x or y // CELL_SIZE != m_obj.y:
+                self.change_pos_in_matrix(m_obj, x // CELL_SIZE,
+                                          y // CELL_SIZE)
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):
         self.remove_moving_object_from_matrix(m_point)
-        if new_y > 0 and new_y > 0:
+        if new_x > 0 and new_y > 0:
             self.matrix[new_y][new_x].update_moving_object(m_point)
             m_point.x = new_x
             m_point.y = new_y

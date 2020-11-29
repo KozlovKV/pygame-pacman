@@ -1,21 +1,23 @@
+from copy import copy
+
 import pygame
 
+from objects.animation import AnimationPreset
 from objects.base import DrawableObject
 
 
 class ImageObject(DrawableObject):
-    def __init__(self, game, filename: str, x: int = None, y: int = None,
-                 frames_count=0, frame_name='',
+    def __init__(self, game, filename: str = None, x: int = None, y: int = None,
+                 animation: AnimationPreset = None,
                  hided_sprite_w=0, hided_sprite_h=0):
         super().__init__(game)
         if filename:
             self.filename = filename
-        self.image = pygame.image.load(self.filename)
+            self.image = pygame.image.load(self.filename)
+        elif animation:
+            self.animation = copy(animation)
+            self.image = animation.frames_list[0]
         self.rect = self.image.get_rect()
-
-        self.frames_count = frames_count
-        self.frame_name = frame_name
-        self.current_frame = 0
 
         self.rect.x = x if x else 0
         self.rect.y = y if y else 0
@@ -38,14 +40,15 @@ class ImageObject(DrawableObject):
         return this_rect.colliderect(other_rect)
 
     def next_frame(self):
-        self.current_frame = (self.current_frame + 1) % self.frames_count
-        current_frame_name = self.frame_name.replace('[F]',
-                                                     str(self.current_frame))
-        self.change_img(current_frame_name)
+        self.image = self.animation.get_next_frame()
+        self.recalculate_img_rect()
 
-    def change_img(self, filename):
+    def load_new_image(self, filename):
         self.filename = filename
         self.image = pygame.image.load(self.filename)
+        self.recalculate_img_rect()
+
+    def recalculate_img_rect(self):
         a = self.rect.x
         b = self.rect.y
         self.rect = self.image.get_rect()
