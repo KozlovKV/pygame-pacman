@@ -164,7 +164,6 @@ class Ghost(ImageObject):
         self.set_position(*self.get_real_position(self.spawn))
         self.alive = False
 
-    # Функция должна быть определена в потомках
     def get_chase_target(self) -> tuple:
         return self.pacman_position()
 
@@ -255,8 +254,8 @@ class Blinky(Ghost):
     """Целевой клеткой всегда является пакман, даже в режиме разбегания.
     Красного цвета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level):
-        super().__init__(game, filename, x, y, level)
+    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool):
+        super().__init__(game, filename, x, y, level, respawn)
 
     def process_logic(self):
         super().process_logic()
@@ -267,8 +266,8 @@ class Pinky(Ghost):
     """Целевой клеткой является позиция на 4 клетки впереди пакмана.
     Розового цввета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level):
-        super().__init__(game, filename, x, y, level)
+    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool):
+        super().__init__(game, filename, x, y, level, respawn)
 
     def process_logic(self):
         super().process_logic()
@@ -280,8 +279,8 @@ class Inky(Ghost):
     Начинает погоню только после того, как пакман съест 30 точек.
     Синего цвета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level, blinky):
-        super().__init__(game, filename, x, y, level)
+    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool, blinky: Ghost):
+        super().__init__(game, filename, x, y, level, respawn)
         self.blinky = blinky
 
     def process_logic(self):
@@ -295,8 +294,8 @@ class Clyde(Ghost):
     Начинает погоню только после того, как пакман съест 1/3 всех точек.
     Оранжевого цвета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level):
-        super().__init__(game, filename, x, y, level)
+    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool):
+        super().__init__(game, filename, x, y, level, respawn)
 
     def process_logic(self):
         super().process_logic()
