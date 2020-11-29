@@ -61,6 +61,7 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
 
 
 class MatrixMap(BaseScene):
+    CELL_SIZE = 30
     BORDER_SIZE = 5
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
 
@@ -111,7 +112,6 @@ class MatrixMap(BaseScene):
         level_objects_list = [string.split() for string in
                               level_strings[2:2 + self.matrix_height]]
         self.matrix = list()
-        teleports_pairs = [list() for _ in range(10)]
         for y in range(self.matrix_height):
             self.matrix.append(list())
             for x in range(self.matrix_width):
@@ -129,8 +129,9 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_static_object(wall)
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
-                                real_field_x + x * CELL_SIZE + 10,
-                                real_field_y + y * CELL_SIZE + 10)
+                                './resources/images/Seed/Seed.png',
+                                real_field_x + x * CELL_SIZE,
+                                real_field_y + y * CELL_SIZE)
                     # Добавление матричной точки зерна
                     seed = SimpleMatrixPoint(x, y, 'seed', seed)
                     self.seeds.append(seed)
