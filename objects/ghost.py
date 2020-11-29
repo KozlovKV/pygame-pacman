@@ -2,8 +2,9 @@ from objects import ImageObject
 from queue import Queue
 from enum import Enum
 from random import choice as choose_random
+from constants import *
+from objects.matrix_map import MatrixMap
 
-WALL_SYMBOL = '#'
 MAIN_SCENE = 3
 
 
@@ -13,8 +14,13 @@ class Status(Enum):
     FRIGHTENED = 2
 
 
-def is_empty(cell: chr) -> bool:
-    return not (cell == WALL_SYMBOL or str.isnumeric(cell))
+def is_empty(cell) -> bool:
+    cell_type = cell.static_obj.type
+    return not (cell_type == 'wall' or cell_type == 'teleport')
+
+
+def is_teleport(cell) -> bool:
+    return cell.static_obj.type == 'teleport'
 
 
 def find_neighbours(matrix: list, cell_row: int, cell_column: int, checker=is_empty) -> list:
@@ -33,32 +39,29 @@ def find_neighbours(matrix: list, cell_row: int, cell_column: int, checker=is_em
 
 
 # Преобразовывает игровое поле в граф в формате списка смежности
-def process_level(level_file_name) -> tuple:
-    with open(level_file_name, 'r') as level:
-        width = int(level.readline().split(': ')[1])
-        height = int(level.readline().split(': ')[1])
-        matrix = [line.split() for line in level.readlines()]
-    graph = {(i, j): [] for i in range(height) for j in range(width)}
-    teleports = dict()  # сопоставляет номеру пару клеток, связанных телепортом
-    for cell_row in range(height):
-        for cell_column in range(width):
-            cell = matrix[cell_row][cell_column]
+def process_level(level: MatrixMap, field_point: tuple) -> dict:
+    matrix = level.matrix
+    graph = dict()
+    for row in matrix:
+        for column in row:
+            cell = matrix[row][column]
             if is_empty(cell):
-                graph[(cell_row, cell_column)] = find_neighbours(matrix, cell_row, cell_column)
-            elif str.isnumeric(cell):
-                teleports[int(cell)] = teleports.get(int(cell), list())
-                teleports[int(cell)].append((cell_row, cell_column))
-    for pair in teleports.values():
-        first_neighbours = find_neighbours(matrix, pair[0][0], pair[0][1])
-        first_cell = first_neighbours[0] if len(first_neighbours) > 0 else (0, 0)
-        second_neighbours = find_neighbours(matrix, pair[-1][0], pair[-1][1])
-        second_cell = second_neighbours[0] if len(first_neighbours) > 0 else (0, 0)
-        graph[first_cell].append(second_cell)
-        graph[second_cell].append(first_cell)
-    return matrix, graph
+                graph[(row, column)] = find_neighbours(matrix, row, column)
+    for teleport in level.teleports:
+        cell_1 = ((teleport.points[0][1] - field_point[1]) // CELL_SIZE,
+                  (teleport.points[0][0] - field_point[0]) // CELL_SIZE)
+        cell_2 = ((teleport.points[1][1] - field_point[1]) // CELL_SIZE,
+                  (teleport.points[1][0] - field_point[0]) // CELL_SIZE)
+        neighbours_1 = find_neighbours(matrix, *cell_1)
+        neighbours_2 = find_neighbours(matrix, *cell_2)
+        for cell in neighbours_1:
+            graph[cell].append(neighbours_2)
+        for cell in neighbours_2:
+            graph[cell].append(neighbours_1)
+    return graph
 
 
-def bfs(graph: list, start: tuple, end: tuple, width: int, height: int) -> tuple:  # Граф - список смежности
+def bfs(graph: dict, start: tuple, end: tuple, width: int, height: int) -> tuple:  # Граф - список смежности
     queue = Queue()
     queue.put(start)
     used = {(x, y): False for x in range(height) for y in range(width)}
@@ -83,7 +86,7 @@ def bfs(graph: list, start: tuple, end: tuple, width: int, height: int) -> tuple
     return parents, found
 
 
-def find_path(graph: list, start: tuple, end: tuple, width: int, height: int) -> list:  # Граф - список смежности
+def find_path(graph: dict, start: tuple, end: tuple, width: int, height: int) -> list:  # Граф - список смежности
     parents, found = bfs(graph, start, end, width, height)
     if not found or start == end:
         return [start]
@@ -99,61 +102,79 @@ def find_path(graph: list, start: tuple, end: tuple, width: int, height: int) ->
 class Ghost(ImageObject):
     status = Status.CHASE
     score_for_kill = 10
+    CHASE_TIME = 300  # время в тиках
+    chase_timer = 0
+    SCATTER_TIME = 500
+    scatter_timer = 0
+    FRIGHTENED_TIME = 100
+    frightened_timer = 0
+    PACMAN_CHOICE_TIME = 200
+    pacman_choice_timer = 0
+    speed = GHOST_SPEED  # расстояние, которое проходит призрак за 1 тик
+    ticks_per_cell = CELL_SIZE // GHOST_SPEED  # количество тиков на прохождение клетки
+    current_ticks = 0  # количество тиков, прошедших с начала движения из предыдущей клетки
+    is_teleporting = False  # телепортируется ли сейчас призрак, нужно для обработки движения
+    teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
 
     def __init__(self, game, filename: str, x: int, y: int,  # x и y - номера строки и столбца клетки спавна
-                 level: str, speed: int = 1, respawn: bool = True,  # level - имя файла с уровнем
-                 chase_time: int = 30, scatter_time: int = 5):
+                 level: MatrixMap, respawn: bool = True):
         super().__init__(game, filename)
-        self.level, self.graph = process_level(level)
-        self.pacmans = game.scenes[MAIN_SCENE].pacmans
-        self.spawn = (x if x else 0, y if y else 0)
+        self.FIELD_POINT = (game.REAL_FIELD_X, game.REAL_FIELD_Y)
+        self.level = level
+        self.matrix = level.matrix
+        self.graph = process_level(self.level, self.FIELD_POINT)
+        self.pacmans = level.pacmans
+        self.current_pacman = choose_random(self.pacmans)
+        self.spawn = (x, y)
         self.cell = (x, y)
-        self.CELL_SIZE = game.scenes[MAIN_SCENE].CELL_SIZE
-        self.FIELD_POINT = game.scenes[MAIN_SCENE].FIELD_POINT
-        self.speed = speed  # расстояние, которое проходит призрак за 1 тик
         self.respawn = respawn
-        self.chase_time = chase_time,
-        self.scatter_time = scatter_time
-        self.ticks_per_cell = self.CELL_SIZE // speed  # количество тиков на прохождение клетки
-        self.current_ticks = 0  # количество тиков, прошедших с начала движения из предыдущей клетки
         self.next_cell = (x, y)
         self.set_position(*self.get_real_position(self.cell))
         self.target = self.cell  # клетка, к которой будет пытаться двигаться призрак
         self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
-        self.is_teleporting = False  # телепортируется ли сейчас призрак, нужно для обработки движения
-        self.teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
 
-    def get_real_position(self, cell):
-        x = self.FIELD_POINT[0] + cell[1] * self.CELL_SIZE
-        y = self.FIELD_POINT[1] + cell[0] * self.CELL_SIZE
+    @classmethod
+    def scary_mode_on(cls):
+        cls.status = Status.FRIGHTENED
+
+    def get_cell(self, position: tuple) -> tuple:
+        x = (position[1] - self.FIELD_POINT[1]) // CELL_SIZE
+        y = (position[0] - self.FIELD_POINT[0]) // CELL_SIZE
         return x, y
 
-    def check_collision(self):
-        for pacman in self.pacmans:
-            if self.collision(pacman):
-                self.react_to_collision(pacman)
+    def get_real_position(self, cell: tuple) -> tuple:
+        x = self.FIELD_POINT[0] + cell[1] * CELL_SIZE
+        y = self.FIELD_POINT[1] + cell[0] * CELL_SIZE
+        return x, y
 
-    def react_to_collision(self, pacman):
+    def collision_reaction(self, pacman) -> None:
         if self.status == Status.FRIGHTENED:
             self.die()
         else:
             pacman.die()
 
-    def die(self):
+    def pacman_position(self) -> tuple:
+        return self.current_pacman.y, self.current_pacman.x
+
+    def die(self) -> None:
         self.game.add_scores(self.score_for_kill)
-        if self.game.
+        if not self.respawn:
+            del self
+            return
         self.set_position(*self.get_real_position(self.spawn))
         self.alive = False
 
     # Функция должна быть определена в потомках
-    def get_chase_target(self):
-        return 0, 0
+    def get_chase_target(self) -> tuple:
+        return self.pacman_position()
 
-    def get_next_cell(self):
-        height = len(self.level)
-        width = len(self.level[0]) if height > 0 else 0
+    def get_next_cell(self) -> tuple:
+        height = self.level.matrix_height
+        width = self.level.matrix_width
         corners = [(0, 0), (0, width - 1), (height - 1, 0), (height - 1, width - 1)]
-        if self.status != Status.CHASE and self.target in corners and len(self.path) > 0:
+        if not self.alive:
+            self.target = self.spawn
+        elif self.status != Status.CHASE and self.target in corners and len(self.path) > 0:
             self.path = self.path[1:]
             return self.path[0]
         elif self.status != Status.CHASE:
@@ -164,33 +185,29 @@ class Ghost(ImageObject):
         return self.path[0]
 
     # Проверяет, соединены ли текущая и следующая клетки телепортом и если да, то находит каким
-    def check_teleport(self):
+    def check_teleport(self) -> None:
         if abs(self.cell[0] - self.next_cell[0]) + abs(self.cell[1] - self.next_cell[1]) <= 1:
             self.is_teleporting = False
             return
         self.is_teleporting = True
-        into_teleports = find_neighbours(self.level, self.cell[0], self.cell[1], str.isnumeric)
-        out_teleports = find_neighbours(self.level, self.next_cell[0], self.next_cell[1], str.isnumeric)
+        into_teleports = find_neighbours(self.matrix, self.cell[0], self.cell[1], is_teleport)
+        out_teleports = find_neighbours(self.matrix, self.next_cell[0], self.next_cell[1], is_teleport)
         for into in into_teleports:
             for out in out_teleports:
-                if self.level[into[0]][into[1]] == self.level[out[0]][out[1]]:
+                if self.matrix[into[0]][into[1]].obj == self.matrix[out[0]][out[1]].obj:
                     self.teleport_cells = (into, out)
                     return
 
-    def process_teleport(self):
-        if self.current_ticks == self.ticks_per_cell // 2:
-            out = self.teleport_cells[1]
-            out_position = self.get_real_position(out)
-            self.set_position(out_position[0] + (self.next_cell[1] - out[1]) * self.current_ticks,
-                              out_position[1] + (self.next_cell[0] - out[0]) * self.current_ticks)
-        elif self.current_ticks < self.ticks_per_cell // 2:
+    def process_teleport(self) -> None:
+        if self.get_cell((self.rect.centerx, self.rect.centery)) == self.cell:
             self.move((self.teleport_cells[0][1] - self.cell[1]) * self.speed,
                       (self.teleport_cells[0][0] - self.cell[0]) * self.speed)
         else:
-            self.move((self.next_cell[1] - self.teleport_cells[1][1]) * self.speed,
-                      (self.next_cell[0] - self.teleport_cells[1][0]) * self.speed)
+            self.cell = self.teleport_cells[1]
+            self.is_teleporting = False
+            self.current_ticks -= 1
 
-    def process_movement(self):
+    def process_movement(self) -> None:
         if self.current_ticks == self.ticks_per_cell:
             self.cell = self.next_cell
             self.set_position(*self.get_real_position(self.cell))
@@ -204,11 +221,33 @@ class Ghost(ImageObject):
                       (self.next_cell[0] - self.cell[0]) * self.speed)
         self.current_ticks += 1
 
-    def process_logic(self):
-        if not self.alive:
-            # TODO что-то делать с таймером
-            return
-        self.check_collision()
+    @classmethod
+    def process_statuses(cls):
+        if cls.status == Status.CHASE:
+            cls.chase_timer += 1
+            if cls.chase_timer >= cls.CHASE_TIME:
+                cls.status = Status.SCATTER
+                cls.chase_timer = 0
+        elif cls.status == Status.SCATTER:
+            cls.scatter_timer += 1
+            if cls.scatter_timer >= cls.SCATTER_TIME:
+                cls.status = Status.CHASE
+                cls.scatter_timer = 0
+        else:
+            cls.frightened_timer += 1
+            if cls.frightened_timer >= cls.FRIGHTENED_TIME:
+                cls.status = Status.CHASE
+                cls.scatter_timer = 0
+                cls.chase_timer = 0
+                cls.scatter_timer = 0
+
+    def process_logic(self) -> None:
+        if not self.alive and self.cell == self.spawn:
+            self.alive = True
+        self.process_statuses()
+        self.pacman_choice_timer += 1
+        if self.pacman_choice_timer >= self.PACMAN_CHOICE_TIME:
+            self.current_pacman = choose_random(self.pacmans)
         self.process_movement()
 
 
