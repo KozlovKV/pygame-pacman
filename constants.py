@@ -3,6 +3,8 @@ import pygame
 
 # https://www.pygame.org/docs/ref/color.html
 # https://github.com/pygame/pygame/blob/master/src_py/colordict.py
+from objects.animation import AnimationPreset
+
 
 class Color:
     RED = pygame.color.Color('red')
@@ -27,3 +29,10 @@ MAIN_FONT = pygame.font.SysFont('Consolas', 32, True)
 CELL_SIZE = 30
 PACMAN_SPEED = 1
 GHOST_SPEED = 2
+
+
+class Textures:
+    MAIN_FOLDER = './resources/images/'
+    WALL = MAIN_FOLDER + 'wall/default/0.png'
+    SEED = MAIN_FOLDER + 'seed/0.png'
+    TELEPORT = AnimationPreset(2, MAIN_FOLDER + 'teleport/[F].png')

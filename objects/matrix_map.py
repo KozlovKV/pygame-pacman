@@ -1,7 +1,6 @@
-import constants
 from constants import *
-from objects import ImageObject
 from objects.base import DrawableObject
+from objects.image import ImageObject
 from objects.seed import Seed
 from objects.teleport import TeleportObject
 from scenes import BaseScene
@@ -112,24 +111,23 @@ class MatrixMap(BaseScene):
         level_objects_list = [string.split() for string in
                               level_strings[2:2 + self.matrix_height]]
         self.matrix = list()
+        teleports_pairs = [list() for _ in range(10)]
         for y in range(self.matrix_height):
             self.matrix.append(list())
             for x in range(self.matrix_width):
                 self.matrix[y].append(MatrixMultiPoint(x, y))
                 object_char = level_objects_list[y][x]
                 if object_char == '#':
-                    wall = DrawableObject(self.game,
-                                          real_field_x + x * CELL_SIZE,
-                                          real_field_y + y * CELL_SIZE,
-                                          CELL_SIZE, CELL_SIZE,
-                                          Color.BLUE)
+                    wall = ImageObject(self.game,
+                                       x=real_field_x + x * CELL_SIZE,
+                                       y=real_field_y + y * CELL_SIZE,
+                                       filename=Textures.WALL)
                     # Добавление матричной точки стены
                     wall = SimpleMatrixPoint(x, y, 'wall', wall)
                     self.walls.append(wall)
                     self.matrix[y][x].update_static_object(wall)
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
-                                './resources/images/Seed/Seed.png',
                                 real_field_x + x * CELL_SIZE,
                                 real_field_y + y * CELL_SIZE)
                     # Добавление матричной точки зерна
@@ -180,9 +178,11 @@ class MatrixMap(BaseScene):
                                                   real_field_y + y1 * CELL_SIZE,
                                                   real_field_x + x2 * CELL_SIZE,
                                                   real_field_y + y2 * CELL_SIZE)
-                        teleport1 = SimpleMatrixPoint(x1, y1, 'teleport', teleport)
+                        teleport1 = SimpleMatrixPoint(x1, y1, 'teleport',
+                                                      teleport)
                         self.matrix[y1][x1].update_static_object(teleport1)
-                        teleport2 = SimpleMatrixPoint(x2, y2, 'teleport', teleport)
+                        teleport2 = SimpleMatrixPoint(x2, y2, 'teleport',
+                                                      teleport)
                         self.matrix[y2][x2].update_static_object(teleport2)
                         self.teleports.append(teleport)
                         teleports_pairs[i] = list()
@@ -240,7 +240,7 @@ class MatrixMap(BaseScene):
     def check_matrix_positions(self, objects):
         for m_obj in objects:
             if m_obj.obj.rect.x // CELL_SIZE != m_obj.x or \
-               m_obj.obj.rect.y // CELL_SIZE != m_obj.y:
+                m_obj.obj.rect.y // CELL_SIZE != m_obj.y:
                 self.change_pos_in_matrix(m_obj,
                                           m_obj.obj.rect.x // CELL_SIZE,
                                           m_obj.obj.rect.x // CELL_SIZE)

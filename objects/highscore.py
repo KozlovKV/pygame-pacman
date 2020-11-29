@@ -1,5 +1,4 @@
-from constants import MAIN_FONT
-from objects import TextObject
+from objects.text import TextObject
 
 
 class HighScoresTable:

@@ -1,7 +1,9 @@
 import pygame
 
-from objects import ButtonObject, TextObject
+
 from objects.base import DrawableObject
+from objects.button import ButtonObject
+from objects.text import TextObject
 
 
 class ArrowSwitcher(DrawableObject):

@@ -1,9 +1,7 @@
-import pygame
-
-from constants import Color
-from objects import ButtonObject, ImageObject
+from constants import Color, Textures
+from objects.button import ButtonObject
+from objects.image import ImageObject
 from objects.base import DrawableObject
-from objects.highscore import HighScoresTable
 from scenes import BaseScene
 
 
@@ -31,8 +29,8 @@ class TestScene(BaseScene):
         self.objects += self.scene_buttons
         self.draw_obj = DrawableObject(self.game, 500, 500, 50, 50)
         self.objects.append(self.draw_obj)
-        self.img_obj = ImageObject(self.game, './resources/images/teleport/teleport_0.png',
-                                   600, 500, 2, './resources/images/teleport/teleport_[F].png')
+        self.img_obj = ImageObject(self.game, x=600, y=500,
+                                   animation=Textures.TELEPORT)
         self.objects.append(self.img_obj)
 
     def additional_logic(self) -> None:

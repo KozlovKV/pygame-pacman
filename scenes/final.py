@@ -1,11 +1,6 @@
-# from datetime import datetime
-#
-# from constants import Color
-# from objects import TextObject
-import pygame
-
 from constants import Color
-from objects import ButtonObject, TextObject
+from objects.button import ButtonObject
+from objects.text import TextObject
 from objects.highscore import HighScoresTable
 from objects.switcher import ArrowSwitcher
 from scenes import BaseScene
