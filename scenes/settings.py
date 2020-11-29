@@ -25,8 +25,6 @@ class SettingsScene(BaseScene):
                       'Pacman skin: ghost',
                       )
         settings_5 = ('LvL texture: ' + str(i) for i in range(lvl_skin + 1))
-        self.objects.append(ButtonObject(self.game, 10, 600, 230, 40, Color.SOFT_RED,
-                                         self.game.exit_game, 'EXIT'))
         self.lvl_config = (ArrowSwitcher(self.game,
                                          100, 10, 600, 50,
                                          Color.WHITE, Color.SOFT_RED,
@@ -47,6 +45,8 @@ class SettingsScene(BaseScene):
                                                 100, 250, 600, 50,
                                                 Color.WHITE, Color.PURPLE,
                                                 0, *settings_5))
+        self.objects.append(ButtonObject(self.game, 10, 600, 230, 40, Color.SOFT_RED,
+                                         self.game.exit_game, 'EXIT'))
         self.objects.append(self.lvl_config)
         self.objects.append(self.mode_config)
         self.objects.append(self.coop_config)

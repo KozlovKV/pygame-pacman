@@ -11,28 +11,31 @@ class FinalSceneName(BaseScene):
         alphabet0 = (chr(i) for i in range(65, 91))
         alphabet1 = (chr(i) for i in range(65, 91))
         alphabet2 = (chr(i) for i in range(65, 91))
-        self.objects.append(ButtonObject(self.game, 60, 300, 200, 40, Color.GREEN,
-                                         self.go_to_game_over_scene_2, 'ENTER'))
-        self.objects.append(ArrowSwitcher(self.game,
+        self.first_letter = (ArrowSwitcher(self.game,
                                           80, 100, 150, 40,
                                           Color.WHITE, Color.SOFT_RED,
                                           0, *alphabet0))
-        self.objects.append(ArrowSwitcher(self.game,
+        self.second_letter = (ArrowSwitcher(self.game,
                                           80, 150, 150, 40,
                                           Color.WHITE, Color.SOFT_RED,
                                           0, *alphabet1))
-        self.objects.append(ArrowSwitcher(self.game,
+        self.third_letter = (ArrowSwitcher(self.game,
                                           80, 200, 150, 40,
                                           Color.WHITE, Color.SOFT_RED,
                                           0, *alphabet2))
+        self.objects.append(ButtonObject(self.game, 60, 300, 200, 40, Color.GREEN,
+                                         self.go_to_game_over_scene_2, 'ENTER'))
+        self.objects.append(self.first_letter)
+        self.objects.append(self.second_letter)
+        self.objects.append(self.third_letter)
         self.objects.append(TextObject(self.game, text='AAA', x=310, y=50))
         self.objects.append(TextObject(self.game, text='ENTER NICKNAME: ', x=150, y=50))
 
     def process_logic(self) -> None:
         self.name = ''
-        self.name += self.objects[1].get_current_value()
-        self.name += self.objects[2].get_current_value()
-        self.name += self.objects[3].get_current_value()
+        self.name += self.first_letter.get_current_value()
+        self.name += self.second_letter.get_current_value()
+        self.name += self.third_letter.get_current_value()
         self.objects[4].update_text(self.name)
 
     def go_to_game_over_scene_2(self):
@@ -42,6 +45,7 @@ class FinalSceneName(BaseScene):
 
 class FinalSceneScores(BaseScene):
     def create_objects(self) -> None:
+        self.highscore_table = HighScoresTable(self.game)
         self.objects.append(TextObject(self.game,
                                        text=('WIN' if self.game.is_win else 'LOSE'),
                                        color=(Color.GREEN if self.game.is_win else Color.SOFT_RED),
@@ -49,11 +53,11 @@ class FinalSceneScores(BaseScene):
         self.objects.append(ButtonObject(self.game, 10, 600, 220, 40, Color.SOFT_RED,
                                          self.game.exit_game, 'EXIT'))
         self.objects.append(ButtonObject(self.game, 10, 550, 220, 40, Color.BLUE,
-                                         self.game.set_test_scene, 'TO MAIN MENU'))
-        self.objects.append(HighScoresTable(self.game))
+                                         self.game.set_test_scene, 'TO TEST MENU'))
+        self.objects.append(self.highscore_table)
 
     def on_activate(self) -> None:
-        self.objects[3].read_scores()
+        self.highscore_table.read_scores()
 
     # TEXT_FMT = 'Game over ({})'
     # seconds_to_end = 3
