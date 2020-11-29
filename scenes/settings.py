@@ -19,12 +19,12 @@ class SettingsScene(BaseScene):
         settings_1 = ("lvl: " + str(i) for i in range(lvl_count + 1))
         settings_2 = ('Mode: score_cup', 'Mode: survival', 'Mode: hunt')
         settings_3 = ('Coop: False', 'Coop: True')
-        settings_6 = ('Pacman skin: classic',
+        settings_4 = ('Pacman skin: classic',
                       'Pacman skin: bordered',
                       'Pacman skin: inverted',
                       'Pacman skin: ghost',
                       )
-        settings_7 = ('LvL texture: ' + str(i) for i in range(lvl_skin + 1))
+        settings_5 = ('LvL texture: ' + str(i) for i in range(lvl_skin + 1))
         self.objects.append(ButtonObject(self.game, 10, 600, 230, 40, Color.SOFT_RED,
                                          self.game.exit_game, 'EXIT'))
         self.lvl_config = (ArrowSwitcher(self.game,
@@ -42,11 +42,11 @@ class SettingsScene(BaseScene):
         self.pacman_config = (ArrowSwitcher(self.game,
                                             100, 190, 600, 50,
                                             Color.WHITE, Color.BLUE,
-                                            0, *settings_6))
+                                            0, *settings_4))
         self.background_config = (ArrowSwitcher(self.game,
                                                 100, 250, 600, 50,
                                                 Color.WHITE, Color.PURPLE,
-                                                0, *settings_7))
+                                                0, *settings_5))
         self.objects.append(self.lvl_config)
         self.objects.append(self.mode_config)
         self.objects.append(self.coop_config)
