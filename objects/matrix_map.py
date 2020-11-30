@@ -2,6 +2,7 @@ from constants import *
 from objects.base import DrawableObject
 from objects.image import ImageObject
 from objects.pacman import Pacman
+from objects.s_seed import SuperSeed
 from objects.seed import Seed
 from objects.teleport import TeleportObject
 from scenes import BaseScene
@@ -135,11 +136,9 @@ class MatrixMap(BaseScene):
                     self.seeds.append(seed)
                     self.matrix[y][x].update_static_object(seed)
                 elif object_char == 'S':
-                    super_seed = DrawableObject(self.game,
-                                                real_field_x + x * CELL_SIZE,
-                                                real_field_y + y * CELL_SIZE,
-                                                CELL_SIZE, CELL_SIZE,
-                                                (233, 185, 149))
+                    super_seed = SuperSeed(self.game,
+                                           real_field_x + x * MatrixMap.CELL_SIZE,
+                                           real_field_y + y * MatrixMap.CELL_SIZE)
                     # Добавление матричной точки супер-зерна
                     super_seed = SimpleMatrixPoint(x, y, 'super_seed',
                                                    super_seed)
@@ -188,7 +187,6 @@ class MatrixMap(BaseScene):
         self.objects += (self.pacmans + self.ghosts + self.teleports)
 
     def additional_logic(self) -> None:
-
         self.pacmans_count = len(
             list(filter(lambda x: x.obj.alive, self.pacmans)))
         self.ghosts_count = len(

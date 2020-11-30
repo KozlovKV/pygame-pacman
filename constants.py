@@ -35,6 +35,7 @@ class Textures:
     MAIN_FOLDER = './resources/images/'
     WALL = MAIN_FOLDER + 'wall/default/0.png'
     SEED = MAIN_FOLDER + 'seed/0.png'
+    SUPER_SEED = MAIN_FOLDER + 'super_seed/default/0.png'
     TELEPORT = AnimationPreset(2, MAIN_FOLDER + 'teleport/[F].png')
     PACMAN = {
         'classic': (AnimationPreset(6, MAIN_FOLDER + 'pacman/classic/[F].png'), True),

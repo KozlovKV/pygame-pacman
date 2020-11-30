@@ -88,8 +88,10 @@ class MainScene(BaseScene):
         elif self.is_lose():
             self.end_game(False)
 
-    def scary_mod_on(self):
-        Ghost.scary_mode_on()
+    def scary_mode_on(self):
+        # TODO: Раскомментировать при добавлении призрака
+        # Ghost.scary_mode_on()
+        pass
 
     def is_win(self):
         if self.game_mode == 'score_cup':
