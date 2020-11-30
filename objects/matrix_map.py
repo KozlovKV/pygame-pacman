@@ -63,11 +63,12 @@ def check_turn_ways(pacman: SimpleMatrixPoint, m_points):
                 ways[0] = 1
             if y <= -1:
                 ways[1] = 1
-            if x >= -1:
+            if x <= -1:
                 ways[2] = 1
-            if y <= -1:
+            if y >= 1:
                 ways[3] = 1
     pacman.obj.update_turn_ways(ways)
+    # print('ways', *ways)
 
 
 def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
