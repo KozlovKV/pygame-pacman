@@ -14,8 +14,6 @@ class HighScoresTable:
 
     def read_scores(self):
         self.score_strings = list()
-        with open('./data/highscores.txt', 'a') as ftest:
-            pass
         with open('./data/highscores.txt', 'r') as fin:
             [self.score_strings.append(score.strip().split(' '))
              for score in fin.readlines()]
