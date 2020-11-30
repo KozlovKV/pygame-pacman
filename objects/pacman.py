@@ -39,8 +39,10 @@ class Pacman(ImageObject):
                 self.angle = 90 * self.turn_status
                 if self.turn_status % 2 == 0:
                     self.vec_x = 1 if self.turn_status == 0 else -1
+                    self.vec_y = 0
                 if self.turn_status % 2 != 0:
                     self.vec_y = 1 if self.turn_status == 3 else -1
+                    self.vec_x = 0
                 self.turn_status = -1
 
     def process_event(self, event):
