@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pygame
 
 from constants import Color
@@ -90,10 +92,13 @@ class Game:
 
     def main_loop(self) -> None:
         while not self.game_over:
+            timer = datetime.now()
             self.process_all_events()
             self.process_all_logic()
             self.process_all_draw()
-            pygame.time.wait(Game.TICK)
+            delta = datetime.now() - timer
+            delta = int(delta.total_seconds())
+            pygame.time.wait(0 if delta >= Game.TICK else Game.TICK - delta)
 
     def set_scene(self, index: int, resume: bool = False) -> None:
         if not resume:

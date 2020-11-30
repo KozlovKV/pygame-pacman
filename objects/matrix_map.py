@@ -52,10 +52,33 @@ class MatrixMultiPoint:
         self.moving_obj.process_draw()
 
 
+def check_turn_ways(pacman: SimpleMatrixPoint, m_points):
+    ways = [0, 0, 0, 0]
+    for m_point in m_points:
+        s_obj = m_point.static_obj
+        if s_obj.type != 'wall':
+            x = s_obj.x - pacman.x
+            y = s_obj.y - pacman.y
+            if x >= 1:
+                ways[0] = 1
+            if y <= -1:
+                ways[1] = 1
+            if x >= -1:
+                ways[2] = 1
+            if y <= -1:
+                ways[3] = 1
+    pacman.obj.update_turn_ways(ways)
+
+
 def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
-    vec_x = wall.x - pacman.x
-    vec_y = wall.y - pacman.y
-    if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
+    x = pacman.x + pacman.obj.vec_x
+    y = pacman.y + pacman.obj.vec_y
+    if (x == wall.x or y == wall.y) and pacman.obj.turn_status == -1 and \
+            pacman.obj.collision(wall.obj):
+    # if (x == wall.x or y == wall.y) and pacman.obj.turn_status == -1:
+        pacman.obj.vec_x *= -1
+        pacman.obj.vec_y *= -1
+        pacman.obj.move(pacman.obj.vec_x*PACMAN_SPEED, pacman.obj.vec_y*PACMAN_SPEED)
         pacman.obj.vec_x = 0
         pacman.obj.vec_y = 0
 
@@ -201,9 +224,9 @@ class MatrixMap(BaseScene):
             self.check_collisions_with_pacman(pacman)
 
     def check_collisions_with_pacman(self, pacman: SimpleMatrixPoint):
-        m_points = []
         x = pacman.x
         y = pacman.y
+        m_points = [self.matrix[y][x]]
         if not x == 0:
             m_points.append(self.matrix[y][x - 1])
         if not x == self.matrix_width - 1:
@@ -225,6 +248,7 @@ class MatrixMap(BaseScene):
 
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
+        check_turn_ways(pacman, m_points)
         for m_point in m_points:
             s_obj = m_point.static_obj
             if s_obj.type == 'wall':
@@ -232,17 +256,20 @@ class MatrixMap(BaseScene):
             elif s_obj.type == 'teleport':
                 s_obj.obj.check_collisions_with_entries(pacman.obj)
             elif not s_obj.type == '':
-                if pacman.obj.collision(s_obj.obj):
+                if pacman.obj.collision_with_small_sprite(s_obj.obj):
                     s_obj.obj.collision_reaction()
                     self.remove_static_object_from_matrix(m_point)
 
     def check_matrix_positions(self, objects):
         for m_obj in objects:
-            x = m_obj.obj.rect.x - self.game.REAL_FIELD_X
-            y = m_obj.obj.rect.y - self.game.REAL_FIELD_Y
-            if x // CELL_SIZE != m_obj.x or y // CELL_SIZE != m_obj.y:
-                self.change_pos_in_matrix(m_obj, x // CELL_SIZE,
-                                          y // CELL_SIZE)
+            field_real_x = m_obj.x * CELL_SIZE + CELL_SIZE // 2
+            field_real_y = m_obj.y * CELL_SIZE + CELL_SIZE // 2
+            real_x = m_obj.obj.rect.x + CELL_SIZE // 2 - self.game.REAL_FIELD_X
+            real_y = m_obj.obj.rect.y + CELL_SIZE // 2 - self.game.REAL_FIELD_Y
+            if abs(field_real_x - real_x) >= CELL_SIZE or \
+                    abs(field_real_y - real_y) >= CELL_SIZE:
+                self.change_pos_in_matrix(m_obj, real_x // CELL_SIZE,
+                                          real_y // CELL_SIZE)
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):
         self.remove_moving_object_from_matrix(m_point)
@@ -250,6 +277,11 @@ class MatrixMap(BaseScene):
             self.matrix[new_y][new_x].update_moving_object(m_point)
             m_point.x = new_x
             m_point.y = new_y
+
+    def correct_real_pos(self, m_point: SimpleMatrixPoint):
+        x = self.game.REAL_FIELD_X + m_point.x * CELL_SIZE
+        y = self.game.REAL_FIELD_Y + m_point.y * CELL_SIZE
+        m_point.obj.set_position(x, y)
 
     def remove_static_object_from_matrix(self, m_point: SimpleMatrixPoint):
         self.matrix[m_point.y][m_point.x].update_static_object(
@@ -268,5 +300,5 @@ class MatrixMap(BaseScene):
             [wall.process_draw() for wall in self.walls]
             [seed.process_draw() for seed in self.seeds]
             [super_seed.process_draw() for super_seed in self.super_seeds]
-            self.first = False
+            # self.first = False
         super(MatrixMap, self).process_draw()
