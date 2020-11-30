@@ -52,10 +52,28 @@ class MatrixMultiPoint:
         self.moving_obj.process_draw()
 
 
+def check_turn_ways(pacman: SimpleMatrixPoint, m_points):
+    ways = [0, 0, 0, 0]
+    for m_point in m_points:
+        s_obj = m_point.static_obj
+        if s_obj.type != 'wall':
+            x = s_obj.x - pacman.x
+            y = s_obj.y - pacman.y
+            if x == 1:
+                ways[0] = 1
+            elif y == -1:
+                ways[1] = 1
+            elif x == -1:
+                ways[2] = 1
+            elif y == -1:
+                ways[3] = 1
+    pacman.obj.update_turn_ways(ways)
+
+
 def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
-    vec_x = wall.x - pacman.x
-    vec_y = wall.y - pacman.y
-    if vec_x == pacman.obj.vec_x or vec_y == pacman.obj.vec_y:
+    x = pacman.x + pacman.obj.vec_x
+    y = pacman.y + pacman.obj.vec_y
+    if (x == wall.x or y == wall.y) and pacman.obj.turn_status == -1:
         pacman.obj.vec_x = 0
         pacman.obj.vec_y = 0
 
@@ -225,6 +243,7 @@ class MatrixMap(BaseScene):
 
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
+        check_turn_ways(pacman, m_points)
         for m_point in m_points:
             s_obj = m_point.static_obj
             if s_obj.type == 'wall':
@@ -268,5 +287,5 @@ class MatrixMap(BaseScene):
             [wall.process_draw() for wall in self.walls]
             [seed.process_draw() for seed in self.seeds]
             [super_seed.process_draw() for super_seed in self.super_seeds]
-            self.first = False
+            # self.first = False
         super(MatrixMap, self).process_draw()
