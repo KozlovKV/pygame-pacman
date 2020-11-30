@@ -75,9 +75,10 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     y = pacman.y + pacman.obj.vec_y
     if (x == wall.x or y == wall.y) and pacman.obj.turn_status == -1 and \
             pacman.obj.collision(wall.obj):
+    # if (x == wall.x or y == wall.y) and pacman.obj.turn_status == -1:
         pacman.obj.vec_x *= -1
         pacman.obj.vec_y *= -1
-        pacman.obj.move(pacman.obj.vec_x, pacman.obj.vec_y)
+        pacman.obj.move(pacman.obj.vec_x*PACMAN_SPEED, pacman.obj.vec_y*PACMAN_SPEED)
         pacman.obj.vec_x = 0
         pacman.obj.vec_y = 0
 
@@ -261,11 +262,14 @@ class MatrixMap(BaseScene):
 
     def check_matrix_positions(self, objects):
         for m_obj in objects:
-            x = m_obj.obj.rect.x + CELL_SIZE // 2 - self.game.REAL_FIELD_X
-            y = m_obj.obj.rect.y + CELL_SIZE // 2 - self.game.REAL_FIELD_Y
-            if x // CELL_SIZE != m_obj.x or y // CELL_SIZE != m_obj.y:
-                self.change_pos_in_matrix(m_obj, x // CELL_SIZE,
-                                          y // CELL_SIZE)
+            field_real_x = m_obj.x * CELL_SIZE + CELL_SIZE // 2
+            field_real_y = m_obj.y * CELL_SIZE + CELL_SIZE // 2
+            real_x = m_obj.obj.rect.x + CELL_SIZE // 2 - self.game.REAL_FIELD_X
+            real_y = m_obj.obj.rect.y + CELL_SIZE // 2 - self.game.REAL_FIELD_Y
+            if abs(field_real_x - real_x) >= CELL_SIZE or \
+                    abs(field_real_y - real_y) >= CELL_SIZE:
+                self.change_pos_in_matrix(m_obj, real_x // CELL_SIZE,
+                                          real_y // CELL_SIZE)
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):
         self.remove_moving_object_from_matrix(m_point)
