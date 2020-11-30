@@ -88,7 +88,7 @@ class MainScene(BaseScene):
         elif self.is_lose():
             self.end_game(False)
 
-    def scary_mod_on(self):
+    def scary_mode_on(self):
         # TODO: Раскомментировать при добавлении призрака
         # Ghost.scary_mode_on()
         pass
