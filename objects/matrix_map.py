@@ -137,9 +137,8 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_static_object(seed)
                 elif object_char == 'S':
                     super_seed = SuperSeed(self.game,
-                                                './resources/images/Таблетка/Стандарт/Powerpill.png',
-                                                real_field_x + x * MatrixMap.CELL_SIZE,
-                                                real_field_y + y * MatrixMap.CELL_SIZE)
+                                           real_field_x + x * MatrixMap.CELL_SIZE,
+                                           real_field_y + y * MatrixMap.CELL_SIZE)
                     # Добавление матричной точки супер-зерна
                     super_seed = SimpleMatrixPoint(x, y, 'super_seed',
                                                    super_seed)
