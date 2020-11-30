@@ -27,8 +27,8 @@ pygame.font.init()
 MAIN_FONT = pygame.font.SysFont('Consolas', 32, True)
 
 CELL_SIZE = 30
-PACMAN_SPEED = 3
-GHOST_SPEED = 2
+PACMAN_SPEED = 4
+GHOST_SPEED = 3
 
 
 class Textures:
