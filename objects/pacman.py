@@ -8,7 +8,8 @@ class Pacman(ImageObject):
 
     def __init__(self, game, x: int, y: int, id: int = 1):
         texture_settings = Textures.PACMAN[game.settings['pacman_texture']]
-        super().__init__(game, x=x, y=y, animation=texture_settings[0])
+        super().__init__(game, x=x, y=y, animation=texture_settings[0],
+                         hided_sprite_w=10, hided_sprite_h=10)
         self.angle = 0
         self.vec_x = 0
         self.vec_y = 0

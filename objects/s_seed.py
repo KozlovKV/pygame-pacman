@@ -4,7 +4,8 @@ from objects.image import ImageObject
 
 class SuperSeed(ImageObject):
     def __init__(self, game, x, y):
-        super().__init__(game, Textures.SUPER_SEED, x, y)
+        super().__init__(game, Textures.SUPER_SEED, x, y,
+                         hided_sprite_w=15, hided_sprite_h=15)
 
     def collision_reaction(self):
         self.die()
