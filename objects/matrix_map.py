@@ -170,7 +170,7 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_static_object(super_seed)
 
                 elif object_char == 'G':
-                    ghost = Ghost(self.game, x, y)
+                    ghost = Ghost(self.game, x, y, self)
                     # Добавление матричной точки призрака
                     ghost = SimpleMatrixPoint(x, y, 'ghost', ghost)
                     self.ghosts.append(ghost)

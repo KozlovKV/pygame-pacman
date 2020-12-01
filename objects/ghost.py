@@ -116,38 +116,21 @@ class Ghost(ImageObject):
     teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
 
     def __init__(self, game, x: int, y: int,  # x и y - номера строки и столбца клетки спавна
-                 respawn: bool = True):
-        self._game = game
-        self._x = x
-        self._y = y
-        self._respawn = respawn
-        self.initial = True
-
-    def initial_check(self):
-        if self.initial:
-            game = self._game
-            x = self._x
-            y = self._y
-            respawn = self._respawn
-
-            self.FIELD_POINT = (game.REAL_FIELD_X, game.REAL_FIELD_Y)
-            scene = game.scenes[MAIN_SCENE]
-            self.level = scene.matrix
-            self.matrix = self.level.matrix
-            self.graph = process_level(self.level, self.FIELD_POINT)
-            self.pacmans = self.level.pacmans
-            self.current_pacman = choose_random(self.pacmans)
-            self.spawn = (x, y)
-            self.cell = (x, y)
-            self.respawn = respawn
-            self.next_cell = (x, y)
-            rx, ry = self.get_real_position(self.cell)
-            super().__init__(game, x=rx, y=ry,
-                             animation=Textures.GHOST['default'])
-            self.target = self.cell  # клетка, к которой будет пытаться двигаться призрак
-            self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
-
-            self.initial = False
+                 matrix_map, respawn: bool = True):
+        self.FIELD_POINT = (game.REAL_FIELD_X, game.REAL_FIELD_Y)
+        self.level = matrix_map
+        self.matrix = self.level.matrix
+        self.graph = process_level(self.level, self.FIELD_POINT)
+        self.pacmans = self.level.pacmans
+        self.current_pacman = choose_random(self.pacmans)
+        self.spawn = (x, y)
+        self.cell = (x, y)
+        self.respawn = respawn
+        self.next_cell = (x, y)
+        rx, ry = self.get_real_position(self.cell)
+        super().__init__(game, x=rx, y=ry, animation=Textures.GHOST['default'])
+        self.target = self.cell  # клетка, к которой будет пытаться двигаться призрак
+        self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
 
     @classmethod
     def scary_mode_on(cls):
@@ -257,7 +240,6 @@ class Ghost(ImageObject):
                 cls.scatter_timer = 0
 
     def process_logic(self) -> None:
-        self.initial_check()
         if not self.alive and self.cell == self.spawn:
             self.alive = True
         Ghost.process_statuses()
