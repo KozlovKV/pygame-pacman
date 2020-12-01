@@ -87,9 +87,12 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
 class MatrixMap(BaseScene):
     BORDER_SIZE = 5
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
+    GHOST_ACTIVATION_CD = 500
 
     def __init__(self, game):
         self.first = True
+        self.current_ghost_cd = MatrixMap.GHOST_ACTIVATION_CD
+
         self.level = game.settings['level']
         self.coop = game.settings['coop']
         self.game_mode = game.settings['mode']
@@ -220,12 +223,25 @@ class MatrixMap(BaseScene):
             list(filter(lambda x: x.obj.alive, self.ghosts)))
         self.seeds_count = len(list(filter(lambda x: x.obj.alive,
                                            self.seeds + self.super_seeds)))
+        self.current_ghost_cd = self.current_ghost_cd + 1 if \
+            self.current_ghost_cd < MatrixMap.GHOST_ACTIVATION_CD else \
+            self.current_ghost_cd
+
+        self.check_ghosts_activity()
 
         self.check_matrix_positions(self.pacmans)
         self.check_matrix_positions(self.ghosts)
 
         for pacman in self.pacmans:
             self.check_collisions_with_pacman(pacman)
+
+    def check_ghosts_activity(self):
+        for ghost in self.ghosts:
+            ghost = ghost.obj
+            if not ghost.active and \
+                    self.current_ghost_cd == MatrixMap.GHOST_ACTIVATION_CD:
+                self.current_ghost_cd = 0
+                ghost.activate()
 
     def check_collisions_with_pacman(self, pacman: SimpleMatrixPoint):
         x = pacman.x
