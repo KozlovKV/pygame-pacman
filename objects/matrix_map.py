@@ -85,7 +85,6 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
 
 
 class MatrixMap(BaseScene):
-    CELL_SIZE = 30
     BORDER_SIZE = 5
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
 
@@ -119,23 +118,28 @@ class MatrixMap(BaseScene):
                           field_height) // 2
 
         # Переменные для рассчёта расположения объектов на игровом поле
-        real_field_x = MatrixMap.FIELD_X + width_padding
-        real_field_y = MatrixMap.FIELD_Y + height_padding
-        self.game.REAL_FIELD_X = real_field_x
-        self.game.REAL_FIELD_Y = real_field_y
+        self.game.REAL_FIELD_X = MatrixMap.FIELD_X + width_padding
+        self.game.REAL_FIELD_Y = MatrixMap.FIELD_Y + height_padding
 
         self.border_field = DrawableObject(self.game,
-                                           real_field_x - MatrixMap.BORDER_SIZE,
-                                           real_field_y - MatrixMap.BORDER_SIZE,
+                                           self.game.REAL_FIELD_X - MatrixMap.BORDER_SIZE,
+                                           self.game.REAL_FIELD_Y - MatrixMap.BORDER_SIZE,
                                            field_width + MatrixMap.BORDER_SIZE * 2,
                                            field_height + MatrixMap.BORDER_SIZE * 2,
                                            Color.SOFT_BLUE)
-        self.field = DrawableObject(self.game, real_field_x, real_field_y,
+        self.field = DrawableObject(self.game, self.game.REAL_FIELD_X, self.game.REAL_FIELD_Y,
                                     field_width, field_height, Color.BLACK)
 
         level_objects_list = [string.split() for string in
                               level_strings[2:2 + self.matrix_height]]
         self.matrix = list()
+        self.generate_all_matrix(level_objects_list)
+        self.generate_ghosts(level_objects_list)
+        self.objects += (self.pacmans + self.ghosts + self.teleports)
+
+    def generate_all_matrix(self, level_objects_list):
+        real_field_x = self.game.REAL_FIELD_X
+        real_field_y = self.game.REAL_FIELD_Y
         teleports_pairs = [list() for _ in range(10)]
         for y in range(self.matrix_height):
             self.matrix.append(list())
@@ -161,20 +165,13 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_static_object(seed)
                 elif object_char == 'S':
                     super_seed = SuperSeed(self.game,
-                                           real_field_x + x * MatrixMap.CELL_SIZE,
-                                           real_field_y + y * MatrixMap.CELL_SIZE)
+                                           real_field_x + x * CELL_SIZE,
+                                           real_field_y + y * CELL_SIZE)
                     # Добавление матричной точки супер-зерна
                     super_seed = SimpleMatrixPoint(x, y, 'super_seed',
                                                    super_seed)
                     self.super_seeds.append(super_seed)
                     self.matrix[y][x].update_static_object(super_seed)
-
-                elif object_char == 'G':
-                    ghost = Ghost(self.game, x, y, self)
-                    # Добавление матричной точки призрака
-                    ghost = SimpleMatrixPoint(x, y, 'ghost', ghost)
-                    self.ghosts.append(ghost)
-                    self.matrix[y][x].update_moving_object(ghost)
                 elif object_char == 'P' or (object_char == 'p' and self.coop):
                     pacman = Pacman(self.game,
                                     real_field_x + x * CELL_SIZE,
@@ -204,7 +201,17 @@ class MatrixMap(BaseScene):
                         self.matrix[y2][x2].update_static_object(teleport2)
                         self.teleports.append(teleport)
                         teleports_pairs[i] = list()
-        self.objects += (self.pacmans + self.ghosts + self.teleports)
+
+    def generate_ghosts(self, level_objects_list):
+        for y in range(self.matrix_height):
+            for x in range(self.matrix_width):
+                object_char = level_objects_list[y][x]
+                if object_char == 'G':
+                    ghost = Ghost(self.game, x, y, self)
+                    # Добавление матричной точки призрака
+                    ghost = SimpleMatrixPoint(x, y, 'ghost', ghost)
+                    self.ghosts.append(ghost)
+                    self.matrix[y][x].update_moving_object(ghost)
 
     def additional_logic(self) -> None:
         self.pacmans_count = len(
