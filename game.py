@@ -24,13 +24,32 @@ class Game:
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
         self.score = 0
-        self.settings = {
+        self.origin_settings = {
+            'lvl_count': 1,
+            'lvl_skin': 34,
             'level': 0,
             'mode': 'score_cup',
-            'field_texture': 0,
             'coop': False,
+            'field_texture': 0,
             'pacman_texture': 'classic',
+            'long_buffer': True,
         }
+        self.settings = {}
+        settings_strings = list()
+        with open('./data/settings.txt', 'a') as ftest:
+            pass
+        with open('./data/settings.txt', 'r') as fin:
+            [settings_strings.append(setting.strip().split(' '))
+             for setting in fin.readlines()]
+            for setting in settings_strings:
+                self.settings[setting[0]] = setting[1]
+        if len(settings_strings) == 0:
+            with open('./data/settings.txt', 'w') as fout:
+                out_strings = [str(setting) + ' ' + str(self.origin_settings[setting]) + '\n'
+                               for setting in self.origin_settings]
+                [settings_strings.append(setting.strip().split(' '))
+                 for setting in out_strings]
+
         self.is_win = False
         self.game_over = False
         self.scenes = [MenuScene(self),

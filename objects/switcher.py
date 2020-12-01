@@ -63,6 +63,11 @@ class ArrowSwitcher(DrawableObject):
         self.button_back.rect = self.rect
         self.button_next.rect = self.rect
 
+    def switch_to(self, new_index):
+        if 0 <= new_index < len(self.values):
+            self.current_index = new_index
+            self.set_text(self.values[new_index])
+
     def set_text(self, text) -> None:
         self.text = text
         self.text_area.text = text
