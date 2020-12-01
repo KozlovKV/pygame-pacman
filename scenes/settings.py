@@ -32,7 +32,7 @@ class SettingsScene(BaseScene):
                  for setting in out_strings]
                 fout.writelines(out_strings)
         for setting in self.settings_strings:
-            self.game.settings[setting[0]] = setting[1]
+            self.game.settings[setting[0]] = self.game.settings_type_defy(setting[1])
         lvl_count = int(self.game.settings['lvl_count'])
         lvl_skin = int(self.game.settings['lvl_skin'])
         self.settings_1 = ["lvl: " + str(i) for i in range(lvl_count)]
@@ -110,8 +110,6 @@ class SettingsScene(BaseScene):
         with open('./data/settings.txt', 'r') as fin:
             [self.settings_strings.append(setting.strip().split(' '))
              for setting in fin.readlines()]
-            for setting in self.settings_strings:
-                self.game.settings[setting[0]] = setting[1]
         if len(self.settings_strings) == 0:
             with open('./data/settings.txt', 'w') as fout:
                 out_strings = [str(setting) + ' ' + str(self.game.origin_settings[setting]) + '\n'
@@ -119,6 +117,8 @@ class SettingsScene(BaseScene):
                 [self.settings_strings.append(setting.strip().split(' '))
                  for setting in out_strings]
                 fout.writelines(out_strings)
+        for setting in self.settings_strings:
+            self.game.settings[setting[0]] = self.game.settings_type_defy(setting[1])
         settings_1_f = [item.split(': ')[1] for item in self.settings_1]
         settings_2_f = [item.split(': ')[1] for item in self.settings_2]
         settings_3_f = [item.split(': ')[1] for item in self.settings_3]
