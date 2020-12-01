@@ -97,7 +97,7 @@ class Game:
             self.process_all_logic()
             self.process_all_draw()
             delta = datetime.now() - timer
-            delta = int(delta.total_seconds())
+            delta = int(delta.total_seconds()*1000)
             pygame.time.wait(0 if delta >= Game.TICK else Game.TICK - delta)
 
     def set_scene(self, index: int, resume: bool = False) -> None:

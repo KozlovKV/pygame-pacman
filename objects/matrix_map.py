@@ -52,24 +52,6 @@ class MatrixMultiPoint:
         self.moving_obj.process_draw()
 
 
-def check_turn_ways(pacman: SimpleMatrixPoint, m_points):
-    ways = [0, 0, 0, 0]
-    for m_point in m_points:
-        s_obj = m_point.static_obj
-        if s_obj.type != 'wall':
-            x = s_obj.x - pacman.x
-            y = s_obj.y - pacman.y
-            if x >= 1:
-                ways[0] = 1
-            if y <= -1:
-                ways[1] = 1
-            if x >= -1:
-                ways[2] = 1
-            if y <= -1:
-                ways[3] = 1
-    pacman.obj.update_turn_ways(ways)
-
-
 def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     x = pacman.x + pacman.obj.vec_x
     y = pacman.y + pacman.obj.vec_y
@@ -248,7 +230,7 @@ class MatrixMap(BaseScene):
 
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
-        check_turn_ways(pacman, m_points)
+        self.check_turn_ways(pacman, m_points)
         for m_point in m_points:
             s_obj = m_point.static_obj
             if s_obj.type == 'wall':
@@ -259,6 +241,27 @@ class MatrixMap(BaseScene):
                 if pacman.obj.collision_with_small_sprite(s_obj.obj):
                     s_obj.obj.collision_reaction()
                     self.remove_static_object_from_matrix(m_point)
+
+    def check_turn_ways(self, pacman: SimpleMatrixPoint, m_points):
+        if abs(
+            pacman.x * CELL_SIZE - pacman.obj.rect.x + self.game.REAL_FIELD_X) <= 3 and \
+            abs(
+                pacman.y * CELL_SIZE == pacman.obj.rect.y - self.game.REAL_FIELD_Y) <= 3:
+            ways = [0, 0, 0, 0]
+            for m_point in m_points:
+                s_obj = m_point.static_obj
+                if s_obj.type != 'wall':
+                    x = s_obj.x - pacman.x
+                    y = s_obj.y - pacman.y
+                    if x >= 1:
+                        ways[0] = 1
+                    if y <= -1:
+                        ways[1] = 1
+                    if x <= -1:
+                        ways[2] = 1
+                    if y >= 1:
+                        ways[3] = 1
+            pacman.obj.update_turn_ways(ways)
 
     def check_matrix_positions(self, objects):
         for m_obj in objects:
