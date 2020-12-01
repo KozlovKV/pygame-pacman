@@ -1,5 +1,6 @@
 from constants import *
 from objects.base import DrawableObject
+from objects.ghost import Ghost
 from objects.image import ImageObject
 from objects.pacman import Pacman
 from objects.s_seed import SuperSeed
@@ -169,11 +170,7 @@ class MatrixMap(BaseScene):
                     self.matrix[y][x].update_static_object(super_seed)
 
                 elif object_char == 'G':
-                    ghost = DrawableObject(self.game,
-                                           real_field_x + x * CELL_SIZE,
-                                           real_field_y + y * CELL_SIZE,
-                                           CELL_SIZE, CELL_SIZE,
-                                           Color.SOFT_BLUE)
+                    ghost = Ghost(self.game, x, y)
                     # Добавление матричной точки призрака
                     ghost = SimpleMatrixPoint(x, y, 'ghost', ghost)
                     self.ghosts.append(ghost)

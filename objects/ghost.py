@@ -3,7 +3,6 @@ from queue import Queue
 from enum import Enum
 from random import choice as choose_random
 from constants import *
-from objects.matrix_map import MatrixMap
 
 MAIN_SCENE = 3
 
@@ -39,19 +38,19 @@ def find_neighbours(matrix: list, cell_row: int, cell_column: int, checker=is_em
 
 
 # Преобразовывает игровое поле в граф в формате списка смежности
-def process_level(level: MatrixMap, field_point: tuple) -> dict:
+def process_level(level, field_point: tuple) -> dict:
     matrix = level.matrix
     graph = dict()
-    for row in matrix:
-        for column in row:
+    for row in range(len(matrix)):
+        for column in range(len(matrix[row])):
             cell = matrix[row][column]
             if is_empty(cell):
                 graph[(row, column)] = find_neighbours(matrix, row, column)
     for teleport in level.teleports:
-        cell_1 = ((teleport.points[0][1] - field_point[1]) // CELL_SIZE,
-                  (teleport.points[0][0] - field_point[0]) // CELL_SIZE)
-        cell_2 = ((teleport.points[1][1] - field_point[1]) // CELL_SIZE,
-                  (teleport.points[1][0] - field_point[0]) // CELL_SIZE)
+        cell_1 = ((teleport.points[0][1].rect.x - field_point[1]) // CELL_SIZE,
+                  (teleport.points[0][0].rect.y - field_point[0]) // CELL_SIZE)
+        cell_2 = ((teleport.points[1][1].rect.x - field_point[1]) // CELL_SIZE,
+                  (teleport.points[1][0].rect.y - field_point[0]) // CELL_SIZE)
         neighbours_1 = find_neighbours(matrix, *cell_1)
         neighbours_2 = find_neighbours(matrix, *cell_2)
         for cell in neighbours_1:
@@ -116,22 +115,39 @@ class Ghost(ImageObject):
     is_teleporting = False  # телепортируется ли сейчас призрак, нужно для обработки движения
     teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
 
-    def __init__(self, game, filename: str, x: int, y: int,  # x и y - номера строки и столбца клетки спавна
-                 level: MatrixMap, respawn: bool = True):
-        super().__init__(game, filename)
-        self.FIELD_POINT = (game.REAL_FIELD_X, game.REAL_FIELD_Y)
-        self.level = level
-        self.matrix = level.matrix
-        self.graph = process_level(self.level, self.FIELD_POINT)
-        self.pacmans = level.pacmans
-        self.current_pacman = choose_random(self.pacmans)
-        self.spawn = (x, y)
-        self.cell = (x, y)
-        self.respawn = respawn
-        self.next_cell = (x, y)
-        self.set_position(*self.get_real_position(self.cell))
-        self.target = self.cell  # клетка, к которой будет пытаться двигаться призрак
-        self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
+    def __init__(self, game, x: int, y: int,  # x и y - номера строки и столбца клетки спавна
+                 respawn: bool = True):
+        self._game = game
+        self._x = x
+        self._y = y
+        self._respawn = respawn
+        self.initial = True
+
+    def initial_check(self):
+        if self.initial:
+            game = self._game
+            x = self._x
+            y = self._y
+            respawn = self._respawn
+
+            self.FIELD_POINT = (game.REAL_FIELD_X, game.REAL_FIELD_Y)
+            scene = game.scenes[MAIN_SCENE]
+            self.level = scene.matrix
+            self.matrix = self.level.matrix
+            self.graph = process_level(self.level, self.FIELD_POINT)
+            self.pacmans = self.level.pacmans
+            self.current_pacman = choose_random(self.pacmans)
+            self.spawn = (x, y)
+            self.cell = (x, y)
+            self.respawn = respawn
+            self.next_cell = (x, y)
+            rx, ry = self.get_real_position(self.cell)
+            super().__init__(game, x=rx, y=ry,
+                             animation=Textures.GHOST['default'])
+            self.target = self.cell  # клетка, к которой будет пытаться двигаться призрак
+            self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
+
+            self.initial = False
 
     @classmethod
     def scary_mode_on(cls):
@@ -241,6 +257,7 @@ class Ghost(ImageObject):
                 cls.scatter_timer = 0
 
     def process_logic(self) -> None:
+        self.initial_check()
         if not self.alive and self.cell == self.spawn:
             self.alive = True
         Ghost.process_statuses()
@@ -254,8 +271,8 @@ class Blinky(Ghost):
     """Целевой клеткой всегда является пакман, даже в режиме разбегания.
     Красного цвета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool):
-        super().__init__(game, filename, x, y, level, respawn)
+    def __init__(self, game, filename: str, x: int, y: int, respawn: bool):
+        super().__init__(game, filename, x, y, respawn)
 
     def process_logic(self):
         super().process_logic()
@@ -266,8 +283,8 @@ class Pinky(Ghost):
     """Целевой клеткой является позиция на 4 клетки впереди пакмана.
     Розового цввета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool):
-        super().__init__(game, filename, x, y, level, respawn)
+    def __init__(self, game, filename: str, x: int, y: int, respawn: bool):
+        super().__init__(game, filename, x, y, respawn)
 
     def process_logic(self):
         super().process_logic()
@@ -279,8 +296,8 @@ class Inky(Ghost):
     Начинает погоню только после того, как пакман съест 30 точек.
     Синего цвета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool, blinky: Ghost):
-        super().__init__(game, filename, x, y, level, respawn)
+    def __init__(self, game, filename: str, x: int, y: int, respawn: bool, blinky: Ghost):
+        super().__init__(game, filename, x, y, respawn)
         self.blinky = blinky
 
     def process_logic(self):
@@ -294,8 +311,8 @@ class Clyde(Ghost):
     Начинает погоню только после того, как пакман съест 1/3 всех точек.
     Оранжевого цвета."""
 
-    def __init__(self, game, filename: str, x: int, y: int, level: MatrixMap, respawn: bool):
-        super().__init__(game, filename, x, y, level, respawn)
+    def __init__(self, game, filename: str, x: int, y: int, level, respawn: bool):
+        super().__init__(game, filename, x, y, respawn)
 
     def process_logic(self):
         super().process_logic()
