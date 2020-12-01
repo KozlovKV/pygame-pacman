@@ -138,7 +138,6 @@ class Ghost(ImageObject):
     @classmethod
     def scary_mode_on(cls) -> None:
         cls.status = Status.FRIGHTENED
-        print('Dont touch me :(')
 
     def get_cell(self, position: tuple) -> tuple:
         x = (position[1] - self.FIELD_POINT[1]) // CELL_SIZE
@@ -248,13 +247,11 @@ class Ghost(ImageObject):
             if self.chase_timer >= self.CHASE_TIME:
                 self.status = Status.SCATTER
                 self.chase_timer = 0
-                print('Im gonna go cry in a corner')
         elif self.status == Status.SCATTER:
             self.scatter_timer += 1
             if self.scatter_timer >= self.SCATTER_TIME:
                 self.status = Status.CHASE
                 self.scatter_timer = 0
-                print('Im gonna getcha')
         else:
             self.frightened_timer += 1
             if self.frightened_timer >= self.FRIGHTENED_TIME:
@@ -262,7 +259,6 @@ class Ghost(ImageObject):
                 self.scatter_timer = 0
                 self.chase_timer = 0
                 self.scatter_timer = 0
-                print('Im gonna getcha')
 
     def process_logic(self) -> None:
         if not self.alive and self.cell == self.spawn:
@@ -280,10 +276,7 @@ class Blinky(Ghost):
 
     def __init__(self, game, x: int, y: int, respawn: bool):
         super().__init__(game, x, y, respawn)
-
-    def process_logic(self):
-        super().process_logic()
-        pass  # TODO
+        self.scatter_timer = 0
 
 
 class Pinky(Ghost):
