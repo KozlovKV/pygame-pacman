@@ -18,7 +18,8 @@ class Pacman(ImageObject):
         self.pacman_id = id
 
         self.frames_keeping = 0
-        self.previous_turn_status = -1
+        self.turn_buff = -1
+        self.previous_turn_buff = -1
         self.turn_status = -1
         '''
         -1 - нет поворота
@@ -33,6 +34,12 @@ class Pacman(ImageObject):
     def update_turn_ways(self, ways=[0, 0, 0, 0]):
         self.turn_ways = ways
 
+    def check_turn_status(self):
+        if self.turn_buff != -1:
+            if self.turn_ways[self.turn_buff] == 1:
+                self.turn_status = self.turn_buff
+                self.turn_buff = -1
+
     def do_turn(self):
         if self.turn_status != -1:
             if self.turn_ways[self.turn_status] == 1:
@@ -43,40 +50,31 @@ class Pacman(ImageObject):
                 if self.turn_status % 2 != 0:
                     self.vec_y = 1 if self.turn_status == 3 else -1
                     self.vec_x = 0
+            else:
+                self.vec_y = 0
+                self.vec_x = 0
                 self.turn_status = -1
+                self.turn_buff = -1
 
     def process_event(self, event):
-        if self.pacman_id == 1:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_d:
-                    self.turn_status = 0
-                elif event.key == pygame.K_w:
-                    self.turn_status = 1
-                elif event.key == pygame.K_a:
-                    self.turn_status = 2
-                elif event.key == pygame.K_s:
-                    self.turn_status = 3
-                
-        elif self.pacman_id == 2:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    self.turn_status = 0
-                elif event.key == pygame.K_UP:
-                    self.turn_status = 1
-                elif event.key == pygame.K_LEFT:
-                    self.turn_status = 2
-                elif event.key == pygame.K_DOWN:
-                    self.turn_status = 3
+        if event.type == pygame.KEYDOWN:
+            keys = [pygame.K_d, pygame.K_w, pygame.K_a, pygame.K_s]
+            if self.pacman_id == 2:
+                keys = [pygame.K_RIGHT, pygame.K_UP, pygame.K_LEFT, pygame.K_DOWN]
+            for i in range(len(keys)):
+                if event.key == keys[i]:
+                    self.turn_buff = i
 
     def process_logic(self):
-        if self.turn_status != -1:
-            if self.turn_status == self.previous_turn_status:
+        if self.turn_buff != -1:
+            if self.turn_buff == self.previous_turn_buff:
                 self.frames_keeping += 1
                 if self.frames_keeping >= Pacman.FRAMES_KEEP_TURN:
-                    self.turn_status = -1
+                    self.turn_buff = -1
                     self.frames_keeping = 0
-            self.previous_turn_status = self.turn_status
+            self.previous_turn_buff = self.turn_buff
 
+        self.check_turn_status()
         self.do_turn()
 
         x = self.vec_x * self.speed
@@ -85,5 +83,6 @@ class Pacman(ImageObject):
 
     def process_draw(self):
         self.next_frame()
-        self.rotate_img(self.angle)
+        if self.rotable:
+            self.rotate_img(self.angle)
         super(Pacman, self).process_draw()

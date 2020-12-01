@@ -63,9 +63,9 @@ def check_turn_ways(pacman: SimpleMatrixPoint, m_points):
                 ways[0] = 1
             if y <= -1:
                 ways[1] = 1
-            if x >= -1:
+            if x <= -1:
                 ways[2] = 1
-            if y <= -1:
+            if y >= 1:
                 ways[3] = 1
     pacman.obj.update_turn_ways(ways)
 
@@ -252,7 +252,8 @@ class MatrixMap(BaseScene):
         for m_point in m_points:
             s_obj = m_point.static_obj
             if s_obj.type == 'wall':
-                wall_collision_check(pacman, s_obj)
+                pass
+                # wall_collision_check(pacman, s_obj)
             elif s_obj.type == 'teleport':
                 s_obj.obj.check_collisions_with_entries(pacman.obj)
             elif not s_obj.type == '':
