@@ -243,10 +243,9 @@ class MatrixMap(BaseScene):
                     self.remove_static_object_from_matrix(m_point)
 
     def check_turn_ways(self, pacman: SimpleMatrixPoint, m_points):
-        if abs(
-            pacman.x * CELL_SIZE - pacman.obj.rect.x + self.game.REAL_FIELD_X) <= 3 and \
-            abs(
-                pacman.y * CELL_SIZE == pacman.obj.rect.y - self.game.REAL_FIELD_Y) <= 3:
+        # В теории, проверка должна помочь избежать поворотв, когда Пакман ещё не готов
+        if abs(pacman.x * CELL_SIZE - pacman.obj.rect.x + self.game.REAL_FIELD_X) <= PACMAN_SPEED and \
+            abs(pacman.y * CELL_SIZE == pacman.obj.rect.y - self.game.REAL_FIELD_Y) <= PACMAN_SPEED:
             ways = [0, 0, 0, 0]
             for m_point in m_points:
                 s_obj = m_point.static_obj
