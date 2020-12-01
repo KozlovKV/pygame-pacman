@@ -154,7 +154,7 @@ class Ghost(ImageObject):
         return x, y
 
     def collision_reaction(self, pacman) -> None:
-        if self.status == Status.FRIGHTENED:
+        if Ghost.status == Status.FRIGHTENED:
             self.die()
         else:
             pacman.die()
