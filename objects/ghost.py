@@ -103,7 +103,7 @@ def find_path(graph: dict, start: tuple, end: tuple, width: int, height: int) ->
 class Ghost(ImageObject):
     status = Status.CHASE
     score_for_kill = 10
-    CHASE_TIME = 300  # время в тиках
+    CHASE_TIME = 50  # время в тиках
     chase_timer = 0
     SCATTER_TIME = 50
     scatter_timer = 0
@@ -116,6 +116,7 @@ class Ghost(ImageObject):
     current_ticks = 0  # количество тиков, прошедших с начала движения из предыдущей клетки
     is_teleporting = False  # телепортируется ли сейчас призрак, нужно для обработки движения
     teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
+    active = False  # вышел ли призрак из спавна
 
     def __init__(self, game, y: int, x: int,  # x и y - номера строки и столбца клетки спавна
                  matrix_map, respawn: bool = True):
@@ -138,6 +139,9 @@ class Ghost(ImageObject):
     @classmethod
     def scary_mode_on(cls) -> None:
         cls.status = Status.FRIGHTENED
+
+    def activate(self):
+        self.active = True
 
     def get_cell(self, position: tuple) -> tuple:
         x = (position[1] - self.FIELD_POINT[1]) // CELL_SIZE
@@ -261,6 +265,8 @@ class Ghost(ImageObject):
                 self.scatter_timer = 0
 
     def process_logic(self) -> None:
+        if not self.active:
+            return
         if not self.alive and self.cell == self.spawn:
             self.alive = True
         self.process_statuses()
@@ -276,8 +282,7 @@ class Blinky(Ghost):
 
     def __init__(self, game, x: int, y: int, respawn: bool):
         super().__init__(game, x, y, respawn)
-        self.scatter_timer = 0
-
+        self.SCATTER_TIME = 0
 
 class Pinky(Ghost):
     """Целевой клеткой является позиция на 4 клетки впереди пакмана.
