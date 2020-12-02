@@ -3,6 +3,8 @@ from objects.image import ImageObject
 
 
 class TeleportObject:
+    KEEP_TELEPORTED_OBJECT = 30
+
     def __init__(self, game, x1, y1, x2, y2):
         self.game = game
         self.points = [
@@ -19,8 +21,9 @@ class TeleportObject:
     def process_logic(self):
         [p.next_frame() for p in self.points]
         if self.last_teleported_object is not None:
-            self.time_from_teleported += self.game.TICK
-        if self.time_from_teleported >= self.game.TICK * 30:
+            self.time_from_teleported += 1
+        if self.time_from_teleported >= TeleportObject.KEEP_TELEPORTED_OBJECT:
+            self.time_from_teleported = 0
             self.last_teleported_object = None
 
     def check_collisions_with_entries(self, obj: ImageObject):

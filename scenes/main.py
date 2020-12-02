@@ -83,6 +83,8 @@ class MainScene(BaseScene):
 
         self.lives_bar.update_text(f'LIVES: {self.lives}')
 
+        self.pacmans_reviving()
+
         if self.is_win():
             self.end_game(True)
         elif self.is_lose():
@@ -92,6 +94,14 @@ class MainScene(BaseScene):
     def scary_mode_on():
         Ghost.scary_mode_on()
 
+    def pacmans_reviving(self):
+        pacmans = self.matrix.pacmans
+        for pacman in pacmans:
+            obj = pacman.obj
+            if not obj.alive and self.lives > 0:
+                self.lives -= 1
+                obj.revive()
+
     def is_win(self):
         if self.game_mode == 'score_cup':
             return self.matrix.seeds_count <= 0
@@ -100,7 +110,7 @@ class MainScene(BaseScene):
         return False
 
     def is_lose(self):
-        if self.matrix.pacmans_count <= 0:
+        if self.matrix.pacmans_count <= 0 and self.lives <= 0:
             return True
         return False
 

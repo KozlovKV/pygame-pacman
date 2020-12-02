@@ -10,12 +10,15 @@ class Pacman(ImageObject):
         texture_settings = Textures.PACMAN[game.settings['pacman_texture']]
         super().__init__(game, x=x, y=y, animation=texture_settings[0],
                          hided_sprite_w=10, hided_sprite_h=10)
+        self.spawn = (x, y)
         self.angle = 0
         self.vec_x = 0
         self.vec_y = 0
         self.speed = PACMAN_SPEED
         self.rotable = texture_settings[1]
         self.pacman_id = id
+
+        self.ticks_to_revive = -1
 
         self.frames_keeping = 0
         self.turn_buff = -1
@@ -77,9 +80,26 @@ class Pacman(ImageObject):
         self.check_turn_status()
         self.do_turn()
 
+        if self.ticks_to_revive > 0:
+            self.vec_x = 0
+            self.vec_y = 0
+            self.ticks_to_revive -= 1
+        elif self.ticks_to_revive == 0:
+            self.ticks_to_revive = -1
+            self.set_position(*self.spawn)
+            anim = Textures.PACMAN[self.game.settings['pacman_texture']][0]
+            self.load_new_animation(anim)
+
         x = self.vec_x * self.speed
         y = self.vec_y * self.speed
         self.move(x, y)
+
+    def revive(self):
+        # anim = Textures.PACMAN[self.game.settings['pacman_texture']+'_die']
+        # self.load_new_animation(anim)
+        # self.ticks_to_revive = anim.frames_count
+        self.ticks_to_revive = 5
+        self.alive = True
 
     def process_draw(self):
         self.next_frame()
