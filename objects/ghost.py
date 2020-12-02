@@ -103,11 +103,11 @@ def find_path(graph: dict, start: tuple, end: tuple, width: int, height: int) ->
 class Ghost(ImageObject):
     status = Status.CHASE
     score_for_kill = 10
-    CHASE_TIME = 50  # время в тиках
+    CHASE_TIME = 300  # время в тиках
     chase_timer = 0
     SCATTER_TIME = 50
     scatter_timer = 0
-    FRIGHTENED_TIME = 50
+    FRIGHTENED_TIME = 100
     frightened_timer = 0
     PACMAN_CHOICE_TIME = 200
     pacman_choice_timer = 0
@@ -198,10 +198,10 @@ class Ghost(ImageObject):
         width = self.level.matrix_width
         if not self.alive:
             self.target = self.spawn
-        elif self.status != Status.CHASE and self.target in self.corners and len(self.path) >= 2:
+        elif Ghost.status != Status.CHASE and self.target in self.corners and len(self.path) >= 2:
             self.path = self.path[1:]
             return self.path[0]
-        elif self.status != Status.CHASE:
+        elif Ghost.status != Status.CHASE:
             self.target = choose_random(self.corners)
         else:
             self.target = self.get_chase_target()
@@ -246,23 +246,24 @@ class Ghost(ImageObject):
         self.current_ticks += 1
 
     def process_statuses(self):
-        if self.status == Status.CHASE:
+        if Ghost.status == Status.CHASE:
             self.chase_timer += 1
+            self.scatter_timer = 0
+            self.frightened_timer = 0
             if self.chase_timer >= self.CHASE_TIME:
-                self.status = Status.SCATTER
-                self.chase_timer = 0
-        elif self.status == Status.SCATTER:
+                Ghost.status = Status.SCATTER
+        elif Ghost.status == Status.SCATTER:
             self.scatter_timer += 1
+            self.chase_timer = 0
+            self.frightened_timer = 0
             if self.scatter_timer >= self.SCATTER_TIME:
-                self.status = Status.CHASE
-                self.scatter_timer = 0
+                Ghost.status = Status.CHASE
         else:
             self.frightened_timer += 1
+            self.chase_timer = 0
+            self.scatter_timer = 0
             if self.frightened_timer >= self.FRIGHTENED_TIME:
-                self.status = Status.CHASE
-                self.scatter_timer = 0
-                self.chase_timer = 0
-                self.scatter_timer = 0
+                Ghost.status = Status.CHASE
 
     def process_logic(self) -> None:
         if not self.active:
@@ -280,16 +281,17 @@ class Blinky(Ghost):
     """Целевой клеткой всегда является пакман, даже в режиме разбегания.
     Красного цвета."""
 
-    def __init__(self, game, x: int, y: int, respawn: bool):
-        super().__init__(game, x, y, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
+        super().__init__(game, x, y, matrix_map, respawn)
         self.SCATTER_TIME = 0
+
 
 class Pinky(Ghost):
     """Целевой клеткой является позиция на 4 клетки впереди пакмана.
     Розового цввета."""
 
-    def __init__(self, game, x: int, y: int, respawn: bool):
-        super().__init__(game, x, y, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
+        super().__init__(game, x, y, matrix_map, respawn)
 
     def process_logic(self):
         super().process_logic()
@@ -301,8 +303,8 @@ class Inky(Ghost):
     Начинает погоню только после того, как пакман съест 30 точек.
     Синего цвета."""
 
-    def __init__(self, game, x: int, y: int, respawn: bool, blinky: Ghost):
-        super().__init__(game, x, y, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map, blinky: Ghost, respawn: bool = True):
+        super().__init__(game, x, y, matrix_map, respawn)
         self.blinky = blinky
 
     def process_logic(self):
@@ -316,8 +318,8 @@ class Clyde(Ghost):
     Начинает погоню только после того, как пакман съест 1/3 всех точек.
     Оранжевого цвета."""
 
-    def __init__(self, game, x: int, y: int, level, respawn: bool):
-        super().__init__(game, x, y, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
+        super().__init__(game, x, y, matrix_map, respawn)
 
     def process_logic(self):
         super().process_logic()
