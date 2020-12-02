@@ -6,15 +6,14 @@ from scenes import BaseScene
 
 
 class SettingsScene(BaseScene):
-    def __int__(self, game):
+    def __init__(self, game):
         self.lvl_config = None
         self.mode_config = None
         self.coop_config = None
         self.pacman_config = None
         self.background_config = None
-        self.settings_strings = list()
+        self.configs = list()
         self.save_changes = True
-        self.origins = False
         super().__init__(game)
 
     def create_objects(self) -> None:
@@ -56,88 +55,66 @@ class SettingsScene(BaseScene):
                                                  100, 310, 600, 50,
                                                  Color.WHITE, Color.PURPLE,
                                                  0, *self.settings_6))
-        self.objects.append(self.lvl_config)
-        self.objects.append(self.mode_config)
-        self.objects.append(self.coop_config)
-        self.objects.append(self.pacman_config)
-        self.objects.append(self.background_config)
-        self.objects.append(self.long_buffer_config)
-        self.objects.append(ButtonObject(self.game, 100, 370, 600, 40, Color.SOFT_RED,
-                                         self.game.set_test_scene, 'SAVE AND RETURN'))
-        self.objects.append(ButtonObject(self.game, 100, 430, 600, 40, Color.SOFT_RED,
-                                         self.quit_without_saving, 'RETURN'))
-        self.objects.append(ButtonObject(self.game, 100, 490, 600, 40, Color.SOFT_RED,
-                                         self.quit_and_defaults, 'DEFAULTS AND RETURN'))
+        self.configs = [
+            self.lvl_config,
+            self.mode_config,
+            self.coop_config,
+            self.pacman_config,
+            self.background_config,
+            self.long_buffer_config,
+        ]
+        self.objects += self.configs
+        self.objects.append(
+            ButtonObject(self.game, 100, 370, 600, 40, Color.SOFT_RED,
+                         self.game.set_test_scene, 'SAVE AND RETURN'))
+        self.objects.append(
+            ButtonObject(self.game, 100, 430, 600, 40, Color.SOFT_RED,
+                         self.quit_without_saving, 'RETURN'))
 
     def quit_without_saving(self):
         self.save_changes = False
         self.game.set_test_scene()
 
-    def quit_and_defaults(self):
-        self.origins = True
-        self.save_changes = False
-        self.defaults = [0, 0, 0, 0, 0, 0, ]
-        self.game.set_test_scene()
-
     def process_logic(self) -> None:
         pass
-        # self.game.settings['level'] = int(self.lvl_config.get_current_value().split(': ')[1])
-        # self.game.settings['mode'] = self.mode_config.get_current_value().split(': ')[1]
-        # self.game.settings['coop'] = self.coop_config.get_current_value().split(': ')[1] == 'True'
-        # self.game.settings['pacman_texture'] = self.pacman_config.get_current_value().split(': ')[1]
-        # self.game.settings['field_texture'] = int(self.background_config.get_current_value().split(': ')[1])
 
     def on_activate(self) -> None:
         self.game.settings = read_json_from_file(SETTINGS_PATH)
 
-        settings_1_f = [item.split(': ')[1] for item in self.settings_1]
-        settings_2_f = [item.split(': ')[1] for item in self.settings_2]
-        settings_3_f = [item.split(': ')[1] for item in self.settings_3]
-        settings_4_f = [item.split(': ')[1] for item in self.settings_4]
-        settings_5_f = [item.split(': ')[1] for item in self.settings_5]
-        settings_6_f = [item.split(': ')[1] for item in self.settings_6]
-        current_index_1 = 0
-        current_index_2 = 0
-        current_index_3 = 0
-        current_index_4 = 0
-        current_index_5 = 0
-        current_index_6 = 0
-        for value in range(len(settings_1_f)):
-            if settings_1_f[value] == self.game.settings['level']:
-                current_index_1 = value
-        for value in range(len(settings_2_f)):
-            if settings_2_f[value] == self.game.settings['mode']:
-                current_index_2 = value
-        for value in range(len(settings_3_f)):
-            if settings_3_f[value] == self.game.settings['coop']:
-                current_index_3 = value
-        for value in range(len(settings_4_f)):
-            if settings_4_f[value] == self.game.settings['pacman_texture']:
-                current_index_4 = value
-        for value in range(len(settings_5_f)):
-            if settings_5_f[value] == self.game.settings['field_texture']:
-                current_index_5 = value
-        for value in range(len(settings_6_f)):
-            if settings_6_f[value] == self.game.settings['long_buffer']:
-                current_index_6 = value
-        self.lvl_config.switch_to(current_index_1)
-        self.mode_config.switch_to(current_index_2)
-        self.coop_config.switch_to(current_index_3)
-        self.pacman_config.switch_to(current_index_4)
-        self.background_config.switch_to(current_index_5)
-        self.long_buffer_config.switch_to(current_index_6)
-        self.game.settings['level'] = int(self.lvl_config.get_current_value().split(': ')[1])
-        self.game.settings['mode'] = self.mode_config.get_current_value().split(': ')[1]
-        self.game.settings['coop'] = self.coop_config.get_current_value().split(': ')[1] == 'True'
-        self.game.settings['pacman_texture'] = self.pacman_config.get_current_value().split(': ')[1]
-        self.game.settings['field_texture'] = int(self.background_config.get_current_value().split(': ')[1])
-        self.game.settings['long_buffer'] = self.long_buffer_config.get_current_value().split(': ')[1] == 'True'
-        self.defaults = [current_index_1,
-                         current_index_2,
-                         current_index_3,
-                         current_index_4,
-                         current_index_5,
-                         current_index_6, ]
+        settings_f_list = [
+            [item.split(': ')[1] for item in self.settings_1],
+            [item.split(': ')[1] for item in self.settings_2],
+            [item.split(': ')[1] for item in self.settings_3],
+            [item.split(': ')[1] for item in self.settings_4],
+            [item.split(': ')[1] for item in self.settings_5],
+            [item.split(': ')[1] for item in self.settings_6],
+        ]
+        settings_names = ['level', 'mode', 'coop',
+                          'pacman_texture', 'field_texture', 'long_buffer']
+        for conf_i in range(len(settings_f_list)):
+            values = settings_f_list[conf_i]
+            value_in_game_settings = self.game.settings[settings_names[conf_i]]
+            for value_i in range(len(values)):
+                if values[value_i] == value_in_game_settings:
+                    self.configs[conf_i].switch_to(value_i)
+
+        self.save_settings_to_game_dict()
 
     def on_deactivate(self) -> None:
-        write_json_to_file(SETTINGS_PATH, self.game.settings)
+        if self.save_changes:
+            self.save_settings_to_game_dict()
+            write_json_to_file(SETTINGS_PATH, self.game.settings)
+
+    def save_settings_to_game_dict(self):
+        self.game.settings['level'] = int(
+            self.lvl_config.get_current_value().split(': ')[1])
+        self.game.settings['mode'] = \
+        self.mode_config.get_current_value().split(': ')[1]
+        self.game.settings['coop'] = \
+        self.coop_config.get_current_value().split(': ')[1] == 'True'
+        self.game.settings['pacman_texture'] = \
+        self.pacman_config.get_current_value().split(': ')[1]
+        self.game.settings['field_texture'] = int(
+            self.background_config.get_current_value().split(': ')[1])
+        self.game.settings['long_buffer'] = \
+        self.long_buffer_config.get_current_value().split(': ')[1] == 'True'

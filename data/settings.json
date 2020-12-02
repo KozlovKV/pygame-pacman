@@ -2,9 +2,9 @@
     "lvl_count": 1,
     "lvl_skin": 1,
     "level": 0,
-    "mode": "score_cup",
-    "coop": false,
+    "mode": "survival",
+    "coop": true,
     "field_texture": 0,
-    "pacman_texture": "classic",
+    "pacman_texture": "bordered",
     "long_buffer": true
 }
