@@ -30,6 +30,7 @@ CELL_SIZE = 30
 PACMAN_SPEED = 4
 GHOST_SPEED = 3
 
+SETTINGS_PATH = './data/settings.json'
 
 class Textures:
     MAIN_FOLDER = './resources/images/'

@@ -1,4 +1,5 @@
-from constants import Color
+from constants import Color, SETTINGS_PATH
+from misc import write_json_to_file, read_json_from_file
 from objects.button import ButtonObject
 from objects.switcher import ArrowSwitcher
 from scenes import BaseScene
@@ -17,22 +18,8 @@ class SettingsScene(BaseScene):
         super().__init__(game)
 
     def create_objects(self) -> None:
-        self.settings_strings = list()
-        self.origins = False
-        with open('./data/settings.txt', 'a') as ftest:
-            pass
-        with open('./data/settings.txt', 'r') as fin:
-            [self.settings_strings.append(setting.strip().split(' '))
-             for setting in fin.readlines()]
-        if len(self.settings_strings) == 0:
-            with open('./data/settings.txt', 'w') as fout:
-                out_strings = [str(setting) + ' ' + str(self.game.origin_settings[setting]) + '\n'
-                               for setting in self.game.origin_settings]
-                [self.settings_strings.append(setting.strip().split(' '))
-                 for setting in out_strings]
-                fout.writelines(out_strings)
-        for setting in self.settings_strings:
-            self.game.settings[setting[0]] = self.game.settings_type_defy(setting[1])
+        self.game.settings = read_json_from_file(SETTINGS_PATH)
+
         lvl_count = int(self.game.settings['lvl_count'])
         lvl_skin = int(self.game.settings['lvl_skin'])
         self.settings_1 = ["lvl: " + str(i) for i in range(lvl_count)]
@@ -69,8 +56,6 @@ class SettingsScene(BaseScene):
                                                  100, 310, 600, 50,
                                                  Color.WHITE, Color.PURPLE,
                                                  0, *self.settings_6))
-        self.objects.append(ButtonObject(self.game, 10, 600, 230, 40, Color.SOFT_RED,
-                                         self.game.exit_game, 'EXIT'))
         self.objects.append(self.lvl_config)
         self.objects.append(self.mode_config)
         self.objects.append(self.coop_config)
@@ -103,22 +88,8 @@ class SettingsScene(BaseScene):
         # self.game.settings['field_texture'] = int(self.background_config.get_current_value().split(': ')[1])
 
     def on_activate(self) -> None:
-        self.save_changes = True
-        self.settings_strings = list()
-        with open('./data/settings.txt', 'a') as ftest:
-            pass
-        with open('./data/settings.txt', 'r') as fin:
-            [self.settings_strings.append(setting.strip().split(' '))
-             for setting in fin.readlines()]
-        if len(self.settings_strings) == 0:
-            with open('./data/settings.txt', 'w') as fout:
-                out_strings = [str(setting) + ' ' + str(self.game.origin_settings[setting]) + '\n'
-                               for setting in self.game.origin_settings]
-                [self.settings_strings.append(setting.strip().split(' '))
-                 for setting in out_strings]
-                fout.writelines(out_strings)
-        for setting in self.settings_strings:
-            self.game.settings[setting[0]] = self.game.settings_type_defy(setting[1])
+        self.game.settings = read_json_from_file(SETTINGS_PATH)
+
         settings_1_f = [item.split(': ')[1] for item in self.settings_1]
         settings_2_f = [item.split(': ')[1] for item in self.settings_2]
         settings_3_f = [item.split(': ')[1] for item in self.settings_3]
@@ -169,22 +140,4 @@ class SettingsScene(BaseScene):
                          current_index_6, ]
 
     def on_deactivate(self) -> None:
-        if not self.save_changes:
-            self.lvl_config.switch_to(self.defaults[0])
-            self.mode_config.switch_to(self.defaults[1])
-            self.coop_config.switch_to(self.defaults[2])
-            self.pacman_config.switch_to(self.defaults[3])
-            self.background_config.switch_to(self.defaults[4])
-            self.long_buffer_config.switch_to(self.defaults[5])
-
-        if self.origins or self.save_changes:
-            self.game.settings['level'] = int(self.lvl_config.get_current_value().split(': ')[1])
-            self.game.settings['mode'] = self.mode_config.get_current_value().split(': ')[1]
-            self.game.settings['coop'] = self.coop_config.get_current_value().split(': ')[1] == 'True'
-            self.game.settings['pacman_texture'] = self.pacman_config.get_current_value().split(': ')[1]
-            self.game.settings['field_texture'] = int(self.background_config.get_current_value().split(': ')[1])
-            self.game.settings['long_buffer'] = self.long_buffer_config.get_current_value().split(': ')[1] == 'True'
-            with open('./data/settings.txt', 'w') as fout:
-                out_strings = [str(setting) + ' ' + str(self.game.settings[setting]) + '\n'
-                               for setting in self.game.settings]
-                fout.writelines(out_strings)
+        write_json_to_file(SETTINGS_PATH, self.game.settings)

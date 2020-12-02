@@ -1,0 +1,10 @@
+{
+    "lvl_count": 1,
+    "lvl_skin": 1,
+    "level": 0,
+    "mode": "score_cup",
+    "coop": false,
+    "field_texture": 0,
+    "pacman_texture": "classic",
+    "long_buffer": true
+}

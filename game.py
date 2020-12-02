@@ -2,7 +2,8 @@ from datetime import datetime
 
 import pygame
 
-from constants import Color
+from constants import Color, SETTINGS_PATH
+from misc import read_json_from_file
 from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
     FinalSceneName, FinalSceneScores
 from scenes.testing import TestScene
@@ -24,31 +25,7 @@ class Game:
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
         self.score = 0
-        self.origin_settings = {
-            'lvl_count': 1,
-            'lvl_skin': 34,
-            'level': 0,
-            'mode': 'score_cup',
-            'coop': False,
-            'field_texture': 0,
-            'pacman_texture': 'classic',
-            'long_buffer': True,
-        }
-        self.settings = {}
-        settings_strings = list()
-        with open('./data/settings.txt', 'a') as ftest:
-            pass
-        with open('./data/settings.txt', 'r') as fin:
-            [settings_strings.append(setting.strip().split(' '))
-             for setting in fin.readlines()]
-        if len(settings_strings) == 0:
-            with open('./data/settings.txt', 'w') as fout:
-                out_strings = [str(setting) + ' ' + str(self.origin_settings[setting]) + '\n'
-                               for setting in self.origin_settings]
-                [settings_strings.append(setting.strip().split(' '))
-                 for setting in out_strings]
-        for setting in settings_strings:
-            self.settings[setting[0]] = self.settings_type_defy(setting[1])
+        self.settings = read_json_from_file(SETTINGS_PATH)
 
         self.is_win = False
         self.game_over = False
@@ -80,15 +57,6 @@ class Game:
 
     def set_test_scene(self):
         self.set_scene(5)
-
-    @staticmethod
-    def settings_type_defy(setting):
-        if setting.isdigit():
-            return int(setting)
-        elif setting == 'True' or setting == 'False':
-            return setting == 'True'
-        else:
-            return setting
 
     @staticmethod
     def exit_button_pressed(event: pygame.event.Event) -> bool:
