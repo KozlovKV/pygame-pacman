@@ -13,6 +13,11 @@ class Status(Enum):
     FRIGHTENED = 2
 
 
+# Вычисляет манхэттенское расстояние между двумя клетками
+def distance(cell1, cell2):
+    return abs(cell1[0] - cell2[0]) + abs(cell1[1] - cell2[1])
+
+
 def is_empty(cell) -> bool:
     cell_type = cell.static_obj.type
     return not (cell_type == 'wall' or cell_type == 'teleport')
@@ -100,6 +105,29 @@ def find_path(graph: dict, start: tuple, end: tuple, width: int, height: int) ->
     return path[1:]
 
 
+class GhostFabric:
+    count: int = 0  # счётчик призраков по модулю 4
+
+    def __init__(self, game, matrix_map, respawn: bool = True):
+        self.game = game
+        self.matrix_map = matrix_map
+        self.respawn = respawn
+        self.blinky = None  # сохраняет последнего Blinky для передачи в конструктор Inky
+
+    def get_next(self, x: int, y: int):
+        if self.count == 0:
+            ghost = Blinky(self.game, y, x, self.matrix_map, self.respawn)
+            self.blinky = ghost
+        elif self.count == 1:
+            ghost = Pinky(self.game, y, x, self.matrix_map, self.respawn)
+        elif self.count == 2:
+            ghost = Inky(self.game, y, x, self.matrix_map, self.blinky, self.respawn)
+        else:
+            ghost = Clyde(self.game, y, x, self.matrix_map, self.respawn)
+        self.count = (self.count + 1) % 4
+        return ghost
+
+
 class Ghost(ImageObject):
     status = Status.CHASE
     score_for_kill = 10
@@ -118,7 +146,7 @@ class Ghost(ImageObject):
     teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
     active = False  # вышел ли призрак из спавна
 
-    def __init__(self, game, y: int, x: int,  # x и y - номера строки и столбца клетки спавна
+    def __init__(self, game, x: int, y: int,  # x и y - номера строки и столбца клетки спавна
                  matrix_map, respawn: bool = True):
         self.FIELD_POINT = (game.REAL_FIELD_X, game.REAL_FIELD_Y)
         self.level = matrix_map
@@ -162,6 +190,17 @@ class Ghost(ImageObject):
     def pacman_position(self) -> tuple:
         return self.current_pacman.y, self.current_pacman.x
 
+    def pacman_direction(self) -> tuple:
+        angle = self.current_pacman.obj.angle
+        if angle == 0:
+            return 0, 1
+        elif angle == 90:
+            return -1, 0
+        elif angle == 180:
+            return 0, -1
+        else:
+            return 1, 0
+
     def find_corners(self) -> list:
         height = self.level.matrix_height
         width = self.level.matrix_width
@@ -169,16 +208,16 @@ class Ghost(ImageObject):
         for i in range(width + height - 1):  # i - индекс диагонали
             for j in range(i):
                 if corners[0] == (0, 0) and j < height and i - j < width \
-                        and is_empty(self.matrix[j][i - j]):
+                   and is_empty(self.matrix[j][i - j]):
                     corners[0] = j, i - j
                 if corners[1] == (0, 0) and j < height and width - i - 1 + j > 0 \
-                        and is_empty(self.matrix[j][width - i - 1 + j]):
+                   and is_empty(self.matrix[j][width - i - 1 + j]):
                     corners[1] = j, width - i - 1 + j
                 if corners[2] == (0, 0) and height - j - 1 > 0 and i - j < width \
-                        and is_empty(self.matrix[height - j - 1][i - j]):
+                   and is_empty(self.matrix[height - j - 1][i - j]):
                     corners[2] = height - j - 1, i - j
                 if corners[3] == (0, 0) and height - j - 1 > 0 and width - i - 1 + j > 0 \
-                        and is_empty(self.matrix[height - j - 1][width - i - 1 + j]):
+                   and is_empty(self.matrix[height - j - 1][width - i - 1 + j]):
                     corners[3] = height - j - 1, width - i - 1 + j
         return corners
 
@@ -193,15 +232,19 @@ class Ghost(ImageObject):
     def get_chase_target(self) -> tuple:
         return self.pacman_position()
 
+    @staticmethod
+    def target_is_corner() -> bool:
+        return Ghost.status != Status.CHASE
+
     def get_next_cell(self) -> tuple:
         height = self.level.matrix_height
         width = self.level.matrix_width
         if not self.alive:
             self.target = self.spawn
-        elif Ghost.status != Status.CHASE and self.target in self.corners and len(self.path) >= 2:
+        elif self.target_is_corner() and self.target in self.corners and len(self.path) >= 2:
             self.path = self.path[1:]
             return self.path[0]
-        elif Ghost.status != Status.CHASE:
+        elif self.target_is_corner():
             self.target = choose_random(self.corners)
         else:
             self.target = self.get_chase_target()
@@ -210,7 +253,7 @@ class Ghost(ImageObject):
 
     # Проверяет, соединены ли текущая и следующая клетки телепортом и если да, то находит каким
     def check_teleport(self) -> None:
-        if abs(self.cell[0] - self.next_cell[0]) + abs(self.cell[1] - self.next_cell[1]) <= 1:
+        if distance(self.cell, self.next_cell) <= 1:
             self.is_teleporting = False
             return
         self.is_teleporting = True
@@ -283,19 +326,37 @@ class Blinky(Ghost):
 
     def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
         super().__init__(game, x, y, matrix_map, respawn)
-        self.SCATTER_TIME = 0
+
+    @staticmethod
+    def target_is_corner() -> bool:
+        return Ghost.status == Status.FRIGHTENED
+
+    def process_logic(self) -> None:
+        super().process_logic()
 
 
 class Pinky(Ghost):
     """Целевой клеткой является позиция на 4 клетки впереди пакмана.
     Розового цввета."""
 
+    target_coeff = 4  # коэффициент, на который целевая клетка дальше пакмана
+
     def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
         super().__init__(game, x, y, matrix_map, respawn)
 
-    def process_logic(self):
-        super().process_logic()
-        pass  # TODO
+    def get_chase_target(self) -> tuple:
+        pacman_pos = self.pacman_position()
+        if distance(self.cell, pacman_pos) <= 4:
+            return pacman_pos
+        pacman_dir = self.pacman_direction()
+        x = pacman_pos[0] + pacman_dir[0] * self.target_coeff
+        y = pacman_pos[1] + pacman_dir[1] * self.target_coeff
+        while x < 0 or x >= self.level.matrix_height or \
+                y < 0 or y >= self.level.matrix_width or \
+                not is_empty(self.matrix[x][y]):
+            x -= pacman_dir[0]
+            y -= pacman_dir[1]
+        return x, y
 
 
 class Inky(Ghost):
@@ -303,13 +364,34 @@ class Inky(Ghost):
     Начинает погоню только после того, как пакман съест 30 точек.
     Синего цвета."""
 
-    def __init__(self, game, x: int, y: int, matrix_map, blinky: Ghost, respawn: bool = True):
+    target_coeff = 2  # коэффициент, на который целевая клетка дальше пакмана
+
+    def __init__(self, game, x: int, y: int, matrix_map, blinky: Ghost = None, respawn: bool = True):
         super().__init__(game, x, y, matrix_map, respawn)
         self.blinky = blinky
 
-    def process_logic(self):
-        super().process_logic()
-        pass  # TODO
+    def get_chase_target(self) -> tuple:
+        pacman_pos = self.pacman_position()
+        if distance(self.cell, pacman_pos) <= 3:
+            return pacman_pos
+        pacman_dir = self.pacman_direction()
+        blinky_x, blinky_y = self.blinky.cell
+        center_x = pacman_pos[0] + pacman_dir[0] * self.target_coeff
+        center_y = pacman_pos[1] + pacman_dir[1] * self.target_coeff
+        x = 2 * center_x - blinky_x
+        y = 2 * center_y - blinky_y
+        if x < 1:
+            x = 1
+        elif x >= self.level.matrix_height - 1:
+            x = self.level.matrix_height - 2
+        if y < 1:
+            y = 1
+        elif y >= self.level.matrix_width - 1:
+            y = self.level.matrix_width - 2
+        if not is_empty(self.matrix[x][y]):
+            neighbours = find_neighbours(self.matrix, x, y)
+            return neighbours[0] if len(neighbours) > 0 else pacman_pos
+        return x, y
 
 
 class Clyde(Ghost):
@@ -320,7 +402,12 @@ class Clyde(Ghost):
 
     def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
         super().__init__(game, x, y, matrix_map, respawn)
+        self.next_corner = choose_random(self.corners)  # следующий угол, в который пойдёт Клайд
 
-    def process_logic(self):
-        super().process_logic()
-        pass  # TODO
+    def get_chase_target(self) -> tuple:
+        pacman_pos = self.pacman_position()
+        if distance(self.cell, pacman_pos) <= 8:
+            return pacman_pos
+        if self.cell == self.next_corner:
+            self.next_corner = choose_random(self.corners)
+        return self.next_corner

@@ -1,6 +1,6 @@
 from constants import *
 from objects.base import DrawableObject
-from objects.ghost import Ghost
+from objects.ghost import GhostFabric
 from objects.image import ImageObject
 from objects.pacman import Pacman
 from objects.s_seed import SuperSeed
@@ -206,11 +206,12 @@ class MatrixMap(BaseScene):
                         teleports_pairs[i] = list()
 
     def generate_ghosts(self, level_objects_list):
+        fabric = GhostFabric(self.game, self)
         for y in range(self.matrix_height):
             for x in range(self.matrix_width):
                 object_char = level_objects_list[y][x]
                 if object_char == 'G':
-                    ghost = Ghost(self.game, x, y, self)
+                    ghost = fabric.get_next(x, y)
                     # Добавление матричной точки призрака
                     ghost = SimpleMatrixPoint(x, y, 'ghost', ghost)
                     self.ghosts.append(ghost)
