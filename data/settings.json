@@ -1,0 +1,11 @@
+{
+    "lvl_count": 1,
+    "lvl_skin": 1,
+    "level": 0,
+    "mode": "survival",
+    "coop": true,
+    "field_texture": 0,
+    "1_pacman_texture": "bordered",
+    "2_pacman_texture": "classic",
+    "long_buffer": true
+}

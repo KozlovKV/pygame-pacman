@@ -2,7 +2,8 @@ from datetime import datetime
 
 import pygame
 
-from constants import Color
+from constants import Color, SETTINGS_PATH
+from misc import read_json_from_file
 from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
     FinalSceneName, FinalSceneScores
 from scenes.testing import TestScene
@@ -24,13 +25,8 @@ class Game:
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
         self.score = 0
-        self.settings = {
-            'level': 0,
-            'mode': 'score_cup',
-            'field_texture': 0,
-            'coop': False,
-            'pacman_texture': 'classic',
-        }
+        self.settings = read_json_from_file(SETTINGS_PATH)
+
         self.is_win = False
         self.game_over = False
         self.scenes = [MenuScene(self),
