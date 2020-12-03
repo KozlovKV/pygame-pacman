@@ -77,10 +77,10 @@ class SettingsScene(BaseScene):
         self.objects += self.configs
         self.objects.append(
             ButtonObject(self.game, 100, 430, 610, 40, Color.SOFT_RED,
-                         self.game.set_test_scene, 'SAVE AND RETURN'))
+                         self.game.set_test_scene, 'SAVE AND RETURN', 'exit'))
         self.objects.append(
             ButtonObject(self.game, 100, 490, 610, 40, Color.SOFT_RED,
-                         self.quit_without_saving, 'RETURN'))
+                         self.quit_without_saving, 'RETURN', 'exit'))
 
     def quit_without_saving(self):
         self.save_changes = False

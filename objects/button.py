@@ -8,21 +8,26 @@ from objects.base import DrawableObject
 
 
 class ButtonObject(DrawableObject):
-    BUTTON_STYLE = {
-        "hover_color": Color.SOFT_BLUE,
-        "clicked_color": Color.SOFT_GREEN,
-        "font_color": Color.WHITE,
-        "clicked_font_color": Color.BLACK,
-        "hover_font_color": Color.SOFT_ORANGE,
-        "font": MAIN_FONT,
-    }
-
     def __init__(self, game,
                  x: int, y: int, width: int, height: int,
                  color: pygame.color.Color = None,
                  function: Callable[[None], None] = None,
-                 text: str = 'Define me!') -> None:
+                 text: str = 'Define me!',
+                 button_type: str = 'multi') -> None:
         super().__init__(game)
+        if color is None:
+            color = self.game.settings[button_type + '_btn_style']["bg_color"]
+        button_style = {
+            "hover_color": self.game.settings[button_type + '_btn_style']["hover_color"],
+            "clicked_color": self.game.settings[button_type + '_btn_style']["clicked_color"],
+            "font_color": self.game.settings[button_type + '_btn_style']["font_color"],
+            "clicked_font_color": self.game.settings[button_type + '_btn_style']["clicked_font_color"],
+            "hover_font_color": self.game.settings[button_type + '_btn_style']["hover_font_color"],
+            "font": pygame.font.SysFont(self.game.settings[button_type + '_btn_style']["font"],
+                                        self.game.settings[button_type + '_btn_style']["font_size"],
+                                        self.game.settings[button_type + '_btn_style']["font_bald"],
+                                        self.game.settings[button_type + '_btn_style']["font_italic"], )
+        }
         self.color = color if color else Color.WHITE
         self.function = function if function else ButtonObject.no_action
         self.text = text
@@ -32,7 +37,7 @@ class ButtonObject(DrawableObject):
             color=self.color,
             function=self.function,
             text=self.text,
-            **self.BUTTON_STYLE
+            **button_style
         )
 
     def set_center(self, x: int, y: int) -> None:

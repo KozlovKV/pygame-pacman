@@ -51,7 +51,7 @@ class MainScene(BaseScene):
                                          200, 40, Color.SOFT_RED,
                                          self.switch_pause, 'PAUSE')
         self.menu_button = ButtonObject(self.game, 10, 60, 200, 40, Color.SOFT_RED,
-                         self.game.set_test_scene, 'TO MENU')
+                         self.game.set_test_scene, 'TO MENU', 'exit')
 
         self.objects.append(self.score_bar)
         self.objects.append(self.time_bar)

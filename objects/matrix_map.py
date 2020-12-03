@@ -111,7 +111,7 @@ class MatrixMap(BaseScene):
                                            self.game.REAL_FIELD_Y - MatrixMap.BORDER_SIZE,
                                            field_width + MatrixMap.BORDER_SIZE * 2,
                                            field_height + MatrixMap.BORDER_SIZE * 2,
-                                           Color.SOFT_BLUE)
+                                           self.game.settings["level_border_color"])
         self.field = DrawableObject(self.game, self.game.REAL_FIELD_X, self.game.REAL_FIELD_Y,
                                     field_width, field_height, Color.BLACK)
 

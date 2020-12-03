@@ -12,19 +12,19 @@ class FinalSceneName(BaseScene):
         alphabet1 = (chr(i) for i in range(65, 91))
         alphabet2 = (chr(i) for i in range(65, 91))
         self.first_letter = (ArrowSwitcher(self.game,
-                                          80, 100, 150, 40,
-                                          Color.WHITE, Color.SOFT_RED,
-                                          0, *alphabet0))
+                                           80, 100, 150, 40,
+                                           Color.WHITE, Color.SOFT_RED,
+                                           0, *alphabet0))
         self.second_letter = (ArrowSwitcher(self.game,
-                                          80, 150, 150, 40,
-                                          Color.WHITE, Color.SOFT_RED,
-                                          0, *alphabet1))
+                                            80, 150, 150, 40,
+                                            Color.WHITE, Color.SOFT_RED,
+                                            0, *alphabet1))
         self.third_letter = (ArrowSwitcher(self.game,
-                                          80, 200, 150, 40,
-                                          Color.WHITE, Color.SOFT_RED,
-                                          0, *alphabet2))
+                                           80, 200, 150, 40,
+                                           Color.WHITE, Color.SOFT_RED,
+                                           0, *alphabet2))
         self.objects.append(ButtonObject(self.game, 60, 300, 200, 40, Color.GREEN,
-                                         self.go_to_game_over_scene_2, 'ENTER'))
+                                         self.go_to_game_over_scene_2, 'ENTER', 'play'))
         self.objects.append(self.first_letter)
         self.objects.append(self.second_letter)
         self.objects.append(self.third_letter)
@@ -51,9 +51,9 @@ class FinalSceneScores(BaseScene):
                                        color=(Color.GREEN if self.game.is_win else Color.SOFT_RED),
                                        x=400, y=50))
         self.objects.append(ButtonObject(self.game, 10, 600, 220, 40, Color.SOFT_RED,
-                                         self.game.exit_game, 'EXIT'))
+                                         self.game.exit_game, 'EXIT', 'exit'))
         self.objects.append(ButtonObject(self.game, 10, 550, 220, 40, Color.BLUE,
-                                         self.game.set_test_scene, 'TO TEST MENU'))
+                                         self.game.set_test_scene, 'TO TEST MENU', 'exit'))
         self.objects.append(self.highscore_table)
 
     def on_activate(self) -> None:

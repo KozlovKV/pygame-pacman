@@ -2,10 +2,47 @@
     "lvl_count": 1,
     "lvl_skin": 1,
     "level": 0,
-    "mode": "survival",
+    "mode": "score_cup",
     "coop": false,
     "field_texture": 0,
     "1_pacman_texture": "bordered",
     "2_pacman_texture": "ghost",
-    "long_buffer": true
+    "long_buffer": true,
+    "play_btn_style": {
+        "bg_color": [0, 205, 0, 255],
+        "hover_color": [0, 108, 0, 255],
+        "clicked_color": [173, 244, 47, 255],
+        "font_color": [255, 255, 255, 255],
+        "clicked_font_color": [0, 0, 0, 255],
+        "hover_font_color": [255, 180, 51, 255],
+        "font": "Consolas",
+        "font_size": 32,
+        "font_bald": true,
+        "font_italic": false
+    },
+    "multi_btn_style": {
+        "bg_color": [173, 216, 230, 255],
+        "hover_color": [25, 25, 112, 255],
+        "clicked_color": [60, 179, 113, 255],
+        "font_color": [255, 255, 255, 255],
+        "clicked_font_color": [0, 0, 0, 255],
+        "hover_font_color": [255, 180, 51, 255],
+        "font": "Comic Sans MS",
+        "font_size": 32,
+        "font_bald": false,
+        "font_italic": false
+    },
+    "exit_btn_style": {
+        "bg_color": [255, 0, 0, 255],
+        "hover_color": [205, 0, 0, 255],
+        "clicked_color": [255, 160, 122, 255],
+        "font_color": [255, 255, 255, 255],
+        "clicked_font_color": [0, 0, 0, 255],
+        "hover_font_color": [255, 180, 51, 255],
+        "font": "Consolas",
+        "font_size": 32,
+        "font_bald": true,
+        "font_italic": false
+    },
+    "level_border_color": [65, 105, 225, 255]
 }
