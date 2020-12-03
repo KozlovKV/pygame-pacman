@@ -2,7 +2,7 @@
     "lvl_count": 2,
     "lvl_skin": 1,
     "level": 1,
-    "mode": "survival",
+    "mode": "hunt",
     "coop": false,
     "field_texture": 0,
     "1_pacman_texture": "ghost",
