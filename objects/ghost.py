@@ -168,6 +168,9 @@ class Ghost(ImageObject):
     def scary_mode_on(cls) -> None:
         cls.status = Status.FRIGHTENED
 
+    def set_spawn_pos(self):
+        self.set_position(*self.spawn)
+
     def activate(self):
         self.active = True
 
