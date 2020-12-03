@@ -177,6 +177,8 @@ class Ghost(ImageObject):
         self.current_ticks = self.current_ticks * self.ticks_per_cell // last_ticks_per_cell
 
     def set_spawn_pos(self) -> None:
+        self.cell = self.get_cell(self.get_real_position(self.spawn))
+        self.next_cell = self.cell
         self.set_position(*self.get_real_position(self.spawn))
 
     def activate(self) -> None:
