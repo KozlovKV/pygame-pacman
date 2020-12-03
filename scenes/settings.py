@@ -102,7 +102,7 @@ class SettingsScene(BaseScene):
             ButtonObject(self.game, x, 550, self.SWITCHER_WIDTH, 40,
                          Color.SOFT_RED,
                          self.quit_without_saving, 'RETURN', 'exit'))
-        self.objects.append(TextObject(self.game, text='SETTINGS',
+        self.objects.append(TextObject(self.game, text='SETTINGS',                                       font_size=50,
                                        x=self.game.SCREEN_WIDTH / 2, y=30))
 
     def quit_without_saving(self):

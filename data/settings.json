@@ -7,6 +7,7 @@
     "field_texture": 0,
     "1_pacman_texture": "ghost",
     "2_pacman_texture": "classic",
+    "acceleration": 5,
     "long_buffer": true,
     "play_btn_style": {
         "bg_color": [
