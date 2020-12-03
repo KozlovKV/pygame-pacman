@@ -56,9 +56,7 @@ class MatrixMultiPoint:
 def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     x = pacman.x + pacman.obj.vec_x
     y = pacman.y + pacman.obj.vec_y
-    if (x == wall.x or y == wall.y) and pacman.obj.turn_status == -1 and \
-            pacman.obj.collision(wall.obj):
-    # if (x == wall.x or y == wall.y) and pacman.obj.turn_status == -1:
+    if (x == wall.x or y == wall.y) and pacman.obj.collision(wall.obj):
         pacman.obj.vec_x *= -1
         pacman.obj.vec_y *= -1
         pacman.obj.move(pacman.obj.vec_x*PACMAN_SPEED, pacman.obj.vec_y*PACMAN_SPEED)
@@ -252,6 +250,7 @@ class MatrixMap(BaseScene):
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
         self.check_turn_ways(pacman, m_points)
+        self.check_in_wall(pacman, m_points)
         for m_point in m_points:
             s_obj = m_point.static_obj
             if s_obj.type == 'wall':
@@ -263,6 +262,14 @@ class MatrixMap(BaseScene):
                 if pacman.obj.collision_with_small_sprite(s_obj.obj):
                     s_obj.obj.collision_reaction()
                     self.remove_static_object_from_matrix(m_point)
+
+    def check_in_wall(self, pacman: SimpleMatrixPoint, m_points):
+        if self.matrix[pacman.y][pacman.x].moving_obj.type == 'wall':
+            p_obj = pacman.obj
+            for m_point in m_points:
+                s_obj = m_point.static_obj
+                if s_obj.type != 'wall':
+                    p_obj.set_position(self.get_real_pos(s_obj.x, s_obj.y))
 
     def check_turn_ways(self, pacman: SimpleMatrixPoint, m_points):
         ways = [0, 0, 0, 0]
@@ -292,8 +299,8 @@ class MatrixMap(BaseScene):
                     abs(field_real_y - real_y) >= CELL_SIZE:
                 self.change_pos_in_matrix(m_obj, real_x // CELL_SIZE,
                                           real_y // CELL_SIZE)
-                if abs(field_real_x - real_x) <= CELL_SIZE*2 and \
-                        abs(field_real_y - real_y) <= CELL_SIZE*2:
+                if abs(field_real_x - real_x) <= CELL_SIZE and \
+                        abs(field_real_y - real_y) <= CELL_SIZE:
                     self.correct_real_pos(m_obj)
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):

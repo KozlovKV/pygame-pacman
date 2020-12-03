@@ -81,8 +81,7 @@ class Game:
         self.scenes[self.current_scene_index].process_logic()
 
     def process_all_draw(self) -> None:
-        if not self.current_scene_index == self.MAIN_SCENE_INDEX:
-            self.screen.fill(Color.BLACK)
+        self.screen.fill(Color.BLACK)
         self.scenes[self.current_scene_index].process_draw()
         pygame.display.flip()
 
