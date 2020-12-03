@@ -7,7 +7,7 @@ class Pacman(ImageObject):
     FRAMES_KEEP_TURN = 10  # Сколько кадров хранить поворот
 
     def __init__(self, game, x: int, y: int, id: int = 1):
-        texture_settings = Textures.PACMAN[game.settings['pacman_texture']]
+        texture_settings = Textures.PACMAN[game.settings[str(id) + '_pacman_texture']]
         super().__init__(game, x=x, y=y, animation=texture_settings[0],
                          hided_sprite_w=10, hided_sprite_h=10)
         self.angle = 0

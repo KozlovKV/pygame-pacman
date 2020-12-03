@@ -5,6 +5,7 @@
     "mode": "survival",
     "coop": true,
     "field_texture": 0,
-    "pacman_texture": "bordered",
+    "1_pacman_texture": "bordered",
+    "2_pacman_texture": "classic",
     "long_buffer": true
 }
