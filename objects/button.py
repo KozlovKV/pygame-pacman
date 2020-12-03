@@ -25,7 +25,7 @@ class ButtonObject(DrawableObject):
             "hover_font_color": self.game.settings[button_type + '_btn_style']["hover_font_color"],
             "font": pygame.font.SysFont(self.game.settings[button_type + '_btn_style']["font"],
                                         self.game.settings[button_type + '_btn_style']["font_size"],
-                                        self.game.settings[button_type + '_btn_style']["font_bald"],
+                                        self.game.settings[button_type + '_btn_style']["font_bold"],
                                         self.game.settings[button_type + '_btn_style']["font_italic"], )
         }
         self.color = color if color else Color.WHITE

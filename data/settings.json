@@ -17,7 +17,7 @@
         "hover_font_color": [255, 180, 51, 255],
         "font": "Consolas",
         "font_size": 32,
-        "font_bald": true,
+        "font_bold": true,
         "font_italic": false
     },
     "multi_btn_style": {
@@ -29,7 +29,7 @@
         "hover_font_color": [255, 180, 51, 255],
         "font": "Comic Sans MS",
         "font_size": 32,
-        "font_bald": false,
+        "font_bold": false,
         "font_italic": false
     },
     "exit_btn_style": {
@@ -41,7 +41,7 @@
         "hover_font_color": [255, 180, 51, 255],
         "font": "Consolas",
         "font_size": 32,
-        "font_bald": true,
+        "font_bold": true,
         "font_italic": false
     },
     "level_border_color": [65, 105, 225, 255]
