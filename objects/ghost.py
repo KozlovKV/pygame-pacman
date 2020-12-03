@@ -159,7 +159,9 @@ class Ghost(ImageObject):
         self.respawn = respawn
         self.next_cell = (x, y)
         rx, ry = self.get_real_position(self.cell)
-        super().__init__(game, x=rx, y=ry, animation=Textures.GHOST['default'])
+        self.alive_animation = Textures.GHOST['alive']
+        self.dead_animation = Textures.GHOST['dead']
+        super().__init__(game, x=rx, y=ry, animation=self.alive_animation)
         self.target = self.cell  # клетка, к которой будет пытаться двигаться призрак
         self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
         self.corners = self.find_corners()
@@ -168,7 +170,18 @@ class Ghost(ImageObject):
     def scary_mode_on(cls) -> None:
         cls.status = Status.FRIGHTENED
 
-    def activate(self):
+    def change_speed(self, new_speed) -> None:
+        self.speed = new_speed
+        last_ticks_per_cell = self.ticks_per_cell
+        self.ticks_per_cell = CELL_SIZE // self.speed
+        self.current_ticks = self.current_ticks * self.ticks_per_cell // last_ticks_per_cell
+
+    def set_spawn_pos(self) -> None:
+        self.cell = self.get_cell(self.get_real_position(self.spawn))
+        self.next_cell = self.cell
+        self.set_position(*self.get_real_position(self.spawn))
+
+    def activate(self) -> None:
         self.active = True
 
     def get_cell(self, position: tuple) -> tuple:
@@ -227,8 +240,9 @@ class Ghost(ImageObject):
         if not self.respawn:
             del self
             return
-        self.set_position(*self.get_real_position(self.spawn))
         self.alive = False
+        self.change_speed(DEAD_GHOST_SPEED)
+        self.load_new_animation(self.dead_animation)
 
     def get_chase_target(self) -> tuple:
         return self.pacman_position()
@@ -276,7 +290,7 @@ class Ghost(ImageObject):
             self.current_ticks -= 1
 
     def process_movement(self) -> None:
-        if self.current_ticks == self.ticks_per_cell:
+        if self.current_ticks >= self.ticks_per_cell:
             self.cell = self.next_cell
             self.set_position(*self.get_real_position(self.cell))
             self.next_cell = self.get_next_cell()
@@ -289,7 +303,7 @@ class Ghost(ImageObject):
                       (self.next_cell[0] - self.cell[0]) * self.speed)
         self.current_ticks += 1
 
-    def process_statuses(self):
+    def process_statuses(self) -> None:
         if Ghost.status == Status.CHASE:
             self.chase_timer += 1
             self.scatter_timer = 0
@@ -314,11 +328,18 @@ class Ghost(ImageObject):
             return
         if not self.alive and self.cell == self.spawn:
             self.alive = True
+            self.change_speed(GHOST_SPEED)
+            self.load_new_animation(self.alive_animation)
         self.process_statuses()
         self.pacman_choice_timer += 1
         if self.pacman_choice_timer >= self.PACMAN_CHOICE_TIME:
             self.current_pacman = choose_random(self.pacmans)
         self.process_movement()
+
+    def process_draw(self) -> None:
+        super().process_draw()
+        if not self.alive:
+            self.game.screen.blit(self.image, self.rect)
 
 
 class Blinky(Ghost):

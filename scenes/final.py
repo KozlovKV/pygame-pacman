@@ -7,36 +7,73 @@ from scenes import BaseScene
 
 
 class FinalSceneName(BaseScene):
+    SWITCHER_WIDTH = 300
+    SWITCHER_HEIGHT = 40
+
+    def __init__(self, game):
+        self.label = None
+        self.name_label = None
+        self.enter_name_label = None
+        self.first_letter = None
+        self.second_letter = None
+        self.third_letter = None
+        self.enter_button = None
+        self.letters = list()
+        super().__init__(game)
+
     def create_objects(self) -> None:
         alphabet0 = (chr(i) for i in range(65, 91))
         alphabet1 = (chr(i) for i in range(65, 91))
         alphabet2 = (chr(i) for i in range(65, 91))
+        x = (self.game.SCREEN_WIDTH - self.SWITCHER_WIDTH) / 2
+
+        self.label = (TextObject(self.game, text='GAME OVER',
+                                 x=self.game.SCREEN_WIDTH / 2, y=50,
+                                 font_size=50))
+        self.name_label = (TextObject(self.game, text='AAA', font_size=40,
+                                      x=self.game.SCREEN_WIDTH / 2 + 130, y=100))
+        self.enter_name_label = (TextObject(self.game, text='ENTER NICKNAME: ',
+                                            x=self.game.SCREEN_WIDTH / 2 - 40, y=100))
         self.first_letter = (ArrowSwitcher(self.game,
-                                           80, 100, 150, 40,
+                                           x, 150,
+                                           self.SWITCHER_WIDTH,
+                                           self.SWITCHER_HEIGHT,
                                            Color.WHITE, Color.SOFT_RED,
                                            0, *alphabet0))
         self.second_letter = (ArrowSwitcher(self.game,
-                                            80, 150, 150, 40,
+                                            x, 200,
+                                            self.SWITCHER_WIDTH,
+                                            self.SWITCHER_HEIGHT,
                                             Color.WHITE, Color.SOFT_RED,
                                             0, *alphabet1))
         self.third_letter = (ArrowSwitcher(self.game,
-                                           80, 200, 150, 40,
+                                           x, 250,
+                                           self.SWITCHER_WIDTH,
+                                           self.SWITCHER_HEIGHT,
                                            Color.WHITE, Color.SOFT_RED,
                                            0, *alphabet2))
-        self.objects.append(ButtonObject(self.game, 60, 300, 200, 40, Color.GREEN,
-                                         self.go_to_game_over_scene_2, 'ENTER', 'play'))
-        self.objects.append(self.first_letter)
-        self.objects.append(self.second_letter)
-        self.objects.append(self.third_letter)
-        self.objects.append(TextObject(self.game, text='AAA', x=310, y=50))
-        self.objects.append(TextObject(self.game, text='ENTER NICKNAME: ', x=150, y=50))
+        self.enter_button = (ButtonObject(self.game,
+                                          x, 350,
+                                          self.SWITCHER_WIDTH,
+                                          self.SWITCHER_HEIGHT, Color.GREEN,
+                                          self.go_to_game_over_scene_2, 'ENTER', 'play'))
+        self.letters = [
+            self.first_letter,
+            self.second_letter,
+            self.third_letter,
+        ]
+        self.objects.append(self.label)
+        self.objects.append(self.enter_name_label)
+        self.objects.append(self.name_label)
+        self.objects += self.letters
+        self.objects.append(self.enter_button)
 
     def process_logic(self) -> None:
         self.name = ''
         self.name += self.first_letter.get_current_value()
         self.name += self.second_letter.get_current_value()
         self.name += self.third_letter.get_current_value()
-        self.objects[4].update_text(self.name)
+        self.name_label.update_text(self.name)
 
     def go_to_game_over_scene_2(self):
         HighScoresTable(self.game).add_new_score(self.name + ' ' + str(self.game.score))
@@ -44,51 +81,45 @@ class FinalSceneName(BaseScene):
 
 
 class FinalSceneScores(BaseScene):
+    BUTTON_WIDTH = 500
+    BUTTON_HEIGHT = 40
+
+    def __init__(self, game):
+        self.highscore_table = None
+        self.label = None
+        self.result_label = None
+        self.return_button = None
+        self.exit_button = None
+        super().__init__(game)
+
     def create_objects(self) -> None:
-        self.highscore_table = HighScoresTable(self.game)
-        self.objects.append(TextObject(self.game,
-                                       text=('WIN' if self.game.is_win else 'LOSE'),
-                                       color=(Color.GREEN if self.game.is_win else Color.SOFT_RED),
-                                       x=400, y=50))
-        self.objects.append(ButtonObject(self.game, 10, 600, 220, 40, Color.SOFT_RED,
+        x = (self.game.SCREEN_WIDTH - self.BUTTON_WIDTH) / 2
+        self.highscore_table = HighScoresTable(self.game,
+                                               x=self.game.SCREEN_WIDTH / 2, y=150)
+        self.label = (TextObject(self.game,
+                                 text='GAME OVER',
+                                 x=self.game.SCREEN_WIDTH / 2, y=50,
+                                 font_size=50))
+        self.result_label = (TextObject(self.game,
+                                        text=('WIN' if self.game.is_win else 'LOSE'),
+                                        color=(Color.GREEN if self.game.is_win else Color.SOFT_RED),
+                                        x=self.game.SCREEN_WIDTH / 2, y=100,
+                                        font_size=45))
+        self.return_button = (ButtonObject(self.game,
+                                           x, 600,
+                                           self.BUTTON_WIDTH,
+                                           self.BUTTON_HEIGHT, Color.BLUE,
+                                           self.game.set_test_scene, 'TO TEST MENU'))
+        self.exit_button = (ButtonObject(self.game,
+                                         x, 650,
+                                         self.BUTTON_WIDTH,
+                                         self.BUTTON_HEIGHT, Color.SOFT_RED,
                                          self.game.exit_game, 'EXIT', 'exit'))
-        self.objects.append(ButtonObject(self.game, 10, 550, 220, 40, Color.BLUE,
-                                         self.game.set_test_scene, 'TO TEST MENU', 'exit'))
         self.objects.append(self.highscore_table)
+        self.objects.append(self.label)
+        self.objects.append(self.result_label)
+        self.objects.append(self.return_button)
+        self.objects.append(self.exit_button)
 
     def on_activate(self) -> None:
         self.highscore_table.read_scores()
-
-    # TEXT_FMT = 'Game over ({})'
-    # seconds_to_end = 3
-    #
-    # def __init__(self, game) -> None:
-    #     self.last_seconds_passed = 0
-    #     super().__init__(game)
-    #     self.update_start_time()
-    #
-    # def on_activate(self) -> None:
-    #     self.update_start_time()
-    #
-    # def update_start_time(self) -> None:
-    #     self.time_start = datetime.now()
-    #
-    # def get_gameover_text_formatted(self) -> str:
-    #     return self.TEXT_FMT.format(self.seconds_to_end - self.last_seconds_passed)
-    #
-    # def create_objects(self) -> None:
-    #     self.text = TextObject(
-    #         self.game,
-    #         text=self.get_gameover_text_formatted(), color=Color.RED,
-    #         x=self.game.WIDTH // 2, y=self.game.HEIGHT // 2
-    #     )
-    #     self.objects.append(self.text)
-    #
-    # def additional_logic(self) -> None:
-    #     time_current = datetime.now()
-    #     seconds_passed = (time_current - self.time_start).seconds
-    #     if self.last_seconds_passed != seconds_passed:
-    #         self.last_seconds_passed = seconds_passed
-    #         self.objects[0].update_text(self.get_gameover_text_formatted())
-    #     if seconds_passed >= self.seconds_to_end:
-    #         self.game.set_scene(self.game.MENU_SCENE_INDEX)

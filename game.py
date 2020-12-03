@@ -13,7 +13,7 @@ class Game:
     SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 900
     REAL_FIELD_X = 0
     REAL_FIELD_Y = 0
-    TICK = 75
+    TICK = 50
     MENU_SCENE_INDEX = 0
     SETTINGS_SCENE_INDEX = 1
     HIGHSCORES_SCENE_INDEX = 2
@@ -81,8 +81,7 @@ class Game:
         self.scenes[self.current_scene_index].process_logic()
 
     def process_all_draw(self) -> None:
-        if not self.current_scene_index == self.MAIN_SCENE_INDEX:
-            self.screen.fill(Color.BLACK)
+        self.screen.fill(Color.BLACK)
         self.scenes[self.current_scene_index].process_draw()
         pygame.display.flip()
 

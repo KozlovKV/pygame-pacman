@@ -25,9 +25,9 @@ class SettingsScene(BaseScene):
     def create_objects(self) -> None:
         self.game.settings = read_json_from_file(SETTINGS_PATH)
 
-        lvl_count = int(self.game.settings['lvl_count'])
-        lvl_skin = int(self.game.settings['lvl_skin'])
-        self.settings_1 = ["Level: " + str(i) for i in range(lvl_count)]
+        self.lvl_count = int(self.game.settings['lvl_count'])
+        self.lvl_skin = int(self.game.settings['lvl_skin'])
+        self.settings_1 = ["Level: " + (str(i) + "/" + str(self.lvl_count-1)) for i in range(self.lvl_count)]
         self.settings_2 = ['Mode: score_cup', 'Mode: survival', 'Mode: hunt']
         self.settings_3 = ['Coop: False', 'Coop: True']
         self.settings_4 = ['First Pacman skin: classic',
@@ -38,7 +38,7 @@ class SettingsScene(BaseScene):
                            'Second Pacman skin: bordered',
                            'Second Pacman skin: inverted',
                            'Second Pacman skin: ghost', ]
-        self.settings_6 = ['Level texture: ' + str(i) for i in range(lvl_skin)]
+        self.settings_6 = ['Level texture: ' + (str(i) + "/" + str(self.lvl_skin-1)) for i in range(self.lvl_skin)]
         self.settings_7 = ['Long turn buffer: True', 'Long turn buffer: False']
 
         x = (self.game.SCREEN_WIDTH - self.SWITCHER_WIDTH) / 2
@@ -103,6 +103,7 @@ class SettingsScene(BaseScene):
                          Color.SOFT_RED,
                          self.quit_without_saving, 'RETURN', 'exit'))
         self.objects.append(TextObject(self.game, text='SETTINGS',
+                                       font_size=50,
                                        x=self.game.SCREEN_WIDTH / 2, y=30))
 
     def quit_without_saving(self):
@@ -116,12 +117,12 @@ class SettingsScene(BaseScene):
         self.game.settings = read_json_from_file(SETTINGS_PATH)
 
         settings_f_list = [
-            [item.split(': ')[1] for item in self.settings_1],
+            [item.split(': ')[1].split('/')[0] for item in self.settings_1],
             [item.split(': ')[1] for item in self.settings_2],
             [item.split(': ')[1] for item in self.settings_3],
             [item.split(': ')[1] for item in self.settings_4],
             [item.split(': ')[1] for item in self.settings_5],
-            [item.split(': ')[1] for item in self.settings_6],
+            [item.split(': ')[1].split('/')[0] for item in self.settings_6],
             [item.split(': ')[1] for item in self.settings_7],
         ]
         settings_names = ['level', 'mode', 'coop',
@@ -143,7 +144,7 @@ class SettingsScene(BaseScene):
 
     def save_settings_to_game_dict(self):
         self.game.settings['level'] = int(
-            self.lvl_config.get_current_value().split(': ')[1])
+            self.lvl_config.get_current_value().split(': ')[1].split('/')[0])
         self.game.settings['mode'] = \
             self.mode_config.get_current_value().split(': ')[1]
         self.game.settings['coop'] = \
@@ -153,6 +154,6 @@ class SettingsScene(BaseScene):
         self.game.settings['2_pacman_texture'] = \
             self.pacman2_config.get_current_value().split(': ')[1]
         self.game.settings['field_texture'] = int(
-            self.background_config.get_current_value().split(': ')[1])
+            self.background_config.get_current_value().split(': ')[1].split('/')[0])
         self.game.settings['long_buffer'] = \
             self.long_buffer_config.get_current_value().split(': ')[1] == 'True'

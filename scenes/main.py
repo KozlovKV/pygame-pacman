@@ -103,8 +103,8 @@ class MainScene(BaseScene):
                 self.lives -= 1
                 for p in pacmans:
                     p.obj.revive()
-                # for g in ghosts:
-                #     g.obj.set_spawn_pos()
+                for g in ghosts:
+                    g.obj.set_spawn_pos()
 
     def is_win(self):
         if self.game_mode == 'score_cup':

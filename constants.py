@@ -27,10 +27,12 @@ pygame.font.init()
 MAIN_FONT = pygame.font.SysFont('Consolas', 32, True)
 
 CELL_SIZE = 30
-PACMAN_SPEED = 4
-GHOST_SPEED = 3
+PACMAN_SPEED = 5
+GHOST_SPEED = 4
+DEAD_GHOST_SPEED = GHOST_SPEED * 2
 
 SETTINGS_PATH = './data/settings.json'
+
 
 class Textures:
     MAIN_FOLDER = './resources/images/'
@@ -45,5 +47,6 @@ class Textures:
         'ghost': (AnimationPreset(6, MAIN_FOLDER + 'pacman/ghost_like/[F].png'), False),
     }
     GHOST = {
-        'default': AnimationPreset(2, MAIN_FOLDER + 'ghost/default/[F].png'),
+        'alive': AnimationPreset(1, MAIN_FOLDER + 'ghost/alive/[F].png'),
+        'dead': AnimationPreset(1, MAIN_FOLDER + 'ghost/dead/[F].png')
     }
