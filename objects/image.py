@@ -15,12 +15,9 @@ class ImageObject(DrawableObject):
                          hided_sprite_w=hided_sprite_w,
                          hided_sprite_h=hided_sprite_h)
         if filename:
-            self.filename = filename
-            self.image = pygame.image.load(self.filename)
+            self.load_new_image(filename)
         elif animation:
-            self.animation = copy(animation)
-            self.image = animation.frames_list[0]
-        self.recalculate_img_rect()
+            self.load_new_animation(animation)
 
     def next_frame(self):
         self.image = self.animation.get_next_frame()
@@ -29,6 +26,11 @@ class ImageObject(DrawableObject):
     def load_new_image(self, filename):
         self.filename = filename
         self.image = pygame.image.load(self.filename)
+        self.recalculate_img_rect()
+
+    def load_new_animation(self, anim):
+        self.animation = copy(anim)
+        self.image = anim.frames_list[0]
         self.recalculate_img_rect()
 
     def recalculate_img_rect(self):

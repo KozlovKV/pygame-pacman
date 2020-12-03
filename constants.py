@@ -30,6 +30,7 @@ CELL_SIZE = 30
 PACMAN_SPEED = 4
 GHOST_SPEED = 3
 
+SETTINGS_PATH = './data/settings.json'
 
 class Textures:
     MAIN_FOLDER = './resources/images/'
@@ -42,4 +43,7 @@ class Textures:
         'bordered': (AnimationPreset(6, MAIN_FOLDER + 'pacman/bordered/[F].png'), True),
         'inverted': (AnimationPreset(6, MAIN_FOLDER + 'pacman/inverted/[F].png'), True),
         'ghost': (AnimationPreset(6, MAIN_FOLDER + 'pacman/ghost_like/[F].png'), False),
+    }
+    GHOST = {
+        'default': AnimationPreset(2, MAIN_FOLDER + 'ghost/default/[F].png'),
     }

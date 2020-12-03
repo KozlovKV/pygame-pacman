@@ -7,9 +7,10 @@ class Pacman(ImageObject):
     FRAMES_KEEP_TURN = 10  # Сколько кадров хранить поворот
 
     def __init__(self, game, x: int, y: int, id: int = 1):
-        texture_settings = Textures.PACMAN[game.settings['pacman_texture']]
+        texture_settings = Textures.PACMAN[game.settings[str(id) + '_pacman_texture']]
         super().__init__(game, x=x, y=y, animation=texture_settings[0],
                          hided_sprite_w=10, hided_sprite_h=10)
+        self.spawn = (x, y)
         self.angle = 0
         self.vec_x = 0
         self.vec_y = 0
@@ -17,7 +18,10 @@ class Pacman(ImageObject):
         self.rotable = texture_settings[1]
         self.pacman_id = id
 
+        self.ticks_to_revive = -1
+
         self.frames_keeping = 0
+        self.previous_turn_status = -1
         self.turn_buff = -1
         self.previous_turn_buff = -1
         self.turn_status = -1
@@ -42,7 +46,7 @@ class Pacman(ImageObject):
 
     def do_turn(self):
         if self.turn_status != -1:
-            if self.turn_ways[self.turn_status] == 1:
+            if self.turn_ways[self.turn_status] == 1 and self.turn_status != self.previous_turn_status:
                 self.angle = 90 * self.turn_status
                 if self.turn_status % 2 == 0:
                     self.vec_x = 1 if self.turn_status == 0 else -1
@@ -50,7 +54,8 @@ class Pacman(ImageObject):
                 if self.turn_status % 2 != 0:
                     self.vec_y = 1 if self.turn_status == 3 else -1
                     self.vec_x = 0
-            else:
+                self.previous_turn_status = self.turn_status
+            elif self.turn_ways[self.turn_status] == 0:
                 self.vec_y = 0
                 self.vec_x = 0
                 self.turn_status = -1
@@ -66,20 +71,38 @@ class Pacman(ImageObject):
                     self.turn_buff = i
 
     def process_logic(self):
-        if self.turn_buff != -1:
-            if self.turn_buff == self.previous_turn_buff:
-                self.frames_keeping += 1
-                if self.frames_keeping >= Pacman.FRAMES_KEEP_TURN:
-                    self.turn_buff = -1
-                    self.frames_keeping = 0
-            self.previous_turn_buff = self.turn_buff
+        if not self.game.settings['long_buffer']:
+            if self.turn_buff != -1:
+                if self.turn_buff == self.previous_turn_buff:
+                    self.frames_keeping += 1
+                    if self.frames_keeping >= Pacman.FRAMES_KEEP_TURN:
+                        self.turn_buff = -1
+                        self.frames_keeping = 0
+                self.previous_turn_buff = self.turn_buff
 
         self.check_turn_status()
         self.do_turn()
 
+        if self.ticks_to_revive > 0:
+            self.vec_x = 0
+            self.vec_y = 0
+            self.ticks_to_revive -= 1
+        elif self.ticks_to_revive == 0:
+            self.ticks_to_revive = -1
+            self.set_position(*self.spawn)
+            anim = Textures.PACMAN[self.game.settings[str(self.pacman_id) + '_pacman_texture']][0]
+            self.load_new_animation(anim)
+
         x = self.vec_x * self.speed
         y = self.vec_y * self.speed
         self.move(x, y)
+
+    def revive(self):
+        # anim = Textures.PACMAN[self.game.settings['pacman_texture']+'_die']
+        # self.load_new_animation(anim)
+        # self.ticks_to_revive = anim.frames_count
+        self.ticks_to_revive = 5
+        self.alive = True
 
     def process_draw(self):
         self.next_frame()
