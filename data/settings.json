@@ -3,7 +3,7 @@
     "lvl_skin": 1,
     "level": 0,
     "mode": "survival",
-    "coop": true,
+    "coop": false,
     "field_texture": 0,
     "1_pacman_texture": "bordered",
     "2_pacman_texture": "ghost",
