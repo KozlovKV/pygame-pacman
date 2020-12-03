@@ -2,10 +2,14 @@ from constants import Color, SETTINGS_PATH
 from misc import write_json_to_file, read_json_from_file
 from objects.button import ButtonObject
 from objects.switcher import ArrowSwitcher
+from objects.text import TextObject
 from scenes import BaseScene
 
 
 class SettingsScene(BaseScene):
+    SWITCHER_WIDTH = 700
+    SWITCHER_HEIGHT = 50
+
     def __init__(self, game):
         self.lvl_config = None
         self.mode_config = None
@@ -37,32 +41,47 @@ class SettingsScene(BaseScene):
         self.settings_6 = ['Level texture: ' + str(i) for i in range(lvl_skin)]
         self.settings_7 = ['Long turn buffer: True', 'Long turn buffer: False']
 
+        x = (self.game.SCREEN_WIDTH - self.SWITCHER_WIDTH) / 2
         self.lvl_config = (ArrowSwitcher(self.game,
-                                         100, 10, 610, 50,
+                                         x, 70,
+                                         self.SWITCHER_WIDTH,
+                                         self.SWITCHER_HEIGHT,
                                          Color.WHITE, Color.SOFT_RED,
                                          0, *self.settings_1))
         self.mode_config = (ArrowSwitcher(self.game,
-                                          100, 70, 610, 50,
+                                          x, 130,
+                                          self.SWITCHER_WIDTH,
+                                          self.SWITCHER_HEIGHT,
                                           Color.WHITE, Color.ORANGE,
                                           0, *self.settings_2))
         self.coop_config = (ArrowSwitcher(self.game,
-                                          100, 130, 610, 50,
+                                          x, 190,
+                                          self.SWITCHER_WIDTH,
+                                          self.SWITCHER_HEIGHT,
                                           Color.WHITE, Color.YELLOW,
                                           0, *self.settings_3))
         self.pacman1_config = (ArrowSwitcher(self.game,
-                                             100, 190, 610, 50,
+                                             x, 250,
+                                             self.SWITCHER_WIDTH,
+                                             self.SWITCHER_HEIGHT,
                                              Color.WHITE, Color.GREEN,
                                              0, *self.settings_4))
         self.pacman2_config = (ArrowSwitcher(self.game,
-                                             100, 250, 610, 50,
+                                             x, 310,
+                                             self.SWITCHER_WIDTH,
+                                             self.SWITCHER_HEIGHT,
                                              Color.WHITE, Color.SOFT_BLUE,
                                              0, *self.settings_5))
         self.background_config = (ArrowSwitcher(self.game,
-                                                100, 310, 610, 50,
+                                                x, 370,
+                                                self.SWITCHER_WIDTH,
+                                                self.SWITCHER_HEIGHT,
                                                 Color.WHITE, Color.BLUE,
                                                 0, *self.settings_6))
         self.long_buffer_config = (ArrowSwitcher(self.game,
-                                                 100, 370, 610, 50,
+                                                 x, 430,
+                                                 self.SWITCHER_WIDTH,
+                                                 self.SWITCHER_HEIGHT,
                                                  Color.WHITE, Color.PURPLE,
                                                  0, *self.settings_7))
         self.configs = [
@@ -76,11 +95,15 @@ class SettingsScene(BaseScene):
         ]
         self.objects += self.configs
         self.objects.append(
-            ButtonObject(self.game, 100, 430, 610, 40, Color.SOFT_RED,
+            ButtonObject(self.game, x, 490, self.SWITCHER_WIDTH, 40,
+                         Color.SOFT_RED,
                          self.game.set_test_scene, 'SAVE AND RETURN', 'exit'))
         self.objects.append(
-            ButtonObject(self.game, 100, 490, 610, 40, Color.SOFT_RED,
+            ButtonObject(self.game, x, 550, self.SWITCHER_WIDTH, 40,
+                         Color.SOFT_RED,
                          self.quit_without_saving, 'RETURN', 'exit'))
+        self.objects.append(TextObject(self.game, text='SETTINGS',
+                                       x=self.game.SCREEN_WIDTH / 2, y=30))
 
     def quit_without_saving(self):
         self.save_changes = False
