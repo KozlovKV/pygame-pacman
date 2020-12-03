@@ -44,3 +44,6 @@ class Textures:
         'inverted': (AnimationPreset(6, MAIN_FOLDER + 'pacman/inverted/[F].png'), True),
         'ghost': (AnimationPreset(6, MAIN_FOLDER + 'pacman/ghost_like/[F].png'), False),
     }
+    GHOST = {
+        'default': AnimationPreset(2, MAIN_FOLDER + 'ghost/default/[F].png'),
+    }
