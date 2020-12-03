@@ -51,7 +51,7 @@ class MainScene(BaseScene):
                                          200, 40, Color.SOFT_RED,
                                          self.switch_pause, 'PAUSE')
         self.menu_button = ButtonObject(self.game, 10, 60, 200, 40, Color.SOFT_RED,
-                         self.game.set_test_scene, 'TO MENU')
+                         self.game.set_test_scene, 'TO MENU', 'exit')
 
         self.objects.append(self.score_bar)
         self.objects.append(self.time_bar)
@@ -96,11 +96,15 @@ class MainScene(BaseScene):
 
     def pacmans_reviving(self):
         pacmans = self.matrix.pacmans
+        ghosts = self.matrix.ghosts
         for pacman in pacmans:
             obj = pacman.obj
             if not obj.alive and self.lives > 0:
                 self.lives -= 1
-                obj.revive()
+                for p in pacmans:
+                    p.obj.revive()
+                # for g in ghosts:
+                #     g.obj.set_spawn_pos()
 
     def is_win(self):
         if self.game_mode == 'score_cup':
