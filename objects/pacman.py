@@ -90,7 +90,7 @@ class Pacman(ImageObject):
         elif self.ticks_to_revive == 0:
             self.ticks_to_revive = -1
             self.set_position(*self.spawn)
-            anim = Textures.PACMAN[self.game.settings['pacman_texture']][0]
+            anim = Textures.PACMAN[self.game.settings[str(self.pacman_id) + '_pacman_texture']][0]
             self.load_new_animation(anim)
 
         x = self.vec_x * self.speed
