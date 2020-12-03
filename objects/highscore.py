@@ -52,7 +52,8 @@ class HighScoresTable:
     def process_event(self, event):
         pass
 
-    def process_draw(self, y=100):
+    def process_draw(self):
+        y = self.y
         header = TextObject(self.game, text='HIGHSCORES:', x=self.x, y=self.y)
         header.process_draw()
         i = 0
