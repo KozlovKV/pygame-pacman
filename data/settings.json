@@ -1,9 +1,9 @@
 {
-    "lvl_count": 1,
+    "lvl_count": 2,
     "lvl_skin": 1,
-    "level": 0,
+    "level": 1,
     "mode": "survival",
-    "coop": true,
+    "coop": false,
     "field_texture": 0,
     "1_pacman_texture": "ghost",
     "2_pacman_texture": "classic",
