@@ -133,6 +133,3 @@ class SettingsScene(BaseScene):
             self.background_config.get_current_value().split(': ')[1])
         self.game.settings['long_buffer'] = \
             self.long_buffer_config.get_current_value().split(': ')[1] == 'True'
-        # for item in self.game.settings:
-        #     print('lol', item, self.game.settings[item])  # /////////////////////////
-        print(self.long_buffer_config.get_current_value().split(': ')[1], 'True', True)
