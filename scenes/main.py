@@ -50,15 +50,15 @@ class MainScene(BaseScene):
                                          self.game.SCREEN_WIDTH - 210, 60,
                                          200, 40, Color.SOFT_RED,
                                          self.switch_pause, 'PAUSE')
+        self.menu_button = ButtonObject(self.game, 10, 60, 200, 40, Color.SOFT_RED,
+                         self.game.set_test_scene, 'TO MENU')
 
         self.objects.append(self.score_bar)
         self.objects.append(self.time_bar)
         self.objects.append(self.lives_bar)
         self.objects.append(self.pause_bar)
         self.objects.append(self.pause_button)
-        self.objects.append(
-            ButtonObject(self.game, 10, 60, 200, 40, Color.SOFT_RED,
-                         self.game.set_test_scene, 'TO TEST'))
+        self.objects.append(self.menu_button)
 
         self.matrix = MatrixMap(self.game)
         self.objects.append(self.matrix)
@@ -124,6 +124,7 @@ class MainScene(BaseScene):
 
     def process_event(self, event: pygame.event.Event) -> None:
         if self.paused:
+            self.menu_button.process_event(event)
             self.pause_button.process_event(event)
             self.additional_event_check(event)
         else:
