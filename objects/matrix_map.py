@@ -123,6 +123,7 @@ class MatrixMap(BaseScene):
     def generate_all_matrix(self, level_objects_list):
         real_field_x = self.game.REAL_FIELD_X
         real_field_y = self.game.REAL_FIELD_Y
+        # print("REAL FIELD", real_field_y, real_field_x)  # ////////////////////////////
         teleports_pairs = [list() for _ in range(10)]
         for y in range(self.matrix_height):
             self.matrix.append(list())
@@ -159,6 +160,7 @@ class MatrixMap(BaseScene):
                     pacman = Pacman(self.game,
                                     real_field_x + x * CELL_SIZE,
                                     real_field_y + y * CELL_SIZE,
+                                    x, y,
                                     self.matrix_width, self.matrix_height,
                                     CELL_SIZE,
                                     1 if object_char == 'P' else 2)
