@@ -59,7 +59,8 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     if (x == wall.x or y == wall.y) and pacman.obj.collision(wall.obj):
         pacman.obj.vec_x *= -1
         pacman.obj.vec_y *= -1
-        pacman.obj.move(pacman.obj.vec_x * PACMAN_SPEED, pacman.obj.vec_y * PACMAN_SPEED)
+        pacman.obj.move(pacman.obj.vec_x * PACMAN_SPEED,
+                        pacman.obj.vec_y * PACMAN_SPEED)
         pacman.obj.vec_x = 0
         pacman.obj.vec_y = 0
 
@@ -84,6 +85,7 @@ class MatrixMap(BaseScene):
         self.seeds = []
         self.super_seeds = []
         self.walls = []
+        self.walls_ghosts_in = []
         self.teleports = []
 
         level_strings = []
@@ -107,16 +109,19 @@ class MatrixMap(BaseScene):
         self.matrix_grid = list()
         for my in range(self.matrix_height):
             for mx in range(self.matrix_width):
-                self.matrix_grid.append([my * CELL_SIZE + self.game.REAL_FIELD_Y,
-                                        mx * CELL_SIZE + self.game.REAL_FIELD_X])
+                self.matrix_grid.append(
+                    [my * CELL_SIZE + self.game.REAL_FIELD_Y,
+                     mx * CELL_SIZE + self.game.REAL_FIELD_X])
 
         self.border_field = DrawableObject(self.game,
                                            self.game.REAL_FIELD_X - MatrixMap.BORDER_SIZE,
                                            self.game.REAL_FIELD_Y - MatrixMap.BORDER_SIZE,
                                            field_width + MatrixMap.BORDER_SIZE * 2,
                                            field_height + MatrixMap.BORDER_SIZE * 2,
-                                           self.game.settings["level_border_color"])
-        self.field = DrawableObject(self.game, self.game.REAL_FIELD_X, self.game.REAL_FIELD_Y,
+                                           self.game.settings[
+                                               "level_border_color"])
+        self.field = DrawableObject(self.game, self.game.REAL_FIELD_X,
+                                    self.game.REAL_FIELD_Y,
                                     field_width, field_height, Color.BLACK)
 
         level_objects_list = [string.split() for string in
@@ -145,7 +150,20 @@ class MatrixMap(BaseScene):
                     wall = SimpleMatrixPoint(x, y, 'wall', wall)
                     self.walls.append(wall)
                     self.matrix[y][x].update_static_object(wall)
-                    self.matrix_grid.remove([real_field_y + y * CELL_SIZE, real_field_x + x * CELL_SIZE])
+                    self.matrix_grid.remove([real_field_y + y * CELL_SIZE,
+                                             real_field_x + x * CELL_SIZE])
+                elif object_char == '+':
+                    wall_ghost_in = ImageObject(self.game,
+                                                x=real_field_x + x * CELL_SIZE,
+                                                y=real_field_y + y * CELL_SIZE,
+                                                filename=Textures.WALL_GHOST_IN)
+                    # Добавление матричной точки стены
+                    wall_ghost_in = SimpleMatrixPoint(x, y, 'wall_ghost_in',
+                                                      wall_ghost_in)
+                    self.walls_ghosts_in.append(wall_ghost_in)
+                    self.matrix[y][x].update_static_object(wall_ghost_in)
+                    self.matrix_grid.remove([real_field_y + y * CELL_SIZE,
+                                             real_field_x + x * CELL_SIZE])
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
                                 real_field_x + x * CELL_SIZE,
@@ -215,9 +233,6 @@ class MatrixMap(BaseScene):
             list(filter(lambda x: x.obj.alive, self.ghosts)))
         self.seeds_count = len(list(filter(lambda x: x.obj.alive,
                                            self.seeds + self.super_seeds)))
-        self.current_ghost_cd = self.current_ghost_cd + 1 if \
-            self.current_ghost_cd < MatrixMap.GHOST_ACTIVATION_CD else \
-            self.current_ghost_cd
 
         self.check_ghosts_activity()
 
@@ -230,10 +245,12 @@ class MatrixMap(BaseScene):
     def check_ghosts_activity(self):
         for ghost in self.ghosts:
             ghost = ghost.obj
-            if not ghost.active and \
-                    self.current_ghost_cd == MatrixMap.GHOST_ACTIVATION_CD:
-                self.current_ghost_cd = 0
-                ghost.activate()
+            if not ghost.active:
+                if self.current_ghost_cd >= MatrixMap.GHOST_ACTIVATION_CD:
+                    self.current_ghost_cd = 0
+                    ghost.activate()
+                else:
+                    self.current_ghost_cd += 1
 
     def check_collisions_with_pacman(self, pacman: SimpleMatrixPoint):
         x = pacman.x
@@ -261,12 +278,10 @@ class MatrixMap(BaseScene):
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
         self.check_turn_ways(pacman, m_points)
-        # self.check_in_wall(pacman, m_points)
         for m_point in m_points:
             s_obj = m_point.static_obj
-            if s_obj.type == 'wall':
+            if s_obj.type == 'wall' or s_obj.type == 'wall_ghost_in':
                 pass
-                # wall_collision_check(pacman, s_obj)
             elif s_obj.type == 'teleport':
                 s_obj.obj.check_collisions_with_entries(pacman.obj)
             elif not s_obj.type == '':
@@ -274,20 +289,12 @@ class MatrixMap(BaseScene):
                     s_obj.obj.collision_reaction()
                     self.remove_static_object_from_matrix(m_point)
 
-    def check_in_wall(self, pacman: SimpleMatrixPoint, m_points):
-        if self.matrix[pacman.y][pacman.x].moving_obj.type == 'wall':
-            p_obj = pacman.obj
-            for m_point in m_points:
-                s_obj = m_point.static_obj
-                if s_obj.type != 'wall':
-                    p_obj.set_position(self.get_real_pos(s_obj.x, s_obj.y))
-
     def check_turn_ways(self, pacman: SimpleMatrixPoint, m_points):
         ways = [0, 0, 0, 0]
         p_obj = pacman.obj
         for m_point in m_points:
             s_obj = m_point.static_obj
-            if s_obj.type != 'wall':
+            if s_obj.type != 'wall' and s_obj.type != 'wall_ghost_in':
                 x = s_obj.x - pacman.x
                 y = s_obj.y - pacman.y
                 if x >= 1:
@@ -307,11 +314,11 @@ class MatrixMap(BaseScene):
             real_x = m_obj.obj.rect.x + CELL_SIZE // 2 - self.game.REAL_FIELD_X
             real_y = m_obj.obj.rect.y + CELL_SIZE // 2 - self.game.REAL_FIELD_Y
             if abs(field_real_x - real_x) >= CELL_SIZE or \
-                    abs(field_real_y - real_y) >= CELL_SIZE:
+                abs(field_real_y - real_y) >= CELL_SIZE:
                 self.change_pos_in_matrix(m_obj, real_x // CELL_SIZE,
                                           real_y // CELL_SIZE)
                 if abs(field_real_x - real_x) <= CELL_SIZE and \
-                        abs(field_real_y - real_y) <= CELL_SIZE:
+                    abs(field_real_y - real_y) <= CELL_SIZE:
                     self.correct_real_pos(m_obj)
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):
@@ -350,6 +357,7 @@ class MatrixMap(BaseScene):
             self.border_field.process_draw()
             self.field.process_draw()
             [wall.process_draw() for wall in self.walls]
+            [wall.process_draw() for wall in self.walls_ghosts_in]
             [seed.process_draw() for seed in self.seeds]
             [super_seed.process_draw() for super_seed in self.super_seeds]
             # self.first = False

@@ -1,7 +1,5 @@
 from datetime import datetime
 
-import pygame
-
 from constants import *
 from misc import read_json_from_file
 from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
@@ -19,8 +17,9 @@ class Game:
     HIGHSCORES_SCENE_INDEX = 2
     MAIN_SCENE_INDEX = 3
     GAMEOVER_SCENE_INDEX = 4
-    GAMEOVER_SCENE_INDEX_2 = 6
-    current_scene_index = 5  # testing hub
+    GAMEOVER_SCENE_INDEX_2 = 5
+    TEST_INDEX = 6
+    current_scene_index = 0  # testing hub
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
@@ -34,8 +33,9 @@ class Game:
                        HighScoresScene(self),
                        MainScene(self),
                        FinalSceneName(self),
-                       TestScene(self),
-                       FinalSceneScores(self), ]
+                       FinalSceneScores(self),
+                       TestScene(self), ]
+        self.set_menu_scene()
 
     def set_menu_scene(self):
         self.set_scene(Game.MENU_SCENE_INDEX)
@@ -56,7 +56,7 @@ class Game:
         self.set_scene(Game.GAMEOVER_SCENE_INDEX_2)
 
     def set_test_scene(self):
-        self.set_scene(5)
+        self.set_scene(self.TEST_INDEX)
 
     @staticmethod
     def exit_button_pressed(event: pygame.event.Event) -> bool:

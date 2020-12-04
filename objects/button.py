@@ -10,10 +10,10 @@ from objects.base import DrawableObject
 class ButtonObject(DrawableObject):
     def __init__(self, game,
                  x: int, y: int, width: int, height: int,
-                 color: pygame.color.Color = None,
                  function: Callable[[None], None] = None,
                  text: str = 'Define me!',
-                 button_type: str = 'multi') -> None:
+                 button_type: str = 'multi',
+                 color: pygame.color.Color = None) -> None:
         super().__init__(game)
         if color is None:
             color = self.game.settings[button_type + '_btn_style']["bg_color"]
