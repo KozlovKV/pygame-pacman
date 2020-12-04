@@ -19,7 +19,7 @@ class TextObject(DrawableObject):
         self.update_text(text)
 
     def update_text(self, text: str, color=None) -> None:
-        if not color is None:
+        if color is not None:
             self.color = color
         self.text = text
         self.surface = self.font.render(self.text, True, self.color)
