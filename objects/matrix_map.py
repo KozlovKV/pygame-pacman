@@ -159,6 +159,8 @@ class MatrixMap(BaseScene):
                     pacman = Pacman(self.game,
                                     real_field_x + x * CELL_SIZE,
                                     real_field_y + y * CELL_SIZE,
+                                    self.matrix_width, self.matrix_height,
+                                    CELL_SIZE,
                                     1 if object_char == 'P' else 2)
                     # Добавление матричной точки пакмана
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
