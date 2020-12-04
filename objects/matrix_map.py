@@ -68,7 +68,7 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
 class MatrixMap(BaseScene):
     BORDER_SIZE = 5
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
-    GHOST_ACTIVATION_CD = 500
+    GHOST_ACTIVATION_CD = 2000
 
     def __init__(self, game):
         self.first = True

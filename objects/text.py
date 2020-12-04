@@ -15,7 +15,7 @@ class TextObject(DrawableObject):
         self.is_italic = is_italic
         self.color = color
         self.font = pygame.font.SysFont(self.font_name, self.font_size, self.is_bold, self.is_italic)
-        self.rect = pygame.rect.Rect(x, y, 10, 10)
+        self.rect = pygame.rect.Rect(x, y, 1, 1)
         self.update_text(text)
 
     def update_text(self, text: str, color=None) -> None:

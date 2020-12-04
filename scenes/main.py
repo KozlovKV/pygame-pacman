@@ -11,6 +11,9 @@ from scenes import BaseScene
 
 
 class MainScene(BaseScene):
+    TICKS_TO_REVIVE = 80
+    BARS_Y = 60
+
     def __init__(self, game):
 
         game.score = 0
@@ -21,6 +24,8 @@ class MainScene(BaseScene):
         self.played_seconds = 0
 
         self.lives = 3
+
+        self.revivings_pause_ticks = self.TICKS_TO_REVIVE
 
         self.paused = False
 
@@ -41,10 +46,14 @@ class MainScene(BaseScene):
         self.time_bar = TextObject(self.game, text='TIME: 0', x=tmp_x, y=20)
 
         tmp_x = self.game.SCREEN_WIDTH // 2
-        self.lives_bar = TextObject(self.game, text=f'LIVES: {self.lives}',
+        self.lives_bar = TextObject(self.game, text=f'SCORE: {self.game.score}',
                                     x=tmp_x, y=20)
         self.pause_bar = TextObject(self.game, text='PAUSED',
-                                    x=tmp_x, y=-60, color=Color.RED)
+                                    x=tmp_x, y=-self.BARS_Y, color=Color.RED)
+        self.ready_bar = TextObject(self.game, text='',
+                                    x=tmp_x, y=-self.BARS_Y, color=Color.YELLOW)
+        self.go_bar = TextObject(self.game, text='GO!',
+                                 x=tmp_x, y=self.BARS_Y, color=Color.GREEN)
 
         self.pause_button = ButtonObject(self.game,
                                          self.game.SCREEN_WIDTH - 210, 60,
@@ -58,6 +67,8 @@ class MainScene(BaseScene):
         self.objects.append(self.time_bar)
         self.objects.append(self.lives_bar)
         self.objects.append(self.pause_bar)
+        self.objects.append(self.ready_bar)
+        self.objects.append(self.go_bar)
         self.objects.append(self.pause_button)
         self.objects.append(self.menu_button)
 
@@ -67,6 +78,15 @@ class MainScene(BaseScene):
     def process_logic(self) -> None:
         if self.paused:
             self.last_timer = datetime.datetime.now()
+        elif self.revivings_pause_ticks > 0:
+            self.revivings_pause_ticks -= 1
+            self.ready_bar.rect.y = self.BARS_Y
+            self.ready_bar.update_text(f'READY! {self.revivings_pause_ticks}')
+            self.go_bar.rect.y = -self.BARS_Y
+        elif self.revivings_pause_ticks == 0:
+            self.revivings_pause_ticks = -1
+            self.ready_bar.rect.y = -self.BARS_Y
+            self.go_bar.rect.y = self.BARS_Y
         else:
             super(MainScene, self).process_logic()
 
@@ -101,6 +121,7 @@ class MainScene(BaseScene):
         for pacman in pacmans:
             obj = pacman.obj
             if not obj.alive and self.lives > 0:
+                self.revivings_pause_ticks = self.TICKS_TO_REVIVE
                 self.lives -= 1
                 for p in pacmans:
                     p.obj.revive()
@@ -137,22 +158,22 @@ class MainScene(BaseScene):
         Sounds.SIREN.stop()
 
     def process_event(self, event: pygame.event.Event) -> None:
-        if self.paused:
-            self.menu_button.process_event(event)
-            self.pause_button.process_event(event)
-            self.additional_event_check(event)
-        else:
-            super(MainScene, self).process_event(event)
+        if self.revivings_pause_ticks == -1:
+            if self.paused:
+                self.menu_button.process_event(event)
+                self.pause_button.process_event(event)
+                self.additional_event_check(event)
+            else:
+                super(MainScene, self).process_event(event)
 
     def additional_event_check(self, event: pygame.event.Event) -> None:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
             self.switch_pause()
 
     def switch_pause(self):
+        self.go_bar.rect.y *= -1
         self.pause_bar.rect.y *= -1
         self.paused = not self.paused
 
     def process_draw(self) -> None:
-        pygame.draw.rect(self.game.screen, Color.BLACK,
-                         (0, 0, self.game.SCREEN_WIDTH, MatrixMap.FIELD_Y))
         super(MainScene, self).process_draw()
