@@ -233,9 +233,6 @@ class MatrixMap(BaseScene):
             list(filter(lambda x: x.obj.alive, self.ghosts)))
         self.seeds_count = len(list(filter(lambda x: x.obj.alive,
                                            self.seeds + self.super_seeds)))
-        self.current_ghost_cd = self.current_ghost_cd + 1 if \
-            self.current_ghost_cd < MatrixMap.GHOST_ACTIVATION_CD else \
-            self.current_ghost_cd
 
         self.check_ghosts_activity()
 
@@ -248,10 +245,12 @@ class MatrixMap(BaseScene):
     def check_ghosts_activity(self):
         for ghost in self.ghosts:
             ghost = ghost.obj
-            if not ghost.active and \
-                self.current_ghost_cd == MatrixMap.GHOST_ACTIVATION_CD:
-                self.current_ghost_cd = 0
-                ghost.activate()
+            if not ghost.active:
+                if self.current_ghost_cd >= MatrixMap.GHOST_ACTIVATION_CD:
+                    self.current_ghost_cd = 0
+                    ghost.activate()
+                else:
+                    self.current_ghost_cd += 1
 
     def check_collisions_with_pacman(self, pacman: SimpleMatrixPoint):
         x = pacman.x

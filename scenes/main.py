@@ -48,10 +48,11 @@ class MainScene(BaseScene):
 
         self.pause_button = ButtonObject(self.game,
                                          self.game.SCREEN_WIDTH - 210, 60,
-                                         200, 40, Color.SOFT_RED,
-                                         self.switch_pause, 'PAUSE')
-        self.menu_button = ButtonObject(self.game, 10, 60, 200, 40, Color.SOFT_RED,
-                         self.game.set_test_scene, 'TO MENU', 'exit')
+                                         200, 40, self.switch_pause,
+                                         'PAUSE', 'multi')
+        self.menu_button = ButtonObject(self.game, 10, 60, 200, 40,
+                                        self.game.set_menu_scene, 'TO MENU',
+                                        'exit')
 
         self.objects.append(self.score_bar)
         self.objects.append(self.time_bar)
@@ -77,7 +78,7 @@ class MainScene(BaseScene):
         self.time_bar.update_text(f'TIME: {int(self.played_seconds)}')
 
         if self.game_mode == 'survival':
-            self.game.set_scores(int(self.played_seconds)*10)
+            self.game.set_scores(int(self.played_seconds) * 10)
 
         self.score_bar.update_text(f'SCORE: {self.game.score}')
 
@@ -130,7 +131,7 @@ class MainScene(BaseScene):
     def music_reload(self):
         Sounds.SIREN.stop()
         Sounds.BEGINING.play()
-        Sounds.SIREN.play(-1, fade_ms=5000)
+        Sounds.SIREN.play(-1, fade_ms=10000)
 
     def on_deactivate(self) -> None:
         Sounds.SIREN.stop()

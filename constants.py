@@ -25,6 +25,7 @@ class Color:
 
 pygame.font.init()
 MAIN_FONT = pygame.font.SysFont('Consolas', 32, True)
+PACMAN_FONT = pygame.font.Font('./resources/fonts/pacman.ttf', 100)
 
 CELL_SIZE = 30
 PACMAN_SPEED = 5

@@ -57,7 +57,7 @@ class FinalSceneName(BaseScene):
         self.enter_button = (ButtonObject(self.game,
                                           x, 350,
                                           self.SWITCHER_WIDTH,
-                                          self.SWITCHER_HEIGHT, Color.GREEN,
+                                          self.SWITCHER_HEIGHT,
                                           self.go_to_game_over_scene_2, 'ENTER',
                                           'play'))
         self.letters = [
@@ -78,16 +78,10 @@ class FinalSceneName(BaseScene):
         self.name += self.third_letter.get_current_value()
         self.name_label.update_text(self.name)
 
-    def on_activate(self) -> None:
-        Sounds.BEGINING.play()
-
-    def on_deactivate(self) -> None:
-        Sounds.BEGINING.stop()
-
     def go_to_game_over_scene_2(self):
         HighScoresTable(self.game).add_new_score(
             self.name + ' ' + str(self.game.score))
-        self.game.set_scene(6)
+        self.game.set_scene(self.game.GAMEOVER_SCENE_INDEX_2)
 
 
 class FinalSceneScores(BaseScene):
@@ -113,19 +107,19 @@ class FinalSceneScores(BaseScene):
                                 font_size=50)
         self.result_label = TextObject(self.game,
                                        text='',
-                                       color=Color.GREEN,
+                                       color=Color.RED,
                                        x=self.game.SCREEN_WIDTH / 2, y=100,
                                        font_size=45)
         self.return_button = ButtonObject(self.game,
                                           x, 600,
                                           self.BUTTON_WIDTH,
-                                          self.BUTTON_HEIGHT, Color.BLUE,
-                                          self.game.set_test_scene,
-                                          'TO TEST MENU')
+                                          self.BUTTON_HEIGHT,
+                                          self.game.set_menu_scene,
+                                          'MENU', 'multi')
         self.exit_button = ButtonObject(self.game,
                                         x, 650,
                                         self.BUTTON_WIDTH,
-                                        self.BUTTON_HEIGHT, Color.SOFT_RED,
+                                        self.BUTTON_HEIGHT,
                                         self.game.exit_game, 'EXIT', 'exit')
         self.objects.append(self.highscore_table)
         self.objects.append(self.label)
