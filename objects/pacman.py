@@ -105,8 +105,10 @@ class Pacman(ImageObject):
 
     def revive(self):
         self.set_position(*self.spawn)
-        self.vec_x = 0
         self.vec_y = 0
+        self.vec_x = 0
+        self.turn_status = -1
+        self.previous_turn_status = -1
         anim = Textures.PACMAN[self.game.settings[str(self.pacman_id) + '_pacman_texture']][0]
         self.load_new_animation(anim)
         self.alive = True
