@@ -250,7 +250,7 @@ class MatrixMap(BaseScene):
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
         self.check_turn_ways(pacman, m_points)
-        self.check_in_wall(pacman, m_points)
+        # self.check_in_wall(pacman, m_points)
         for m_point in m_points:
             s_obj = m_point.static_obj
             if s_obj.type == 'wall':

@@ -55,11 +55,11 @@ class Pacman(ImageObject):
                     self.vec_y = 1 if self.turn_status == 3 else -1
                     self.vec_x = 0
                 self.previous_turn_status = self.turn_status
-            # elif self.turn_ways[self.turn_status] == 0:
-            #     self.vec_y = 0
-            #     self.vec_x = 0
-            #     self.turn_status = -1
-            #     self.turn_buff = -1
+            elif self.turn_ways[self.turn_status] == 0:
+                self.vec_y = 0
+                self.vec_x = 0
+                self.turn_status = -1
+                self.turn_buff = -1
 
     def process_event(self, event):
         if event.type == pygame.KEYDOWN:
