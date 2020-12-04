@@ -104,6 +104,12 @@ class MatrixMap(BaseScene):
         self.game.REAL_FIELD_X = MatrixMap.FIELD_X + width_padding
         self.game.REAL_FIELD_Y = MatrixMap.FIELD_Y + height_padding
 
+        self.matrix_grid = list()
+        for my in range(self.matrix_height):
+            for mx in range(self.matrix_width):
+                self.matrix_grid.append([my * CELL_SIZE + self.game.REAL_FIELD_Y,
+                                        mx * CELL_SIZE + self.game.REAL_FIELD_X])
+
         self.border_field = DrawableObject(self.game,
                                            self.game.REAL_FIELD_X - MatrixMap.BORDER_SIZE,
                                            self.game.REAL_FIELD_Y - MatrixMap.BORDER_SIZE,
@@ -139,6 +145,7 @@ class MatrixMap(BaseScene):
                     wall = SimpleMatrixPoint(x, y, 'wall', wall)
                     self.walls.append(wall)
                     self.matrix[y][x].update_static_object(wall)
+                    self.matrix_grid.remove([real_field_y + y * CELL_SIZE, real_field_x + x * CELL_SIZE])
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
                                 real_field_x + x * CELL_SIZE,
@@ -160,9 +167,7 @@ class MatrixMap(BaseScene):
                     pacman = Pacman(self.game,
                                     real_field_x + x * CELL_SIZE,
                                     real_field_y + y * CELL_SIZE,
-                                    x, y,
-                                    self.matrix_width, self.matrix_height,
-                                    CELL_SIZE,
+                                    self.matrix_grid,
                                     1 if object_char == 'P' else 2)
                     # Добавление матричной точки пакмана
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
@@ -188,6 +193,8 @@ class MatrixMap(BaseScene):
                         self.matrix[y2][x2].update_static_object(teleport2)
                         self.teleports.append(teleport)
                         teleports_pairs[i] = list()
+        for pman in self.pacmans:
+            pman.obj.set_grid(self.matrix_grid)
 
     def generate_ghosts(self, level_objects_list):
         fabric = GhostFabric(self.game, self)

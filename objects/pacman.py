@@ -6,21 +6,20 @@ import pygame
 class Pacman(ImageObject):
     FRAMES_KEEP_TURN = 10  # Сколько кадров хранить поворот
 
-    def __init__(self, game, x: int, y: int, m_x: int, m_y: int,
-                 m_w: int, m_h: int, cell_size: int,
+    def __init__(self, game, x: int, y: int, matrix_grid,
                  id: int = 1):
         texture_settings = Textures.PACMAN[game.settings[str(id) + '_pacman_texture']]
         super().__init__(game, x=x, y=y, animation=texture_settings[0],
                          hided_sprite_w=10, hided_sprite_h=10)
         self.spawn = (x, y)
-        self.rotable_points = list()
-        fieldx = x - (m_x * cell_size)
-        fieldy = y - (m_y * cell_size)
-        for my in range(m_h):
-            for mx in range(m_w):
-                self.rotable_points.append([my * cell_size + fieldy,
-                                           mx * cell_size + fieldx])
-                # print('POINTS', my * cell_size + fieldy, mx * cell_size + fieldx)  # /////////////////////////
+        self.rotable_points = matrix_grid
+        # fieldx = x - (m_x * cell_size)
+        # fieldy = y - (m_y * cell_size)
+        # for my in range(m_h):
+        #     for mx in range(m_w):
+        #         self.rotable_points.append([my * cell_size + fieldy,
+        #                                    mx * cell_size + fieldx])
+        #       # print('POINTS', my * cell_size + fieldy, mx * cell_size + fieldx)  # /////////////////////////
         self.angle = 0
         self.vec_x = 0
         self.vec_y = 0
@@ -120,3 +119,6 @@ class Pacman(ImageObject):
         if self.rotable:
             self.rotate_img(self.angle)
         super(Pacman, self).process_draw()
+
+    def set_grid(self, matrix_grid):
+        self.rotable_points = matrix_grid
