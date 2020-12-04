@@ -28,7 +28,7 @@ MAIN_FONT = pygame.font.SysFont('Consolas', 32, True)
 
 CELL_SIZE = 30
 PACMAN_SPEED = 5
-GHOST_SPEED = 4
+GHOST_SPEED = 3
 DEAD_GHOST_SPEED = GHOST_SPEED * 2
 
 SETTINGS_PATH = './data/settings.json'
@@ -50,3 +50,20 @@ class Textures:
         'alive': AnimationPreset(1, MAIN_FOLDER + 'ghost/alive/[F].png'),
         'dead': AnimationPreset(1, MAIN_FOLDER + 'ghost/dead/[F].png')
     }
+
+
+pygame.mixer.init()
+
+class Sounds:
+    MAIN_FOLDER = './resources/sounds/'
+    BEGINING = pygame.mixer.Sound(MAIN_FOLDER + 'begining.wav')
+    SEED = [
+        pygame.mixer.Sound(MAIN_FOLDER + 'seed_1.wav'),
+        pygame.mixer.Sound(MAIN_FOLDER + 'seed_2.wav'),
+    ]
+    SUPER_SEED = pygame.mixer.Sound(MAIN_FOLDER + 'super_seed.wav')
+    PACMAN_DEATH = pygame.mixer.Sound(MAIN_FOLDER + 'pacman_death.wav')
+    GHOST_DEATH = pygame.mixer.Sound(MAIN_FOLDER + 'ghost_death.wav')
+    WIN = pygame.mixer.Sound(MAIN_FOLDER + 'win.wav')
+    LOSE = pygame.mixer.Sound(MAIN_FOLDER + 'lose.wav')
+    SIREN = pygame.mixer.Sound(MAIN_FOLDER + 'siren.wav')

@@ -59,7 +59,7 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     if (x == wall.x or y == wall.y) and pacman.obj.collision(wall.obj):
         pacman.obj.vec_x *= -1
         pacman.obj.vec_y *= -1
-        pacman.obj.move(pacman.obj.vec_x*PACMAN_SPEED, pacman.obj.vec_y*PACMAN_SPEED)
+        pacman.obj.move(pacman.obj.vec_x * PACMAN_SPEED, pacman.obj.vec_y * PACMAN_SPEED)
         pacman.obj.vec_x = 0
         pacman.obj.vec_y = 0
 
@@ -104,6 +104,12 @@ class MatrixMap(BaseScene):
         self.game.REAL_FIELD_X = MatrixMap.FIELD_X + width_padding
         self.game.REAL_FIELD_Y = MatrixMap.FIELD_Y + height_padding
 
+        self.matrix_grid = list()
+        for my in range(self.matrix_height):
+            for mx in range(self.matrix_width):
+                self.matrix_grid.append([my * CELL_SIZE + self.game.REAL_FIELD_Y,
+                                        mx * CELL_SIZE + self.game.REAL_FIELD_X])
+
         self.border_field = DrawableObject(self.game,
                                            self.game.REAL_FIELD_X - MatrixMap.BORDER_SIZE,
                                            self.game.REAL_FIELD_Y - MatrixMap.BORDER_SIZE,
@@ -123,6 +129,7 @@ class MatrixMap(BaseScene):
     def generate_all_matrix(self, level_objects_list):
         real_field_x = self.game.REAL_FIELD_X
         real_field_y = self.game.REAL_FIELD_Y
+        # print("REAL FIELD", real_field_y, real_field_x)  # ////////////////////////////
         teleports_pairs = [list() for _ in range(10)]
         for y in range(self.matrix_height):
             self.matrix.append(list())
@@ -138,6 +145,7 @@ class MatrixMap(BaseScene):
                     wall = SimpleMatrixPoint(x, y, 'wall', wall)
                     self.walls.append(wall)
                     self.matrix[y][x].update_static_object(wall)
+                    self.matrix_grid.remove([real_field_y + y * CELL_SIZE, real_field_x + x * CELL_SIZE])
                 elif object_char == '_' and not self.game_mode == 'survival':
                     seed = Seed(self.game,
                                 real_field_x + x * CELL_SIZE,
@@ -159,6 +167,7 @@ class MatrixMap(BaseScene):
                     pacman = Pacman(self.game,
                                     real_field_x + x * CELL_SIZE,
                                     real_field_y + y * CELL_SIZE,
+                                    self.matrix_grid,
                                     1 if object_char == 'P' else 2)
                     # Добавление матричной точки пакмана
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
@@ -184,6 +193,8 @@ class MatrixMap(BaseScene):
                         self.matrix[y2][x2].update_static_object(teleport2)
                         self.teleports.append(teleport)
                         teleports_pairs[i] = list()
+        for pman in self.pacmans:
+            pman.obj.set_grid(self.matrix_grid)
 
     def generate_ghosts(self, level_objects_list):
         fabric = GhostFabric(self.game, self)
@@ -250,7 +261,7 @@ class MatrixMap(BaseScene):
     def pacman_collisions_with_static_objects(self, pacman: SimpleMatrixPoint,
                                               m_points):
         self.check_turn_ways(pacman, m_points)
-        self.check_in_wall(pacman, m_points)
+        # self.check_in_wall(pacman, m_points)
         for m_point in m_points:
             s_obj = m_point.static_obj
             if s_obj.type == 'wall':

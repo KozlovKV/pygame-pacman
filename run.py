@@ -9,6 +9,7 @@ from game import Game
 def main():
     pygame.init()
     pygame.font.init()
+    pygame.mixer.init()
     Game().main_loop()
     sys.exit(0)
 

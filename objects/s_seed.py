@@ -1,4 +1,4 @@
-from constants import Textures
+from constants import Textures, Sounds
 from objects.image import ImageObject
 
 
@@ -9,6 +9,7 @@ class SuperSeed(ImageObject):
 
     def collision_reaction(self):
         self.die()
+        Sounds.SUPER_SEED.play()
         self.game.add_scores(10)
         scene = self.game.scenes[self.game.current_scene_index]
         scene.scary_mode_on()
