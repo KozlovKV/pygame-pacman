@@ -48,10 +48,9 @@ class MainScene(BaseScene):
 
         self.pause_button = ButtonObject(self.game,
                                          self.game.SCREEN_WIDTH - 210, 60,
-                                         200, 40, Color.SOFT_RED,
-                                         self.switch_pause, 'PAUSE', 'multi')
+                                         200, 40, self.switch_pause,
+                                         'PAUSE', 'multi')
         self.menu_button = ButtonObject(self.game, 10, 60, 200, 40,
-                                        Color.SOFT_RED,
                                         self.game.set_menu_scene, 'TO MENU',
                                         'exit')
 
@@ -132,7 +131,7 @@ class MainScene(BaseScene):
     def music_reload(self):
         Sounds.SIREN.stop()
         Sounds.BEGINING.play()
-        Sounds.SIREN.play(-1, fade_ms=5000)
+        Sounds.SIREN.play(-1, fade_ms=10000)
 
     def on_deactivate(self) -> None:
         Sounds.SIREN.stop()

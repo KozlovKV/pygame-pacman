@@ -20,27 +20,23 @@ class MenuScene(BaseScene):
 
         self.play_btn = ButtonObject(self.game, x, y+160,
                                      self.BTN_WIDTH, self.BTN_HEIGHT,
-                                     Color.SOFT_RED,
                                      self.game.set_main_scene, 'PLAY', 'play')
         self.objects.append(self.play_btn)
 
         self.hs_btn = ButtonObject(self.game, x, y+240,
                                    self.BTN_WIDTH, self.BTN_HEIGHT,
-                                   Color.SOFT_RED,
                                    self.game.set_highscores_scene,
                                    'HIGHSCORES', 'multi')
         self.objects.append(self.hs_btn)
 
         self.settings_btn = ButtonObject(self.game, x, y+320,
                                          self.BTN_WIDTH, self.BTN_HEIGHT,
-                                         Color.SOFT_RED,
                                          self.game.set_settings_scene,
                                          'SETTINGS', 'multi')
         self.objects.append(self.settings_btn)
 
         self.exit_btn = ButtonObject(self.game, x, y+400,
                                      self.BTN_WIDTH, self.BTN_HEIGHT,
-                                     Color.SOFT_RED,
                                      self.game.exit_game, 'EXIT', 'exit')
         self.objects.append(self.exit_btn)
 
