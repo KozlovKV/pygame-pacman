@@ -18,7 +18,8 @@ class Game:
     MAIN_SCENE_INDEX = 3
     GAMEOVER_SCENE_INDEX = 4
     GAMEOVER_SCENE_INDEX_2 = 5
-    current_scene_index = 6  # testing hub
+    TEST_INDEX = 6
+    current_scene_index = 0  # testing hub
 
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode(Game.SCREEN_SIZE)
@@ -55,7 +56,7 @@ class Game:
         self.set_scene(Game.GAMEOVER_SCENE_INDEX_2)
 
     def set_test_scene(self):
-        self.set_scene(5)
+        self.set_scene(self.TEST_INDEX)
 
     @staticmethod
     def exit_button_pressed(event: pygame.event.Event) -> bool:

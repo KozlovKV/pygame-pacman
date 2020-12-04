@@ -97,7 +97,7 @@ class SettingsScene(BaseScene):
         self.objects.append(
             ButtonObject(self.game, x, 490, self.SWITCHER_WIDTH, 40,
                          Color.SOFT_RED,
-                         self.game.set_test_scene, 'SAVE AND RETURN', 'exit'))
+                         self.game.set_menu_scene, 'SAVE AND RETURN', 'exit'))
         self.objects.append(
             ButtonObject(self.game, x, 550, self.SWITCHER_WIDTH, 40,
                          Color.SOFT_RED,

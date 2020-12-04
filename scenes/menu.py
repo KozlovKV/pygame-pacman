@@ -9,7 +9,7 @@ class MenuScene(BaseScene):
     BTN_HEIGHT = 50
 
     def create_objects(self) -> None:
-        y = 100
+        y = 140
         self.header = TextObject(self.game, text='',
                                  x=self.game.SCREEN_WIDTH / 2, y=y)
         self.header.font = PACMAN_FONT
@@ -24,21 +24,21 @@ class MenuScene(BaseScene):
                                      self.game.set_main_scene, 'PLAY', 'play')
         self.objects.append(self.play_btn)
 
-        self.hs_btn = ButtonObject(self.game, x, y+220,
+        self.hs_btn = ButtonObject(self.game, x, y+240,
                                    self.BTN_WIDTH, self.BTN_HEIGHT,
                                    Color.SOFT_RED,
                                    self.game.set_highscores_scene,
                                    'HIGHSCORES', 'multi')
         self.objects.append(self.hs_btn)
 
-        self.settings_btn = ButtonObject(self.game, x, y+280,
+        self.settings_btn = ButtonObject(self.game, x, y+320,
                                          self.BTN_WIDTH, self.BTN_HEIGHT,
                                          Color.SOFT_RED,
-                                         self.game.set_highscores_scene,
+                                         self.game.set_settings_scene,
                                          'SETTINGS', 'multi')
         self.objects.append(self.settings_btn)
 
-        self.exit_btn = ButtonObject(self.game, x, y+340,
+        self.exit_btn = ButtonObject(self.game, x, y+400,
                                      self.BTN_WIDTH, self.BTN_HEIGHT,
                                      Color.SOFT_RED,
                                      self.game.exit_game, 'EXIT', 'exit')

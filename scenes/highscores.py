@@ -7,7 +7,7 @@ from scenes import BaseScene
 class HighScoresScene(BaseScene):
     def create_objects(self) -> None:
         button = ButtonObject(self.game, 300, 600, 200, 40,
-                              Color.SOFT_RED, self.game.set_test_scene,
+                              Color.SOFT_RED, self.game.set_menu_scene,
                               'RETURN', 'exit')
         self.table = HighScoresTable(self.game, 400, 100)
         self.objects.append(button)
