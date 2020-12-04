@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pygame
 
-from constants import Color, SETTINGS_PATH
+from constants import *
 from misc import read_json_from_file
 from scenes import MenuScene, SettingsScene, HighScoresScene, MainScene, \
     FinalSceneName, FinalSceneScores

@@ -236,6 +236,7 @@ class Ghost(ImageObject):
         return corners
 
     def die(self) -> None:
+        Sounds.GHOST_DEATH.play()
         self.game.add_scores(self.score_for_kill)
         if not self.respawn:
             del self

@@ -1,4 +1,4 @@
-from constants import PACMAN_SPEED, Textures
+from constants import PACMAN_SPEED, Textures, Sounds
 from objects.image import ImageObject
 import pygame
 
@@ -93,25 +93,22 @@ class Pacman(ImageObject):
         self.check_turn_status()
         self.do_turn()
 
-        if self.ticks_to_revive > 0:
-            self.vec_x = 0
-            self.vec_y = 0
-            self.ticks_to_revive -= 1
-        elif self.ticks_to_revive == 0:
-            self.ticks_to_revive = -1
-            self.set_position(*self.spawn)
-            anim = Textures.PACMAN[self.game.settings[str(self.pacman_id) + '_pacman_texture']][0]
-            self.load_new_animation(anim)
-
         x = self.vec_x * self.speed
         y = self.vec_y * self.speed
         self.move(x, y)
 
-    def revive(self):
+    def die(self):
         # anim = Textures.PACMAN[self.game.settings['pacman_texture']+'_die']
         # self.load_new_animation(anim)
-        # self.ticks_to_revive = anim.frames_count
-        self.ticks_to_revive = 5
+        self.alive = False
+        Sounds.PACMAN_DEATH.play()
+
+    def revive(self):
+        self.set_position(*self.spawn)
+        self.vec_x = 0
+        self.vec_y = 0
+        anim = Textures.PACMAN[self.game.settings[str(self.pacman_id) + '_pacman_texture']][0]
+        self.load_new_animation(anim)
         self.alive = True
 
     def process_draw(self):

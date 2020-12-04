@@ -1,4 +1,4 @@
-from constants import Color
+from constants import Color, Sounds
 from objects.button import ButtonObject
 from objects.text import TextObject
 from objects.highscore import HighScoresTable
@@ -75,6 +75,12 @@ class FinalSceneName(BaseScene):
         self.name += self.third_letter.get_current_value()
         self.name_label.update_text(self.name)
 
+    def on_activate(self) -> None:
+        Sounds.BEGINING.play()
+
+    def on_deactivate(self) -> None:
+        Sounds.BEGINING.stop()
+
     def go_to_game_over_scene_2(self):
         HighScoresTable(self.game).add_new_score(self.name + ' ' + str(self.game.score))
         self.game.set_scene(6)
@@ -122,4 +128,8 @@ class FinalSceneScores(BaseScene):
         self.objects.append(self.exit_button)
 
     def on_activate(self) -> None:
+        if self.game.is_win:
+            Sounds.WIN.play()
+        else:
+            Sounds.LOSE.play()
         self.highscore_table.read_scores()
