@@ -1,4 +1,4 @@
-from constants import Color
+from constants import Color, Sounds
 from objects.button import ButtonObject
 from scenes import BaseScene
 
@@ -18,6 +18,12 @@ class MenuScene(BaseScene):
         #     Color.RED, self.game.exit_game, 'Выход'
         # )
         # self.objects = [self.button_start, self.button_exit]
+
+    def on_activate(self) -> None:
+        Sounds.BEGINING.play()
+
+    def on_deactivate(self) -> None:
+        Sounds.BEGINING.stop()
 
     def start_game(self) -> None:
         self.game.set_scene(self.game.MAIN_SCENE_INDEX)

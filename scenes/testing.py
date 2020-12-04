@@ -1,4 +1,4 @@
-from constants import Color, Textures
+from constants import Color, Textures, Sounds
 from objects.button import ButtonObject
 from objects.image import ImageObject
 from objects.base import DrawableObject
@@ -32,6 +32,9 @@ class TestScene(BaseScene):
         self.img_obj = ImageObject(self.game, x=600, y=500,
                                    animation=Textures.TELEPORT)
         self.objects.append(self.img_obj)
+
+    def on_activate(self) -> None:
+        Sounds.BEGINING.play()
 
     def additional_logic(self) -> None:
         self.img_obj.next_frame()

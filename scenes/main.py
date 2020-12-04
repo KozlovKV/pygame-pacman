@@ -2,7 +2,7 @@ import datetime
 
 import pygame
 
-from constants import Color, MAIN_FONT
+from constants import Color, MAIN_FONT, Sounds
 from objects.button import ButtonObject
 from objects.ghost import Ghost
 from objects.text import TextObject
@@ -105,6 +105,7 @@ class MainScene(BaseScene):
                     p.obj.revive()
                 for g in ghosts:
                     g.obj.set_spawn_pos()
+                self.music_reload()
 
     def is_win(self):
         if self.game_mode == 'score_cup':
@@ -124,7 +125,15 @@ class MainScene(BaseScene):
 
     def on_activate(self) -> None:
         self.__init__(self.game)
-        self.game.screen.fill(Color.BLACK)
+        self.music_reload()
+
+    def music_reload(self):
+        Sounds.SIREN.stop()
+        Sounds.BEGINING.play()
+        Sounds.SIREN.play(-1, fade_ms=5000)
+
+    def on_deactivate(self) -> None:
+        Sounds.SIREN.stop()
 
     def process_event(self, event: pygame.event.Event) -> None:
         if self.paused:
