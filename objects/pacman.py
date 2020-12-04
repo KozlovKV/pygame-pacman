@@ -16,12 +16,12 @@ class Pacman(ImageObject):
         self.rotable_points = list()
         fieldx = x % cell_size
         fieldy = y % cell_size
-        print(fieldy, fieldx)
+        # print(fieldy, fieldx)
         for my in range(m_h):
             for mx in range(m_w):
                 self.rotable_points.append([my * cell_size + fieldy,
                                            mx * cell_size + fieldx])
-                print('POINTS', my * cell_size + fieldy, mx * cell_size + fieldx)  # /////////////////////////
+                # print('POINTS', my * cell_size + fieldy, mx * cell_size + fieldx)  # /////////////////////////
         self.angle = 0
         self.vec_x = 0
         self.vec_y = 0
@@ -51,7 +51,7 @@ class Pacman(ImageObject):
 
     def check_turn_status(self):
         if self.turn_buff != -1:
-            print("PACPOS", self.rect.y, self.rect.x)
+            # print("PACPOS", self.rect.y, self.rect.x)
             if self.turn_ways[self.turn_buff] == 1 and [self.rect.y, self.rect.x] in self.rotable_points:
                 self.turn_status = self.turn_buff
                 self.turn_buff = -1
