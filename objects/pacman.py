@@ -114,7 +114,6 @@ class Pacman(ImageObject):
         self.alive = True
 
     def process_draw(self):
-        self.next_frame()
         if self.rotable:
             self.rotate_img(self.angle)
         super(Pacman, self).process_draw()

@@ -156,7 +156,7 @@ class Ghost(ImageObject):
         self.current_pacman = choose_random(self.pacmans)
         self.spawn = (x, y)
         self.cell = (x, y)
-        self.respawn = respawn
+        self.respawn = game.settings['mode'] != 'hunt'
         self.next_cell = (x, y)
         rx, ry = self.get_real_position(self.cell)
         self.alive_animation = Textures.GHOST['alive']

@@ -106,7 +106,7 @@ class SettingsScene(BaseScene):
 
     def quit_without_saving(self):
         self.save_changes = False
-        self.game.set_test_scene()
+        self.game.set_menu_scene()
 
     def process_logic(self) -> None:
         pass

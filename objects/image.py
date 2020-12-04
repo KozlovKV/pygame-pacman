@@ -14,6 +14,9 @@ class ImageObject(DrawableObject):
         super().__init__(game, x=x, y=y, w=CELL_SIZE, h=CELL_SIZE,
                          hided_sprite_w=hided_sprite_w,
                          hided_sprite_h=hided_sprite_h)
+        self.filename = None
+        self.animation = None
+        self.image = None
         if filename:
             self.load_new_image(filename)
         elif animation:
@@ -46,3 +49,5 @@ class ImageObject(DrawableObject):
     def process_draw(self) -> None:
         if self.alive:
             self.game.screen.blit(self.image, self.rect)
+            if self.animation is not None:
+                self.next_frame()

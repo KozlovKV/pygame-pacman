@@ -19,7 +19,6 @@ class TeleportObject:
         pass
 
     def process_logic(self):
-        [p.next_frame() for p in self.points]
         if self.last_teleported_object is not None:
             self.time_from_teleported += 1
         if self.time_from_teleported >= TeleportObject.KEEP_TELEPORTED_OBJECT:
