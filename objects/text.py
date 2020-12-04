@@ -18,7 +18,9 @@ class TextObject(DrawableObject):
         self.rect = pygame.rect.Rect(x, y, 10, 10)
         self.update_text(text)
 
-    def update_text(self, text: str) -> None:
+    def update_text(self, text: str, color=None) -> None:
+        if not color is None:
+            self.color = color
         self.text = text
         self.surface = self.font.render(self.text, True, self.color)
         x = self.rect.centerx

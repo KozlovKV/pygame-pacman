@@ -138,6 +138,6 @@ class FinalSceneScores(BaseScene):
             Sounds.WIN.play()
         else:
             Sounds.LOSE.play()
-        self.result_label.update_text('WIN' if self.game.is_win else 'LOSE')
-        self.result_label.color = Color.GREEN if self.game.is_win else Color.SOFT_RED
+        self.result_label.update_text('WIN' if self.game.is_win else 'LOSE',
+                                      Color.GREEN if self.game.is_win else Color.SOFT_RED)
         self.highscore_table.read_scores()
