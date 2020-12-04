@@ -31,9 +31,11 @@ class FinalSceneName(BaseScene):
                                  x=self.game.SCREEN_WIDTH / 2, y=50,
                                  font_size=50))
         self.name_label = (TextObject(self.game, text='AAA', font_size=40,
-                                      x=self.game.SCREEN_WIDTH / 2 + 130, y=100))
+                                      x=self.game.SCREEN_WIDTH / 2 + 130,
+                                      y=100))
         self.enter_name_label = (TextObject(self.game, text='ENTER NICKNAME: ',
-                                            x=self.game.SCREEN_WIDTH / 2 - 40, y=100))
+                                            x=self.game.SCREEN_WIDTH / 2 - 40,
+                                            y=100))
         self.first_letter = (ArrowSwitcher(self.game,
                                            x, 150,
                                            self.SWITCHER_WIDTH,
@@ -56,7 +58,8 @@ class FinalSceneName(BaseScene):
                                           x, 350,
                                           self.SWITCHER_WIDTH,
                                           self.SWITCHER_HEIGHT, Color.GREEN,
-                                          self.go_to_game_over_scene_2, 'ENTER', 'play'))
+                                          self.go_to_game_over_scene_2, 'ENTER',
+                                          'play'))
         self.letters = [
             self.first_letter,
             self.second_letter,
@@ -82,7 +85,8 @@ class FinalSceneName(BaseScene):
         Sounds.BEGINING.stop()
 
     def go_to_game_over_scene_2(self):
-        HighScoresTable(self.game).add_new_score(self.name + ' ' + str(self.game.score))
+        HighScoresTable(self.game).add_new_score(
+            self.name + ' ' + str(self.game.score))
         self.game.set_scene(6)
 
 
@@ -101,26 +105,28 @@ class FinalSceneScores(BaseScene):
     def create_objects(self) -> None:
         x = (self.game.SCREEN_WIDTH - self.BUTTON_WIDTH) / 2
         self.highscore_table = HighScoresTable(self.game,
-                                               x=self.game.SCREEN_WIDTH / 2, y=150)
-        self.label = (TextObject(self.game,
-                                 text='GAME OVER',
-                                 x=self.game.SCREEN_WIDTH / 2, y=50,
-                                 font_size=50))
-        self.result_label = (TextObject(self.game,
-                                        text=('WIN' if self.game.is_win else 'LOSE'),
-                                        color=(Color.GREEN if self.game.is_win else Color.SOFT_RED),
-                                        x=self.game.SCREEN_WIDTH / 2, y=100,
-                                        font_size=45))
-        self.return_button = (ButtonObject(self.game,
-                                           x, 600,
-                                           self.BUTTON_WIDTH,
-                                           self.BUTTON_HEIGHT, Color.BLUE,
-                                           self.game.set_test_scene, 'TO TEST MENU'))
-        self.exit_button = (ButtonObject(self.game,
-                                         x, 650,
-                                         self.BUTTON_WIDTH,
-                                         self.BUTTON_HEIGHT, Color.SOFT_RED,
-                                         self.game.exit_game, 'EXIT', 'exit'))
+                                               x=self.game.SCREEN_WIDTH / 2,
+                                               y=150)
+        self.label = TextObject(self.game,
+                                text='GAME OVER',
+                                x=self.game.SCREEN_WIDTH / 2, y=50,
+                                font_size=50)
+        self.result_label = TextObject(self.game,
+                                       text='',
+                                       color=Color.GREEN,
+                                       x=self.game.SCREEN_WIDTH / 2, y=100,
+                                       font_size=45)
+        self.return_button = ButtonObject(self.game,
+                                          x, 600,
+                                          self.BUTTON_WIDTH,
+                                          self.BUTTON_HEIGHT, Color.BLUE,
+                                          self.game.set_test_scene,
+                                          'TO TEST MENU')
+        self.exit_button = ButtonObject(self.game,
+                                        x, 650,
+                                        self.BUTTON_WIDTH,
+                                        self.BUTTON_HEIGHT, Color.SOFT_RED,
+                                        self.game.exit_game, 'EXIT', 'exit')
         self.objects.append(self.highscore_table)
         self.objects.append(self.label)
         self.objects.append(self.result_label)
@@ -132,4 +138,6 @@ class FinalSceneScores(BaseScene):
             Sounds.WIN.play()
         else:
             Sounds.LOSE.play()
+        self.result_label.update_text('WIN' if self.game.is_win else 'LOSE')
+        self.result_label.color = Color.GREEN if self.game.is_win else Color.SOFT_RED
         self.highscore_table.read_scores()

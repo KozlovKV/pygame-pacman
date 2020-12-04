@@ -36,7 +36,8 @@ SETTINGS_PATH = './data/settings.json'
 
 class Textures:
     MAIN_FOLDER = './resources/images/'
-    WALL = MAIN_FOLDER + 'wall/default/0.png'
+    WALL = MAIN_FOLDER + 'wall/default.png'
+    WALL_GHOST_IN = MAIN_FOLDER + 'wall/ghost_in.png'
     SEED = MAIN_FOLDER + 'seed/0.png'
     SUPER_SEED = MAIN_FOLDER + 'super_seed/default/0.png'
     TELEPORT = AnimationPreset(2, MAIN_FOLDER + 'teleport/[F].png')
