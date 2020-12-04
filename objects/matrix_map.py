@@ -59,7 +59,7 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
     if (x == wall.x or y == wall.y) and pacman.obj.collision(wall.obj):
         pacman.obj.vec_x *= -1
         pacman.obj.vec_y *= -1
-        pacman.obj.move(pacman.obj.vec_x*PACMAN_SPEED, pacman.obj.vec_y*PACMAN_SPEED)
+        pacman.obj.move(pacman.obj.vec_x * PACMAN_SPEED, pacman.obj.vec_y * PACMAN_SPEED)
         pacman.obj.vec_x = 0
         pacman.obj.vec_y = 0
 

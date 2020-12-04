@@ -1,4 +1,4 @@
-from constants import PACMAN_SPEED, Textures, Sounds
+from constants import Textures, Sounds, PACMAN_SPEED
 from objects.image import ImageObject
 import pygame
 
