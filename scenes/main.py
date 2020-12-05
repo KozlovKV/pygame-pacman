@@ -12,7 +12,8 @@ from scenes import BaseScene
 
 
 class MainScene(BaseScene):
-    TICKS_TO_REVIVE = 60
+    TICKS_TO_REVIVE = 40
+    TICKS_TO_DEATH_SOUND = 30
     BORDER_SIZE = 2
     BARS_Y = 50
 
@@ -26,6 +27,8 @@ class MainScene(BaseScene):
         self.played_seconds = 0
 
         self.lives = 3
+
+        self.death_music_timer = 0
 
         self.revivings_pause_ticks = self.TICKS_TO_REVIVE
 
@@ -87,6 +90,8 @@ class MainScene(BaseScene):
     def process_logic(self) -> None:
         if self.paused:
             self.last_timer = datetime.datetime.now()
+        elif self.death_music_timer > 0:
+            self.death_music_timer -= 1
         elif self.revivings_pause_ticks > 0:
             self.revivings_pause_ticks -= 1
             self.ready_bar.rect.y = self.BARS_Y
@@ -97,6 +102,7 @@ class MainScene(BaseScene):
             self.ready_bar.rect.y = -self.BARS_Y
             self.go_bar.rect.y = self.BARS_Y
         else:
+            self.pacmans_reviving()
             super(MainScene, self).process_logic()
 
     def additional_logic(self) -> None:
@@ -112,8 +118,6 @@ class MainScene(BaseScene):
         self.score_bar.update_text(f'SCORE: {self.game.score}')
 
         self.lives_bar.update_text(f'LIVES: {self.lives}')
-
-        self.pacmans_reviving()
 
         if self.is_win():
             self.end_game(True)
@@ -158,7 +162,7 @@ class MainScene(BaseScene):
         self.__init__(self.game)
         self.music_reload()
 
-    def music_reload(self):
+    def music_reload(self, ):
         Sounds.SIREN.stop()
         Sounds.BEGINING.play()
         Sounds.SIREN.play(-1, fade_ms=50000)
@@ -167,7 +171,7 @@ class MainScene(BaseScene):
         Sounds.SIREN.stop()
 
     def process_event(self, event: pygame.event.Event) -> None:
-        if self.revivings_pause_ticks == -1:
+        if self.revivings_pause_ticks == -1 and self.death_music_timer == 0:
             if self.paused:
                 self.menu_button.process_event(event)
                 self.pause_button.process_event(event)
