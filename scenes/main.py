@@ -11,7 +11,7 @@ from scenes import BaseScene
 
 
 class MainScene(BaseScene):
-    TICKS_TO_REVIVE = 80
+    TICKS_TO_REVIVE = 60
     BARS_Y = 60
 
     def __init__(self, game):
