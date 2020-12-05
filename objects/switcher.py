@@ -19,7 +19,7 @@ class ArrowSwitcher(DrawableObject):
         self.rect = pygame.rect.Rect(x, y, width, height)
         self.text_area = TextObject(
             game,
-            'Consolas', 32, True, False,
+            'Comic Sans MS', 32, False, False,
             self.values[self.current_index],
             text_color,
             x + width // 2, y + height // 2
