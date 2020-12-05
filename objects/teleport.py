@@ -5,11 +5,11 @@ from objects.image import ImageObject
 class TeleportObject:
     KEEP_TELEPORTED_OBJECT = 30
 
-    def __init__(self, game, x1, y1, x2, y2):
+    def __init__(self, game, x1, y1, x2, y2, num):
         self.game = game
         self.points = [
-            ImageObject(self.game, x=x1, y=y1, animation=Textures.TELEPORT),
-            ImageObject(self.game, x=x2, y=y2, animation=Textures.TELEPORT),
+            ImageObject(self.game, x=x1, y=y1, animation=Textures.TELEPORT[num]),
+            ImageObject(self.game, x=x2, y=y2, animation=Textures.TELEPORT[num]),
         ]
 
         self.time_from_teleported = 0

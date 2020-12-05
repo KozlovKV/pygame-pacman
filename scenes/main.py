@@ -11,7 +11,7 @@ from scenes import BaseScene
 
 
 class MainScene(BaseScene):
-    TICKS_TO_REVIVE = 80
+    TICKS_TO_REVIVE = 60
     BARS_Y = 60
 
     def __init__(self, game):
@@ -152,7 +152,7 @@ class MainScene(BaseScene):
     def music_reload(self):
         Sounds.SIREN.stop()
         Sounds.BEGINING.play()
-        Sounds.SIREN.play(-1, fade_ms=10000)
+        Sounds.SIREN.play(-1, fade_ms=50000)
 
     def on_deactivate(self) -> None:
         Sounds.SIREN.stop()
@@ -172,7 +172,7 @@ class MainScene(BaseScene):
 
     def switch_pause(self):
         self.go_bar.rect.y *= -1
-        self.pause_bar.rect.y *= -1
+        self.pause_bar.rect.y = self.BARS_Y if self.pause_bar.rect.y < 0 else -self.BARS_Y
         self.paused = not self.paused
 
     def process_draw(self) -> None:
