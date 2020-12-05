@@ -5,7 +5,7 @@
     "mode": "score_cup",
     "coop": false,
     "field_texture": 0,
-    "1_pacman_texture": "bordered",
+    "1_pacman_texture": "ghost",
     "2_pacman_texture": "classic",
     "acceleration": true,
     "long_buffer": true,

@@ -2,6 +2,7 @@ from objects.image import ImageObject
 from queue import Queue
 from enum import Enum
 from random import choice as choose_random
+from pygame.transform import rotate as rotate_img
 from constants import *
 
 MAIN_SCENE = 3
@@ -108,22 +109,21 @@ def find_path(graph: dict, start: tuple, end: tuple, width: int, height: int) ->
 class GhostFabric:
     count: int = 0  # счётчик призраков по модулю 4
 
-    def __init__(self, game, matrix_map, respawn: bool = True):
+    def __init__(self, game, matrix_map):
         self.game = game
         self.matrix_map = matrix_map
-        self.respawn = respawn
         self.blinky = None  # сохраняет последнего Blinky для передачи в конструктор Inky
 
     def get_next(self, x: int, y: int):
         if self.count == 0:
-            ghost = Blinky(self.game, y, x, self.matrix_map, self.respawn)
+            ghost = Blinky(self.game, y, x, self.matrix_map)
             self.blinky = ghost
         elif self.count == 1:
-            ghost = Pinky(self.game, y, x, self.matrix_map, self.respawn)
+            ghost = Pinky(self.game, y, x, self.matrix_map)
         elif self.count == 2:
-            ghost = Inky(self.game, y, x, self.matrix_map, self.blinky, self.respawn)
+            ghost = Inky(self.game, y, x, self.matrix_map, self.blinky)
         else:
-            ghost = Clyde(self.game, y, x, self.matrix_map, self.respawn)
+            ghost = Clyde(self.game, y, x, self.matrix_map)
         self.count = (self.count + 1) % 4
         return ghost
 
@@ -145,9 +145,15 @@ class Ghost(ImageObject):
     is_teleporting = False  # телепортируется ли сейчас призрак, нужно для обработки движения
     teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
     active = False  # вышел ли призрак из спавна
+    deleted = False  # True когда призрак полностью удалён из игры
+    alive_animation = Textures.GHOST['alive']
+    eye_image = pygame.image.load(Textures.GHOST_EYE)
+    left_eye_pos = 10, 8   # позиция левого и правого глаза
+    right_eye_pos = 16, 8  # относительно левого верхнего угла тестуры призрака
+    eyes_angle = 0
 
     def __init__(self, game, x: int, y: int,  # x и y - номера строки и столбца клетки спавна
-                 matrix_map, respawn: bool = True):
+                 matrix_map):
         self.FIELD_POINT = (game.REAL_FIELD_X, game.REAL_FIELD_Y)
         self.level = matrix_map
         self.matrix = self.level.matrix
@@ -159,12 +165,40 @@ class Ghost(ImageObject):
         self.respawn = game.settings['mode'] != 'hunt'
         self.next_cell = (x, y)
         rx, ry = self.get_real_position(self.cell)
-        self.alive_animation = Textures.GHOST['alive']
-        self.dead_animation = Textures.GHOST['dead']
         super().__init__(game, x=rx, y=ry, animation=self.alive_animation)
         self.target = self.cell  # клетка, к которой будет пытаться двигаться призрак
         self.path = [self.target]  # путь до цели, вычисляется с помощью find_path
         self.corners = self.find_corners()
+
+    def process_draw(self) -> None:
+        if self.alive:
+            self.game.screen.blit(self.image, self.rect)
+            if self.animation is not None:
+                self.next_frame()
+        self.rotate_eyes()
+        self.game.screen.blit(self.eye_image, (self.rect.x + self.left_eye_pos[0],
+                                               self.rect.y + self.left_eye_pos[1]))
+        self.game.screen.blit(self.eye_image, (self.rect.x + self.right_eye_pos[0],
+                                               self.rect.y + self.right_eye_pos[1]))
+
+    def rotate_eyes(self) -> None:
+        if self.is_teleporting:
+            eyes_direction = (self.teleport_cells[0][0] - self.cell[0],
+                              self.teleport_cells[0][1] - self.cell[1])
+        else:
+            eyes_direction = (self.next_cell[0] - self.cell[0],
+                              self.next_cell[1] - self.cell[1])
+        if eyes_direction == (0, 1):
+            new_eyes_angle = 0
+        elif eyes_direction == (0, -1):
+            new_eyes_angle = 180
+        elif eyes_direction == (1, 0):
+            new_eyes_angle = 270
+        else:
+            new_eyes_angle = 90
+        if self.eyes_angle != new_eyes_angle:
+            self.eye_image = rotate_img(self.eye_image, new_eyes_angle - self.eyes_angle)
+            self.eyes_angle = new_eyes_angle
 
     @classmethod
     def scary_mode_on(cls) -> None:
@@ -177,6 +211,8 @@ class Ghost(ImageObject):
         self.current_ticks = self.current_ticks * self.ticks_per_cell // last_ticks_per_cell
 
     def set_spawn_pos(self) -> None:
+        if self.deleted:
+            return
         self.cell = self.get_cell(self.get_real_position(self.spawn))
         self.next_cell = self.cell
         self.set_position(*self.get_real_position(self.spawn))
@@ -239,11 +275,11 @@ class Ghost(ImageObject):
         Sounds.GHOST_DEATH.play()
         self.game.add_scores(self.score_for_kill)
         if not self.respawn:
-            del self
+            self.deleted = True
+            super().die()
             return
         self.alive = False
         self.change_speed(DEAD_GHOST_SPEED)
-        self.load_new_animation(self.dead_animation)
 
     def get_chase_target(self) -> tuple:
         return self.pacman_position()
@@ -325,7 +361,7 @@ class Ghost(ImageObject):
                 Ghost.status = Status.CHASE
 
     def process_logic(self) -> None:
-        if not self.active:
+        if not self.active or self.deleted:
             return
         if not self.alive and self.cell == self.spawn:
             self.alive = True
@@ -337,18 +373,13 @@ class Ghost(ImageObject):
             self.current_pacman = choose_random(self.pacmans)
         self.process_movement()
 
-    def process_draw(self) -> None:
-        super().process_draw()
-        if not self.alive:
-            self.game.screen.blit(self.image, self.rect)
-
 
 class Blinky(Ghost):
     """Целевой клеткой всегда является пакман, даже в режиме разбегания.
     Красного цвета."""
 
-    def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
-        super().__init__(game, x, y, matrix_map, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map):
+        super().__init__(game, x, y, matrix_map)
 
     @staticmethod
     def target_is_corner() -> bool:
@@ -364,8 +395,8 @@ class Pinky(Ghost):
 
     target_coeff = 4  # коэффициент, на который целевая клетка дальше пакмана
 
-    def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
-        super().__init__(game, x, y, matrix_map, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map):
+        super().__init__(game, x, y, matrix_map)
 
     def get_chase_target(self) -> tuple:
         pacman_pos = self.pacman_position()
@@ -389,8 +420,8 @@ class Inky(Ghost):
 
     target_coeff = 2  # коэффициент, на который целевая клетка дальше пакмана
 
-    def __init__(self, game, x: int, y: int, matrix_map, blinky: Ghost = None, respawn: bool = True):
-        super().__init__(game, x, y, matrix_map, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map, blinky: Ghost = None):
+        super().__init__(game, x, y, matrix_map)
         self.blinky = blinky
 
     def get_chase_target(self) -> tuple:
@@ -423,8 +454,8 @@ class Clyde(Ghost):
     Начинает погоню только после того, как пакман съест 1/3 всех точек.
     Оранжевого цвета."""
 
-    def __init__(self, game, x: int, y: int, matrix_map, respawn: bool = True):
-        super().__init__(game, x, y, matrix_map, respawn)
+    def __init__(self, game, x: int, y: int, matrix_map):
+        super().__init__(game, x, y, matrix_map)
         self.next_corner = choose_random(self.corners)  # следующий угол, в который пойдёт Клайд
 
     def get_chase_target(self) -> tuple:
