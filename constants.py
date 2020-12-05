@@ -53,9 +53,18 @@ class Textures:
         'inverted': (AnimationPreset(6, MAIN_FOLDER + 'pacman/inverted/[F].png'), True),
         'ghost': (AnimationPreset(6, MAIN_FOLDER + 'pacman/ghost_like/[F].png'), False),
     }
-    GHOST = {
-        'alive': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/alive/[F].png'),
-        'dead': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/dead/[F].png')
+    SIMPLE_GHOST = {
+        'body': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/body/[F].png'),
+        'simple_core': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/simple_core/[F].png'),
+        'scared_core': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/scared_core/[F].png'),
+    }
+    GHOST_COLORS = {
+        'black': AnimationPreset(3, MAIN_FOLDER + 'ghost/colors/black/[F].png'),
+        'blue': AnimationPreset(3, MAIN_FOLDER + 'ghost/colors/blue/[F].png'),
+        'green': AnimationPreset(3, MAIN_FOLDER + 'ghost/colors/green/[F].png'),
+        'purple': AnimationPreset(3, MAIN_FOLDER + 'ghost/colors/purple/[F].png'),
+        'red': AnimationPreset(3, MAIN_FOLDER + 'ghost/colors/red/[F].png'),
+        'yellow': AnimationPreset(3, MAIN_FOLDER + 'ghost/colors/yellow/[F].png'),
     }
 
 
