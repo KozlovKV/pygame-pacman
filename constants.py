@@ -39,6 +39,13 @@ class Textures:
     MAIN_FOLDER = './resources/images/'
     WALL = MAIN_FOLDER + 'wall/default.png'
     WALL_GHOST_IN = MAIN_FOLDER + 'wall/ghost_in.png'
+    CELL_BG = [
+        MAIN_FOLDER + 'cell_bg/0.png',
+        MAIN_FOLDER + 'cell_bg/1.png',
+        MAIN_FOLDER + 'cell_bg/2.png',
+        MAIN_FOLDER + 'cell_bg/3.png',
+        MAIN_FOLDER + 'cell_bg/4.png',
+    ]
     SEED = MAIN_FOLDER + 'seed/0.png'
     SUPER_SEED = MAIN_FOLDER + 'super_seed/default/0.png'
     TELEPORT = [
