@@ -324,7 +324,7 @@ class MatrixMap(BaseScene):
 
     def change_pos_in_matrix(self, m_point: SimpleMatrixPoint, new_x, new_y):
         self.remove_moving_object_from_matrix(m_point)
-        if new_x > 0 and new_y > 0:
+        if new_x > 0 and new_y > 0 and new_x < self.matrix_width and new_y < self.matrix_height:
             self.matrix[new_y][new_x].update_moving_object(m_point)
             m_point.x = new_x
             m_point.y = new_y
