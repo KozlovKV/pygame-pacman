@@ -3,6 +3,7 @@ import datetime
 import pygame
 
 from constants import Color, MAIN_FONT, Sounds
+from objects.base import DrawableObject
 from objects.button import ButtonObject
 from objects.ghost import Ghost
 from objects.text import TextObject
@@ -12,7 +13,8 @@ from scenes import BaseScene
 
 class MainScene(BaseScene):
     TICKS_TO_REVIVE = 60
-    BARS_Y = 60
+    BORDER_SIZE = 2
+    BARS_Y = 50
 
     def __init__(self, game):
 
@@ -32,17 +34,25 @@ class MainScene(BaseScene):
         super().__init__(game)
 
     def create_objects(self) -> None:
-        self.score_bar = None
-        self.time_bar = None
-        self.lives_bar = None
-        self.pause_bar = None
-        self.pause_button = None
 
-        tmp_x = 20 + MAIN_FONT.size('SCORE: 0000')[0] // 2
+        self.matrix = MatrixMap(self.game)
+        self.objects.append(self.matrix)
+
+        self.info_border = DrawableObject(self.game, 0, 0,
+                                          self.game.SCREEN_WIDTH,
+                                          self.matrix.FIELD_Y,
+                                          self.game.settings[
+                                              "level_border_color"])
+        self.info_bg = DrawableObject(self.game, self.BORDER_SIZE,
+                                      self.BORDER_SIZE,
+                                      self.game.SCREEN_WIDTH - self.BORDER_SIZE * 2,
+                                      self.matrix.FIELD_Y - self.BORDER_SIZE * 2,
+                                      Color.BLACK)
+        tmp_x = self.BORDER_SIZE*5 + MAIN_FONT.size('SCORE: 0000')[0] // 2
         self.score_bar = TextObject(self.game, text='SCORE: 0', x=tmp_x, y=20)
 
         tmp_x = self.game.SCREEN_WIDTH - MAIN_FONT.size('TIME: 0000')[
-            0] // 2 - 20
+            0] // 2 - self.BORDER_SIZE*5
         self.time_bar = TextObject(self.game, text='TIME: 0', x=tmp_x, y=20)
 
         tmp_x = self.game.SCREEN_WIDTH // 2
@@ -56,13 +66,15 @@ class MainScene(BaseScene):
                                  x=tmp_x, y=self.BARS_Y, color=Color.GREEN)
 
         self.pause_button = ButtonObject(self.game,
-                                         self.game.SCREEN_WIDTH - 210, 60,
+                                         self.game.SCREEN_WIDTH - 210, self.BARS_Y,
                                          200, 40, self.switch_pause,
                                          'PAUSE', 'multi')
-        self.menu_button = ButtonObject(self.game, 10, 60, 200, 40,
+        self.menu_button = ButtonObject(self.game, 10, self.BARS_Y, 200, 40,
                                         self.game.set_menu_scene, 'TO MENU',
                                         'exit')
 
+        self.objects.append(self.info_border)
+        self.objects.append(self.info_bg)
         self.objects.append(self.score_bar)
         self.objects.append(self.time_bar)
         self.objects.append(self.lives_bar)
@@ -71,9 +83,6 @@ class MainScene(BaseScene):
         self.objects.append(self.go_bar)
         self.objects.append(self.pause_button)
         self.objects.append(self.menu_button)
-
-        self.matrix = MatrixMap(self.game)
-        self.objects.append(self.matrix)
 
     def process_logic(self) -> None:
         if self.paused:
