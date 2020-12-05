@@ -146,8 +146,16 @@ class Ghost(ImageObject):
     teleport_cells = [(-1, -1), (-1, -1)]  # координаты телепортов для случая is_teleporting == True
     active = False  # вышел ли призрак из спавна
     deleted = False  # True когда призрак полностью удалён из игры
-    alive_animation = Textures.GHOST['alive']
-    eye_image = pygame.image.load(Textures.GHOST_EYE)
+    alive_animation = Textures.SIMPLE_GHOST['body']
+    border_animation = Textures.GHOST_COLORS['black']  # border - обводка ядра
+    border_pos = 0, 0
+    simple_core_animation = Textures.SIMPLE_GHOST['simple_core']
+    frightened_core_animation = Textures.SIMPLE_GHOST['scared_core']
+    core_animation = simple_core_animation
+    simple_core_pos = 0, 1
+    frightened_core_pos = 0, -1
+    core_pos = simple_core_pos
+    eye_image = pygame.image.load(Textures.SIMPLE_GHOST['eye'])
     left_eye_pos = 10, 8   # позиция левого и правого глаза
     right_eye_pos = 16, 8  # относительно левого верхнего угла тестуры призрака
     eyes_angle = 0
@@ -172,7 +180,10 @@ class Ghost(ImageObject):
 
     def process_draw(self) -> None:
         if self.alive:
+            border_img = self.border_animation.get_next_frame()
             self.game.screen.blit(self.image, self.rect)
+            self.game.screen.blit(border_img, (self.rect.x + self.border_pos[0],
+                                               self.rect.y + self.border_pos[1]))
             if self.animation is not None:
                 self.next_frame()
         self.rotate_eyes()
@@ -180,6 +191,18 @@ class Ghost(ImageObject):
                                                self.rect.y + self.left_eye_pos[1]))
         self.game.screen.blit(self.eye_image, (self.rect.x + self.right_eye_pos[0],
                                                self.rect.y + self.right_eye_pos[1]))
+        core_img = Ghost.next_core_frame()
+        self.game.screen.blit(core_img, (self.rect.x + Ghost.core_pos[0],
+                                         self.rect.y + Ghost.core_pos[1]))
+
+    def next_border_frame(self) -> any:  # возвращает картинку обводки ядра
+        border_img = self.border_animation.get_next_frame()
+        return border_img
+
+    @classmethod
+    def next_core_frame(cls) -> any:  # возвращает картинку ядра
+        core_img = cls.core_animation.get_next_frame()
+        return core_img
 
     def rotate_eyes(self) -> None:
         if self.is_teleporting:
@@ -203,6 +226,8 @@ class Ghost(ImageObject):
     @classmethod
     def scary_mode_on(cls) -> None:
         cls.status = Status.FRIGHTENED
+        cls.core_animation = cls.frightened_core_animation
+        cls.core_pos = cls.frightened_core_pos
 
     def change_speed(self, new_speed) -> None:
         self.speed = new_speed
@@ -359,6 +384,8 @@ class Ghost(ImageObject):
             self.scatter_timer = 0
             if self.frightened_timer >= self.FRIGHTENED_TIME:
                 Ghost.status = Status.CHASE
+                Ghost.core_animation = Ghost.simple_core_animation
+                Ghost.core_pos = Ghost.simple_core_pos
 
     def process_logic(self) -> None:
         if not self.active or self.deleted:
@@ -378,6 +405,8 @@ class Blinky(Ghost):
     """Целевой клеткой всегда является пакман, даже в режиме разбегания.
     Красного цвета."""
 
+    border_animation = Textures.GHOST_COLORS['red']
+
     def __init__(self, game, x: int, y: int, matrix_map):
         super().__init__(game, x, y, matrix_map)
 
@@ -392,6 +421,8 @@ class Blinky(Ghost):
 class Pinky(Ghost):
     """Целевой клеткой является позиция на 4 клетки впереди пакмана.
     Розового цввета."""
+
+    border_animation = Textures.GHOST_COLORS['purple']
 
     target_coeff = 4  # коэффициент, на который целевая клетка дальше пакмана
 
@@ -418,6 +449,7 @@ class Inky(Ghost):
     Начинает погоню только после того, как пакман съест 30 точек.
     Синего цвета."""
 
+    border_animation = Textures.GHOST_COLORS['blue']
     target_coeff = 2  # коэффициент, на который целевая клетка дальше пакмана
 
     def __init__(self, game, x: int, y: int, matrix_map, blinky: Ghost = None):
@@ -453,6 +485,8 @@ class Clyde(Ghost):
     В остальное время находится в режиме разбегания.
     Начинает погоню только после того, как пакман съест 1/3 всех точек.
     Оранжевого цвета."""
+
+    border_animation = Textures.GHOST_COLORS['black']
 
     def __init__(self, game, x: int, y: int, matrix_map):
         super().__init__(game, x, y, matrix_map)
