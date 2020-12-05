@@ -55,6 +55,7 @@ class Textures:
     }
     SIMPLE_GHOST = {
         'body': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/body/[F].png'),
+        'eye': MAIN_FOLDER + 'ghost/default/eye.png',
         'simple_core': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/simple_core/[F].png'),
         'scared_core': AnimationPreset(4, MAIN_FOLDER + 'ghost/default/scared_core/[F].png'),
     }
