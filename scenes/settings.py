@@ -164,6 +164,6 @@ class SettingsScene(BaseScene):
         self.game.settings['field_texture'] = int(
             self.background_config.get_current_value().split(': ')[1].split('/')[0])
         self.game.settings['cell_texture'] = int(
-            self.background_config.get_current_value().split(': ')[1].split('/')[0])
+            self.cell_config.get_current_value().split(': ')[1].split('/')[0])
         self.game.settings['long_buffer'] = \
             self.long_buffer_config.get_current_value().split(': ')[1] == 'True'

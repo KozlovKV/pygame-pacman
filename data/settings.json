@@ -6,7 +6,7 @@
     "mode": "hunt",
     "coop": false,
     "field_texture": 0,
-    "cell_texture": 4,
+    "cell_texture": 2,
     "1_pacman_texture": "ghost",
     "2_pacman_texture": "classic",
     "acceleration": true,
