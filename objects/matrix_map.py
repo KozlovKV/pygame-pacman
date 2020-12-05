@@ -146,7 +146,7 @@ class MatrixMap(BaseScene):
                     wall = ImageObject(self.game,
                                        x=real_field_x + x * CELL_SIZE,
                                        y=real_field_y + y * CELL_SIZE,
-                                       filename=Textures.CELL_BG[0])
+                                       filename=Textures.CELL_BG[self.game.settings['cell_texture']])
                     # Добавление матричной точки стены
                     self.bg_walls.append(wall)
                 if object_char == '#':

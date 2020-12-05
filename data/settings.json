@@ -1,16 +1,16 @@
 {
     "lvl_count": 2,
     "lvl_skin": 1,
-    "cell_skin": 1,
+    "cell_skin": 5,
     "level": 0,
-    "mode": "survival",
+    "mode": "hunt",
     "coop": false,
     "field_texture": 0,
-    "cell_texture": 0,
+    "cell_texture": 4,
     "1_pacman_texture": "ghost",
     "2_pacman_texture": "classic",
     "acceleration": true,
-    "long_buffer": false,
+    "long_buffer": true,
     "play_btn_style": {
         "bg_color": [
             0,
