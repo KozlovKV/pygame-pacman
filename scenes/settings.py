@@ -81,7 +81,7 @@ class SettingsScene(BaseScene):
                                                 Color.WHITE, Color.BLUE,
                                                 0, *self.settings_6))
         self.cell_config = (ArrowSwitcher(self.game,
-                                          x, 370,
+                                          x, 430,
                                           self.SWITCHER_WIDTH,
                                           self.SWITCHER_HEIGHT,
                                           Color.WHITE, Color.PURPLE,
@@ -99,6 +99,7 @@ class SettingsScene(BaseScene):
             self.pacman1_config,
             self.pacman2_config,
             self.background_config,
+            self.cell_config,
             self.long_buffer_config,
         ]
         self.objects += self.configs
