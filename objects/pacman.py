@@ -98,10 +98,10 @@ class Pacman(ImageObject):
         self.move(x, y)
 
     def die(self):
-        # anim = Textures.PACMAN[self.game.settings['pacman_texture']+'_die']
-        # self.load_new_animation(anim)
         self.alive = False
         Sounds.PACMAN_DEATH.play()
+        scene = self.game.scenes[self.game.current_scene_index]
+        scene.death_music_timer = scene.TICKS_TO_DEATH_SOUND
 
     def revive(self):
         self.set_position(*self.spawn)

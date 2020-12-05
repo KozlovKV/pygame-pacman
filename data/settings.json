@@ -1,10 +1,12 @@
 {
     "lvl_count": 2,
     "lvl_skin": 1,
+    "cell_skin": 5,
     "level": 0,
-    "mode": "score_cup",
+    "mode": "hunt",
     "coop": false,
     "field_texture": 0,
+    "cell_texture": 2,
     "1_pacman_texture": "ghost",
     "2_pacman_texture": "classic",
     "acceleration": true,
@@ -46,7 +48,7 @@
             51,
             255
         ],
-        "font": "Consolas",
+        "font": "Comic Sans MS",
         "font_size": 32,
         "font_bold": true,
         "font_italic": false
@@ -130,7 +132,7 @@
             51,
             255
         ],
-        "font": "Consolas",
+        "font": "Comic Sans MS",
         "font_size": 32,
         "font_bold": true,
         "font_italic": false

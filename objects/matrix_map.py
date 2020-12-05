@@ -84,6 +84,7 @@ class MatrixMap(BaseScene):
         self.ghosts = []
         self.seeds = []
         self.super_seeds = []
+        self.bg_walls = []
         self.walls = []
         self.walls_ghosts_in = []
         self.teleports = []
@@ -141,6 +142,13 @@ class MatrixMap(BaseScene):
             for x in range(self.matrix_width):
                 self.matrix[y].append(MatrixMultiPoint(x, y))
                 object_char = level_objects_list[y][x]
+                if object_char != '#' and object_char != '+':
+                    wall = ImageObject(self.game,
+                                       x=real_field_x + x * CELL_SIZE,
+                                       y=real_field_y + y * CELL_SIZE,
+                                       filename=Textures.CELL_BG[self.game.settings['cell_texture']])
+                    # Добавление матричной точки стены
+                    self.bg_walls.append(wall)
                 if object_char == '#':
                     wall = ImageObject(self.game,
                                        x=real_field_x + x * CELL_SIZE,
@@ -359,6 +367,7 @@ class MatrixMap(BaseScene):
             self.field.process_draw()
             [wall.process_draw() for wall in self.walls]
             [wall.process_draw() for wall in self.walls_ghosts_in]
+            [bg_wall.process_draw() for bg_wall in self.bg_walls]
             [seed.process_draw() for seed in self.seeds]
             [super_seed.process_draw() for super_seed in self.super_seeds]
             # self.first = False

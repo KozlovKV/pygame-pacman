@@ -3,6 +3,7 @@ import datetime
 import pygame
 
 from constants import Color, MAIN_FONT, Sounds
+from objects.base import DrawableObject
 from objects.button import ButtonObject
 from objects.ghost import Ghost
 from objects.text import TextObject
@@ -11,8 +12,10 @@ from scenes import BaseScene
 
 
 class MainScene(BaseScene):
-    TICKS_TO_REVIVE = 60
-    BARS_Y = 60
+    TICKS_TO_REVIVE = 40
+    TICKS_TO_DEATH_SOUND = 30
+    BORDER_SIZE = 2
+    BARS_Y = 50
 
     def __init__(self, game):
 
@@ -25,6 +28,8 @@ class MainScene(BaseScene):
 
         self.lives = 3
 
+        self.death_music_timer = 0
+
         self.revivings_pause_ticks = self.TICKS_TO_REVIVE
 
         self.paused = False
@@ -32,17 +37,25 @@ class MainScene(BaseScene):
         super().__init__(game)
 
     def create_objects(self) -> None:
-        self.score_bar = None
-        self.time_bar = None
-        self.lives_bar = None
-        self.pause_bar = None
-        self.pause_button = None
 
-        tmp_x = 20 + MAIN_FONT.size('SCORE: 0000')[0] // 2
+        self.matrix = MatrixMap(self.game)
+        self.objects.append(self.matrix)
+
+        self.info_border = DrawableObject(self.game, 0, 0,
+                                          self.game.SCREEN_WIDTH,
+                                          self.matrix.FIELD_Y,
+                                          self.game.settings[
+                                              "level_border_color"])
+        self.info_bg = DrawableObject(self.game, self.BORDER_SIZE,
+                                      self.BORDER_SIZE,
+                                      self.game.SCREEN_WIDTH - self.BORDER_SIZE * 2,
+                                      self.matrix.FIELD_Y - self.BORDER_SIZE * 2,
+                                      Color.BLACK)
+        tmp_x = self.BORDER_SIZE*5 + MAIN_FONT.size('SCORE: 0000')[0] // 2
         self.score_bar = TextObject(self.game, text='SCORE: 0', x=tmp_x, y=20)
 
         tmp_x = self.game.SCREEN_WIDTH - MAIN_FONT.size('TIME: 0000')[
-            0] // 2 - 20
+            0] // 2 - self.BORDER_SIZE*5
         self.time_bar = TextObject(self.game, text='TIME: 0', x=tmp_x, y=20)
 
         tmp_x = self.game.SCREEN_WIDTH // 2
@@ -56,13 +69,15 @@ class MainScene(BaseScene):
                                  x=tmp_x, y=self.BARS_Y, color=Color.GREEN)
 
         self.pause_button = ButtonObject(self.game,
-                                         self.game.SCREEN_WIDTH - 210, 60,
+                                         self.game.SCREEN_WIDTH - 210, self.BARS_Y,
                                          200, 40, self.switch_pause,
                                          'PAUSE', 'multi')
-        self.menu_button = ButtonObject(self.game, 10, 60, 200, 40,
+        self.menu_button = ButtonObject(self.game, 10, self.BARS_Y, 200, 40,
                                         self.game.set_menu_scene, 'TO MENU',
                                         'exit')
 
+        self.objects.append(self.info_border)
+        self.objects.append(self.info_bg)
         self.objects.append(self.score_bar)
         self.objects.append(self.time_bar)
         self.objects.append(self.lives_bar)
@@ -72,12 +87,11 @@ class MainScene(BaseScene):
         self.objects.append(self.pause_button)
         self.objects.append(self.menu_button)
 
-        self.matrix = MatrixMap(self.game)
-        self.objects.append(self.matrix)
-
     def process_logic(self) -> None:
         if self.paused:
             self.last_timer = datetime.datetime.now()
+        elif self.death_music_timer > 0:
+            self.death_music_timer -= 1
         elif self.revivings_pause_ticks > 0:
             self.revivings_pause_ticks -= 1
             self.ready_bar.rect.y = self.BARS_Y
@@ -88,6 +102,7 @@ class MainScene(BaseScene):
             self.ready_bar.rect.y = -self.BARS_Y
             self.go_bar.rect.y = self.BARS_Y
         else:
+            self.pacmans_reviving()
             super(MainScene, self).process_logic()
 
     def additional_logic(self) -> None:
@@ -103,8 +118,6 @@ class MainScene(BaseScene):
         self.score_bar.update_text(f'SCORE: {self.game.score}')
 
         self.lives_bar.update_text(f'LIVES: {self.lives}')
-
-        self.pacmans_reviving()
 
         if self.is_win():
             self.end_game(True)
@@ -149,7 +162,7 @@ class MainScene(BaseScene):
         self.__init__(self.game)
         self.music_reload()
 
-    def music_reload(self):
+    def music_reload(self, ):
         Sounds.SIREN.stop()
         Sounds.BEGINING.play()
         Sounds.SIREN.play(-1, fade_ms=50000)
@@ -158,7 +171,7 @@ class MainScene(BaseScene):
         Sounds.SIREN.stop()
 
     def process_event(self, event: pygame.event.Event) -> None:
-        if self.revivings_pause_ticks == -1:
+        if self.revivings_pause_ticks == -1 and self.death_music_timer == 0:
             if self.paused:
                 self.menu_button.process_event(event)
                 self.pause_button.process_event(event)

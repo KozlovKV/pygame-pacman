@@ -27,7 +27,8 @@ class SettingsScene(BaseScene):
 
         self.lvl_count = int(self.game.settings['lvl_count'])
         self.lvl_skin = int(self.game.settings['lvl_skin'])
-        self.settings_1 = ["Level: " + (str(i) + "/" + str(self.lvl_count-1)) for i in range(self.lvl_count)]
+        self.cell_skin = int(self.game.settings['cell_skin'])
+        self.settings_1 = ["Level: " + (str(i) + "/" + str(self.lvl_count - 1)) for i in range(self.lvl_count)]
         self.settings_2 = ['Mode: score_cup', 'Mode: survival', 'Mode: hunt']
         self.settings_3 = ['Coop: False', 'Coop: True']
         self.settings_4 = ['First Pacman skin: classic',
@@ -38,8 +39,9 @@ class SettingsScene(BaseScene):
                            'Second Pacman skin: bordered',
                            'Second Pacman skin: inverted',
                            'Second Pacman skin: ghost', ]
-        self.settings_6 = ['Level texture: ' + (str(i) + "/" + str(self.lvl_skin-1)) for i in range(self.lvl_skin)]
-        self.settings_7 = ['Long turn buffer: True', 'Long turn buffer: False']
+        self.settings_6 = ['Level texture: ' + (str(i) + "/" + str(self.lvl_skin - 1)) for i in range(self.lvl_skin)]
+        self.settings_7 = ['Cell texture: ' + (str(i) + "/" + str(self.cell_skin - 1)) for i in range(self.cell_skin)]
+        self.settings_8 = ['Long turn buffer: True', 'Long turn buffer: False']
 
         x = (self.game.SCREEN_WIDTH - self.SWITCHER_WIDTH) / 2
         self.lvl_config = (ArrowSwitcher(self.game,
@@ -78,12 +80,18 @@ class SettingsScene(BaseScene):
                                                 self.SWITCHER_HEIGHT,
                                                 Color.WHITE, Color.BLUE,
                                                 0, *self.settings_6))
+        self.cell_config = (ArrowSwitcher(self.game,
+                                          x, 430,
+                                          self.SWITCHER_WIDTH,
+                                          self.SWITCHER_HEIGHT,
+                                          Color.WHITE, Color.PURPLE,
+                                          0, *self.settings_7))
         self.long_buffer_config = (ArrowSwitcher(self.game,
-                                                 x, 430,
+                                                 x, 490,
                                                  self.SWITCHER_WIDTH,
                                                  self.SWITCHER_HEIGHT,
-                                                 Color.WHITE, Color.PURPLE,
-                                                 0, *self.settings_7))
+                                                 Color.WHITE, Color.GREY,
+                                                 0, *self.settings_8))
         self.configs = [
             self.lvl_config,
             self.mode_config,
@@ -91,14 +99,15 @@ class SettingsScene(BaseScene):
             self.pacman1_config,
             self.pacman2_config,
             self.background_config,
+            self.cell_config,
             self.long_buffer_config,
         ]
         self.objects += self.configs
         self.objects.append(
-            ButtonObject(self.game, x, 490, self.SWITCHER_WIDTH, 40,
+            ButtonObject(self.game, x, 550, self.SWITCHER_WIDTH, 40,
                          self.game.set_menu_scene, 'SAVE AND RETURN', 'exit'))
         self.objects.append(
-            ButtonObject(self.game, x, 550, self.SWITCHER_WIDTH, 40,
+            ButtonObject(self.game, x, 610, self.SWITCHER_WIDTH, 40,
                          self.quit_without_saving, 'RETURN', 'exit'))
         self.objects.append(TextObject(self.game, text='SETTINGS',
                                        font_size=50,
@@ -121,11 +130,12 @@ class SettingsScene(BaseScene):
             [item.split(': ')[1] for item in self.settings_4],
             [item.split(': ')[1] for item in self.settings_5],
             [item.split(': ')[1].split('/')[0] for item in self.settings_6],
+            [item.split(': ')[1].split('/')[0] for item in self.settings_7],
             [item.split(': ')[1] for item in self.settings_7],
         ]
         settings_names = ['level', 'mode', 'coop',
                           '1_pacman_texture', '2_pacman_texture',
-                          'field_texture', 'long_buffer']
+                          'field_texture', 'cell_texture', 'long_buffer']
         for conf_i in range(len(settings_f_list)):
             values = settings_f_list[conf_i]
             value_in_game_settings = self.game.settings[settings_names[conf_i]]
@@ -153,5 +163,7 @@ class SettingsScene(BaseScene):
             self.pacman2_config.get_current_value().split(': ')[1]
         self.game.settings['field_texture'] = int(
             self.background_config.get_current_value().split(': ')[1].split('/')[0])
+        self.game.settings['cell_texture'] = int(
+            self.cell_config.get_current_value().split(': ')[1].split('/')[0])
         self.game.settings['long_buffer'] = \
             self.long_buffer_config.get_current_value().split(': ')[1] == 'True'

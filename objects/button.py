@@ -15,8 +15,8 @@ class ButtonObject(DrawableObject):
                  button_type: str = 'multi',
                  color: pygame.color.Color = None) -> None:
         super().__init__(game)
-        if color is None:
-            color = self.game.settings[button_type + '_btn_style']["bg_color"]
+        # if color is None:
+        #     color = self.game.settings[button_type + '_btn_style']["bg_color"]
         button_style = {
             "hover_color": self.game.settings[button_type + '_btn_style']["hover_color"],
             "clicked_color": self.game.settings[button_type + '_btn_style']["clicked_color"],
@@ -28,7 +28,7 @@ class ButtonObject(DrawableObject):
                                         self.game.settings[button_type + '_btn_style']["font_bold"],
                                         self.game.settings[button_type + '_btn_style']["font_italic"], )
         }
-        self.color = color if color else Color.WHITE
+        self.color = color if color else self.game.settings[button_type + '_btn_style']["bg_color"]
         self.function = function if function else ButtonObject.no_action
         self.text = text
         self.rect = pygame.rect.Rect(x, y, width, height)
