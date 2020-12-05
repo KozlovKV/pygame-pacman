@@ -27,11 +27,6 @@ class TestScene(BaseScene):
                          self.next_img, 'NEXT'),
         ]
         self.objects += self.scene_buttons
-        self.draw_obj = DrawableObject(self.game, 500, 500, 50, 50)
-        self.objects.append(self.draw_obj)
-        self.img_obj = ImageObject(self.game, x=600, y=500,
-                                   animation=Textures.TELEPORT)
-        self.objects.append(self.img_obj)
 
     def on_activate(self) -> None:
         Sounds.BEGINING.play()

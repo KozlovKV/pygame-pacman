@@ -68,7 +68,7 @@ def wall_collision_check(pacman: SimpleMatrixPoint, wall: SimpleMatrixPoint):
 class MatrixMap(BaseScene):
     BORDER_SIZE = 5
     FIELD_POINT = FIELD_X, FIELD_Y = 0, 100  # Координаты отсчёта для обрамления и расположения поля игры
-    GHOST_ACTIVATION_CD = 2000
+    GHOST_ACTIVATION_CD = 1000
 
     def __init__(self, game):
         self.first = True
@@ -191,7 +191,7 @@ class MatrixMap(BaseScene):
                     pacman = SimpleMatrixPoint(x, y, 'pacman', pacman)
                     self.pacmans.append(pacman)
                     self.matrix[y][x].update_moving_object(pacman)
-                elif '0' <= object_char <= '9':
+                elif '0' <= object_char <= '3':
                     i = int(object_char)
                     teleports_pairs[i].append((x, y))
                     if len(teleports_pairs[i]) == 2:
@@ -202,7 +202,8 @@ class MatrixMap(BaseScene):
                                                   real_field_x + x1 * CELL_SIZE,
                                                   real_field_y + y1 * CELL_SIZE,
                                                   real_field_x + x2 * CELL_SIZE,
-                                                  real_field_y + y2 * CELL_SIZE)
+                                                  real_field_y + y2 * CELL_SIZE,
+                                                  int(object_char))
                         teleport1 = SimpleMatrixPoint(x1, y1, 'teleport',
                                                       teleport)
                         self.matrix[y1][x1].update_static_object(teleport1)

@@ -41,7 +41,12 @@ class Textures:
     WALL_GHOST_IN = MAIN_FOLDER + 'wall/ghost_in.png'
     SEED = MAIN_FOLDER + 'seed/0.png'
     SUPER_SEED = MAIN_FOLDER + 'super_seed/default/0.png'
-    TELEPORT = AnimationPreset(4, MAIN_FOLDER + 'teleport/[F].png')
+    TELEPORT = [
+        AnimationPreset(4, MAIN_FOLDER + 'teleport/blue/[F].png'),
+        AnimationPreset(4, MAIN_FOLDER + 'teleport/green/[F].png'),
+        AnimationPreset(4, MAIN_FOLDER + 'teleport/red/[F].png'),
+        AnimationPreset(4, MAIN_FOLDER + 'teleport/yellow/[F].png'),
+    ]
     PACMAN = {
         'classic': (AnimationPreset(6, MAIN_FOLDER + 'pacman/classic/[F].png'), True),
         'bordered': (AnimationPreset(6, MAIN_FOLDER + 'pacman/bordered/[F].png'), True),
