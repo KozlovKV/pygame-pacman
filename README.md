@@ -1,40 +1,22 @@
-<h1>Project Pac-man (pygame)</h1>
+# Project Pac-man (pygame)
 
-<div>
-    <h2>Description</h2>
-    <p>This is simple version of Pac-man arcade game developed on Python Pygame</p>
-    <h3>Features</h3>
-    <ul>
-        <li>Feature 1</li>
-        <li>Feature 2</li>
-        <li>Feature 3</li>
-    </ul>
-    <hr>
-    <br>
-</div>
+## Description
+This is simple version of Pac-man arcade game developed on Python Pygame
+### Features
+- Co-op (WASD + arrows)
+- Different skins for Pac-man, background, new skins for the ghosts and teleports
+- 3 game modes:
+  1. Score cup (classic)
+  2. Hunt (to win kill all ghosts)
+  3. Survival (**impossible to win!!!**)
+- New maps and simple map creation method ([guide](/resources/levels/how_to_do.txt))
 
-<div>
-    <h2>Tech stack</h2>
-    <ul>
-        <li>Python packages:
-        <ul>
-            <li>Pygame</li>
-        </ul></li>
-        <li>IDE:
-        <ul>
-            <li>PyCharm</li>
-        </ul></li>
-    </ul>
-    <hr>
-    <br>
-</div>
+## Tech stack
+1. Python packages:
+   - Pygame
+2. IDE:
+   - PyCharm
 
-<div>
-    <h2>3d party sources</h2>
-    <ul>
-        <li>[Button](https://nisnom.com/veb-razrabotki/6-stilnyh-hoverov-dlya-knopok/#more-1718)</li>
-        <li>[Origin](https://gitlab.informatics.ru/2020-2021/online/s101/group-04/pacman-1/pacman)(Made in the school)</li>
-    </ul>
-    <hr>
-    <br>
-</div>
+## 3d party sources</h2>
+- [Button](https://github.com/Mekire/pygame-button) (by @Mekire)
+- [Origin](https://gitlab.informatics.ru/2020-2021/online/s101/group-04/pacman-1/pacman) (Made in the school)
