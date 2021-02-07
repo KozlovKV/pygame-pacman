@@ -1,24 +1,40 @@
-# Проект "DEFINE ME"
+<h1>Project Pac-man (pygame)</h1>
 
-### Цель
-DEFINE ME
+<div>
+    <h2>Description</h2>
+    <p>This is simple version of Pac-man arcade game developed on Python Pygame</p>
+    <h3>Features</h3>
+    <ul>
+        <li>Feature 1</li>
+        <li>Feature 2</li>
+        <li>Feature 3</li>
+    </ul>
+    <hr>
+    <br>
+</div>
 
-### Технологический стек:
-- python 3.6
-- pygame 1.9+
+<div>
+    <h2>Tech stack</h2>
+    <ul>
+        <li>Python packages:
+        <ul>
+            <li>Pygame</li>
+        </ul></li>
+        <li>IDE:
+        <ul>
+            <li>PyCharm</li>
+        </ul></li>
+    </ul>
+    <hr>
+    <br>
+</div>
 
-### Инструкция по настройке проекта:
-1. Склонировать проект
-2. Открыть проект в PyCharm с наcтройками по умолчанию
-3. Создать виртуальное окружение (через settings -> project "DEFINE ME" -> project interpreter)
-4. Открыть терминал в PyCharm
-5. **Проверить, что виртуальное окружение активировано**.
-6. Обновить pip:
-    ```bash
-    pip install --upgrade pip
-    ```
-7. Установить в виртуальное окружение необходимые пакеты: 
-    ```bash
-    pip install -r requirements.txt
-    ```
-8. Создать конфигурацию запуска в PyCharm (файл `run.py`)
+<div>
+    <h2>3d party sources</h2>
+    <ul>
+        <li>[Button](https://nisnom.com/veb-razrabotki/6-stilnyh-hoverov-dlya-knopok/#more-1718)</li>
+        <li>[Origin](https://gitlab.informatics.ru/2020-2021/online/s101/group-04/pacman-1/pacman)(Made in the school)</li>
+    </ul>
+    <hr>
+    <br>
+</div>
