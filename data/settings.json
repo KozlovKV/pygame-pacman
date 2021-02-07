@@ -6,7 +6,7 @@
     "mode": "score_cup",
     "coop": false,
     "field_texture": 0,
-    "cell_texture": 4,
+    "cell_texture": 0,
     "1_pacman_texture": "classic",
     "2_pacman_texture": "ghost",
     "acceleration": true,
