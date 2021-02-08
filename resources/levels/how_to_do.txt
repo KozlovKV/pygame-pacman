@@ -1,15 +1,15 @@
-Формат:
-W: ширина
-H: высота
+Format:
+W: <width>
+H: <height>
 . . .
-. . .  - ячейки поля
+. . .  - field's cells
 . . .
 
-Условные обозначения:
-# - стена
-P - спавн первого Пакмана
-p - спавн второго Пакмана
-G - точки спавна призраков
-_ - пустая клетка (во всех режимах кроме выживания заполняется зёрнами)
-S - супер зерно
-1-9 - точки телепортов (для работы нужна ровно пара)
+Reference designation:
+# - wall
+P - 1st player spawn
+p - 2nd player spawn
+G - ghosts spawn points
+_ - empty cell (not survival: filling seeds)
+S - super-seed
+1-9 - teleports (pair of numbers - for correct work must be left-right or up-down destination)
